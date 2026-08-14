@@ -23,6 +23,8 @@ const config: ExpoConfig = {
       NSLocationAlwaysAndWhenInUseUsageDescription:
         'Shubh uses your location only to compute local sunrise and today’s sky windows.',
       NSMicrophoneUsageDescription: micPermission,
+      NSUserNotificationsUsageDescription:
+        'Shubh sends a local reminder for the next festival. No account.',
     },
     privacyManifests: {
       NSPrivacyCollectedDataTypes: [
@@ -52,7 +54,7 @@ const config: ExpoConfig = {
       monochromeImage: './assets/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
-    permissions: ['ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION', 'RECORD_AUDIO'],
+    permissions: ['ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION', 'RECORD_AUDIO', 'POST_NOTIFICATIONS'],
   },
   plugins: [
     [
@@ -70,6 +72,12 @@ const config: ExpoConfig = {
         microphonePermission: micPermission,
       },
     ],
+    [
+      'expo-notifications',
+      {
+        icon: './assets/icon.png',
+      },
+    ],
   ],
   extra: {
     eas: {
@@ -78,6 +86,8 @@ const config: ExpoConfig = {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? '',
     REVENUECAT_API_KEY:
       process.env.REVENUECAT_API_KEY ?? process.env.EXPO_PUBLIC_REVENUECAT_API_KEY ?? '',
+    TATHAASTU_API_KEY: process.env.TATHAASTU_API_KEY ?? '',
+    TATHAASTU_PROXY_URL: process.env.TATHAASTU_PROXY_URL ?? '',
   },
 };
 

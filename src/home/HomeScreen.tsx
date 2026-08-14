@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
+import { AlmanacDock, type AlmanacTab } from '../almanac/AlmanacDock';
+import { AlmanacHost } from '../almanac/AlmanacHost';
 import { AskFAB, AskSheet } from '../ask';
 import { useCredits } from '../billing';
 import { getSkyState, type SkyState } from '../engine';
@@ -34,6 +36,7 @@ export function HomeScreen() {
   const [now, setNow] = useState(() => new Date());
   const [searchOpen, setSearchOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
+  const [almanac, setAlmanac] = useState<AlmanacTab | null>(null);
 
   useEffect(() => {
     const tick = setInterval(() => setNow(new Date()), 1000);
@@ -114,6 +117,7 @@ export function HomeScreen() {
               <Text style={styles.rule}>{copy.startingSomethingNew}</Text>
             </View>
             <View style={styles.dock}>
+              <AlmanacDock copy={copy} onOpen={setAlmanac} />
               <AskFAB
                 remaining={credits.remaining}
                 language={language}
@@ -140,6 +144,14 @@ export function HomeScreen() {
         )}
 
         <Text style={styles.privacy}>{copy.privacyLocation}</Text>
+
+        <AlmanacHost
+          tab={almanac}
+          onClose={() => setAlmanac(null)}
+          city={place.city}
+          language={language}
+          copy={copy}
+        />
 
         <CitySearch
           visible={searchOpen}

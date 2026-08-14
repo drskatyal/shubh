@@ -1,6 +1,25 @@
 import type { StartSomethingState, WindowKind } from '../engine';
+import type { FinderEvent } from '../tathaastu/types';
 
 export type Language = 'hi' | 'en';
+
+export type AlmanacCopy = {
+  muhurat: string;
+  festivals: string;
+  calendar: string;
+  close: string;
+  share: string;
+  score: string;
+  reason: string;
+  upcoming: string;
+  whyThisDate: string;
+  usingFixtures: string;
+  liveNeedsKey: string;
+  noDates: string;
+  daySummary: string;
+  events: Record<FinderEvent, string>;
+  weekdays: [string, string, string, string, string, string, string];
+};
 
 export type Copy = {
   appName: string;
@@ -23,6 +42,7 @@ export type Copy = {
   micSlot: string;
   privacyLocation: string;
   windows: Record<WindowKind, string>;
+  almanac: AlmanacCopy;
 };
 
 export const STRINGS: Record<Language, Copy> = {
@@ -59,6 +79,29 @@ export const STRINGS: Record<Language, Copy> = {
       kaal: 'Kaal',
       rog: 'Rog',
     },
+    almanac: {
+      muhurat: 'Muhurat',
+      festivals: 'Festivals',
+      calendar: 'Calendar',
+      close: 'Close',
+      share: 'Share',
+      score: 'Score',
+      reason: 'Why',
+      upcoming: 'Upcoming',
+      whyThisDate: 'Why this date?',
+      usingFixtures: 'Live panchang needs a key. Showing fixtures.',
+      liveNeedsKey: 'Live panchang needs a key / plan.',
+      noDates: 'No ranked dates in this range.',
+      daySummary: 'This day',
+      events: {
+        marriage: 'Marriage',
+        griha_pravesh: 'Housewarming',
+        vehicle_purchase: 'Vehicle',
+        business_start: 'Business',
+        naming: 'Naming',
+      },
+      weekdays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+    },
   },
   hi: {
     appName: 'शुभ',
@@ -92,6 +135,29 @@ export const STRINGS: Record<Language, Copy> = {
       udveg: 'उद्वेग',
       kaal: 'काल',
       rog: 'रोग',
+    },
+    almanac: {
+      muhurat: 'मुहूर्त',
+      festivals: 'त्योहार',
+      calendar: 'पंचांग',
+      close: 'बंद',
+      share: 'शेयर',
+      score: 'अंक',
+      reason: 'कारण',
+      upcoming: 'आने वाले',
+      whyThisDate: 'यह तारीख क्यों?',
+      usingFixtures: 'लाइव पंचांग के लिए कुंजी चाहिए। नमूना दिख रहा है।',
+      liveNeedsKey: 'लाइव पंचांग के लिए कुंजी / प्लान चाहिए।',
+      noDates: 'इस अवधि में कोई अच्छी तारीख नहीं मिली।',
+      daySummary: 'यह दिन',
+      events: {
+        marriage: 'विवाह',
+        griha_pravesh: 'गृह प्रवेश',
+        vehicle_purchase: 'वाहन',
+        business_start: 'व्यवसाय',
+        naming: 'नामकरण',
+      },
+      weekdays: ['र', 'सो', 'मं', 'बु', 'गु', 'शु', 'श'],
     },
   },
 };
