@@ -8,7 +8,7 @@ The app is layered, not a tab dump: home glance → almanac (muhurat / festivals
 
 - Home glance: city, tithi, nakshatra, yoga, karana, good/avoid, Rahu, current window. Motion stays.
 - Muhurat finder, festival calendar, kundli.
-- **Matching is a first-class market**, not a side screen. Voice capture (one take) → confirm cards → Divine Ashtakoot + Manglik → shareable milan card. Optional 60-day marriage muhurat. Quiet type-on-cards fallback. Birth stays on device; audio is not stored.
+- **Matching is a first-class market**, not a side screen. Full-screen voice capture (one take, Record — no text box) → confirm cards → Divine Ashtakoot + Manglik → WhatsApp-family milan card. Optional 60-day marriage muhurat. Quiet type-on-cards fallback. Birth stays on device; audio is not stored.
 - Share cards: today’s panchang, match score, festival why-this-date. Image + text. WhatsApp-ready.
 - Hindi + English via Divine `lan`. Other Indian codes pluggable.
 - Ask: full-screen temple of cards (not a chat box). Mic + optional text, labeled **पूछो / Record**. Credits decrement per ask (and per first marriage extract).

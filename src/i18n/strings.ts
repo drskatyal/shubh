@@ -149,7 +149,7 @@ export const STRINGS: Record<Language, Copy> = {
     personB: 'Person 2',
     matchScore: 'Get matching score',
     matchingInProgress: 'Matching…',
-    shareScore: 'Share score card',
+    shareScore: 'WhatsApp family',
     scoreCardTitle: 'Shubh · Guna milan',
     close: 'Close',
     windows: {
@@ -253,7 +253,7 @@ export const STRINGS: Record<Language, Copy> = {
     personB: 'व्यक्ति 2',
     matchScore: 'मिलान अंक देखें',
     matchingInProgress: 'मिलान हो रहा है…',
-    shareScore: 'अंक कार्ड साझा करें',
+    shareScore: 'परिवार को WhatsApp करें',
     scoreCardTitle: 'शुभ · गुण मिलान',
     close: 'बंद',
     windows: {

@@ -11,6 +11,9 @@ describe('hi/en copy', () => {
     expect(STRINGS.en.asoLine).toMatch(/panchang|kundli|guna milan|rahukaal|muhurat/i);
     expect(STRINGS.hi.asoLine).toMatch(/पंचांग|कुंडली|गुण मिलान|राहु|मुहूर्त/);
     expect(`${STRINGS.en.micSlot} ${STRINGS.en.subtitle}`).not.toMatch(/pandit|gemini|ai astrologer/i);
+    expect(STRINGS.en.shareScore).toMatch(/WhatsApp/i);
+    expect(STRINGS.hi.shareScore).toMatch(/WhatsApp/i);
+    expect(`${STRINGS.en.shareScore} ${STRINGS.hi.shareScore}`).not.toMatch(/gemini|llm|\bai\b|powered by/i);
     expect(STRINGS.hi.almanac.liveNeedsKey).not.toMatch(/fixtures|नमूना कुंडली/);
     expect(STRINGS.en.almanac.liveNeedsKey).not.toMatch(/fixture/i);
   });

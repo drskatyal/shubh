@@ -106,7 +106,7 @@ After extract, two birth cards: **Humne yeh samjha**. Tap one field to fix it. N
 
 If a field is missing, sky wait ends on that card. Mic hint says only what is missing (`ladke ka samay?`). One more short take patches the gap — not a restart.
 
-Quiet fallback: **Likhna hai?** / Type instead — same two cards, tap-to-fill.
+Quiet fallback: **Likhna hai?** / Type instead — same two cards, tap-to-fill. The Record button has no text field beside it. Matching is a full-screen page, not a side sheet. The home dock fills the Match chip so milan is the market, not a leftover tab.
 
 ### After the match
 

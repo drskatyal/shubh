@@ -15,21 +15,20 @@ import { color } from '../../theme/tokens';
 import { tapHaptic } from '../../ui/haptics';
 import { formatScoreCardText } from '../../kundli/formatScoreCard';
 import { ScoreCard } from '../../kundli/ScoreCard';
-import { saveLastMatch, saveMatchForms } from '../../kundli/storage';
+import { loadLastMatch, saveLastMatch, saveMatchForms } from '../../kundli/storage';
 import type { Copy } from '../../i18n/strings';
-import { AskComposer } from '../AskComposer';
 import { createExpoRecorder, type Recorder } from '../record';
 import {
   milanCta,
   muhuratFollowLabel,
   RECORD_PROMPT,
-  recordLabel,
   recordPromptLine,
   typeInsteadLabel,
 } from './copy';
 import { ConfirmBirthCards } from './ConfirmBirthCards';
 import { personToBirth } from './geo';
 import { emptyExtract, missingFields } from './parse';
+import { RecordDock } from './RecordDock';
 import { runExtract } from './runExtract';
 import { askedShaadiNow } from './shaadiNow';
 import type { MarriageExtract } from './types';
@@ -87,6 +86,12 @@ export function MarriageFlow({
   useEffect(() => {
     if (recorder) recRef.current = recorder;
   }, [recorder]);
+
+  useEffect(() => {
+    void loadLastMatch().then((stored) => {
+      if (stored && !match) setMatch(stored);
+    });
+  }, []);
 
   useEffect(() => {
     if (seedText?.trim() && wallet && connected && !extract) {
@@ -269,17 +274,7 @@ export function MarriageFlow({
 
       {waiting ? <DivineWait locale={language} label={hi ? 'आकाश पढ़ रहे हैं' : 'Reading the sky'} /> : null}
 
-      {!connected && !typedFallback ? (
-        <Pressable
-          onPress={() => {
-            setTypedFallback(true);
-            setExtract((prev) => prev ?? emptyExtract());
-          }}
-          style={styles.quiet}
-        >
-          <Text style={styles.quietText}>{typeInsteadLabel(language)}</Text>
-        </Pressable>
-      ) : showPaywall && !typedFallback && !extract ? (
+      {showPaywall && !typedFallback && !extract ? (
         <Paywall
           language={language}
           remaining={remaining}
@@ -287,25 +282,21 @@ export function MarriageFlow({
           onBuyPack={onBuyPack ?? (async () => undefined)}
           onRestore={onRestore ?? (async () => undefined)}
         />
-      ) : !match ? (
-        <AskComposer
+      ) : (
+        <RecordDock
           language={language}
-          phase={phase === 'matching' ? 'sending' : phase}
-          text={text}
-          onChangeText={setText}
+          phase={phase}
+          hint={extract ? hint : undefined}
           onMic={() => void onMic()}
-          onSendText={() => void submitExtract(undefined, text.trim())}
-          disabled={waiting}
-          hint={extract ? hint : RECORD_PROMPT}
-          micLabel={recordLabel(language)}
+          disabled={waiting || !connected || !wallet}
         />
-      ) : null}
+      )}
 
-      {!extract && !typedFallback ? (
+      {!typedFallback ? (
         <Pressable
           onPress={() => {
             setTypedFallback(true);
-            setExtract(emptyExtract());
+            setExtract((prev) => prev ?? emptyExtract());
           }}
           style={styles.quiet}
         >
