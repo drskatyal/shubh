@@ -22,4 +22,14 @@ describe('buildAskPrompt', () => {
     assert.match(system, /Hindi/);
     assert.match(userText, /Language: hi/);
   });
+
+  it('stuffs TathaAstu day-context when provided', () => {
+    const { userText } = buildAskPrompt(MOCK_SKY, 'en', {
+      tithi: { name: 'Dwitiya' },
+      nakshatra: { name: 'Purva Phalguni' },
+    });
+    assert.match(userText, /TathaAstu day-context/);
+    assert.match(userText, /Dwitiya/);
+    assert.match(userText, /Purva Phalguni/);
+  });
 });

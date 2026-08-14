@@ -10,6 +10,7 @@ export async function runAsk(opts: {
   language: Language;
   wallet: CreditWallet;
   apiKey: string | null;
+  dayContext?: Record<string, unknown> | null;
   ask?: typeof askGemini;
 }): Promise<AskResult> {
   if (!opts.apiKey) {
@@ -35,6 +36,7 @@ export async function runAsk(opts: {
       audio: opts.audio,
       sky: opts.sky,
       language: opts.language,
+      dayContext: opts.dayContext,
     });
     const remaining = await opts.wallet.consume();
     await speakVerdict(verdict);

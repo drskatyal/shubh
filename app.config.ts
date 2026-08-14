@@ -70,6 +70,7 @@ const config: ExpoConfig = {
         microphonePermission: micPermission,
       },
     ],
+    'expo-sharing',
   ],
   extra: {
     eas: {
@@ -78,6 +79,9 @@ const config: ExpoConfig = {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? '',
     REVENUECAT_API_KEY:
       process.env.REVENUECAT_API_KEY ?? process.env.EXPO_PUBLIC_REVENUECAT_API_KEY ?? '',
+    // Proxy origin only — never TATHAASTU_API_KEY. The key stays on the server.
+    TATHAASTU_PROXY_URL:
+      process.env.TATHAASTU_PROXY_URL ?? process.env.EXPO_PUBLIC_TATHAASTU_PROXY_URL ?? '',
   },
 };
 

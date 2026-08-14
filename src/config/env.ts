@@ -1,6 +1,7 @@
 type Extra = {
   GEMINI_API_KEY?: string;
   REVENUECAT_API_KEY?: string;
+  TATHAASTU_PROXY_URL?: string;
 };
 
 function readExtra(): Extra {
@@ -39,4 +40,29 @@ export function getRevenueCatApiKey(): string | null {
 
 export function isDevUnlock(): boolean {
   return process.env.EXPO_PUBLIC_SHUBH_DEV_UNLOCK === '1';
+}
+
+/**
+ * Public proxy origin only — not a secret.
+ * Same name as PR #4 / #5 so the three TathaAstu lanes share one client.
+ */
+export function getTathaastuProxyUrl(): string | null {
+  return (
+    trim(process.env.TATHAASTU_PROXY_URL) ??
+    trim(process.env.EXPO_PUBLIC_TATHAASTU_PROXY_URL) ??
+    trim(readExtra().TATHAASTU_PROXY_URL)
+  );
+}
+
+/**
+ * Server / Node-test key only. Never EXPO_PUBLIC_, never written into extra.
+ * The app binary must use the proxy.
+ */
+export function getTathaastuApiKey(): string | null {
+  return trim(process.env.TATHAASTU_API_KEY);
+}
+
+export function getTathaastuBaseUrl(): string {
+  const proxy = getTathaastuProxyUrl();
+  return proxy ?? 'https://api.tathaastuapi.com';
 }

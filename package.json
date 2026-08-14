@@ -9,6 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "vitest run && node --experimental-strip-types --test src/motion/__tests__/*.test.ts && tsx --test src/ask/__tests__/*.test.ts src/billing/__tests__/*.test.ts",
+    "tatha-proxy": "node server/tathaastu-proxy.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "expo-file-system": "~57.0.4",
     "expo-location": "~57.0.10",
     "expo-modules-core": "~57.0.11",
+    "expo-sharing": "~57.0.12",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-native": "0.86.2",
