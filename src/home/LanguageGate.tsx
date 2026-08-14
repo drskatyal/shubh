@@ -13,6 +13,7 @@ export function LanguageGate({ children }: { children: ReactNode }) {
   if (!chosen) {
     return (
       <View style={styles.screen}>
+        <Text style={styles.kicker}>SHUBH</Text>
         <Text style={styles.brand}>{copy.appName}</Text>
         <Text style={styles.sub}>{copy.subtitle}</Text>
         <Text style={styles.prompt}>{copy.pickLanguage}</Text>
@@ -39,35 +40,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 28,
   },
+  kicker: {
+    color: 'rgba(232, 197, 120, 0.55)',
+    letterSpacing: 6,
+    fontSize: 12,
+    fontWeight: '700',
+  },
   brand: {
     color: '#E8C578',
-    fontSize: 40,
+    fontSize: 48,
     fontWeight: '700',
+    marginTop: 8,
   },
   sub: {
     color: 'rgba(244, 238, 224, 0.7)',
-    marginTop: 8,
-    fontSize: 16,
+    marginTop: 10,
+    fontSize: 18,
   },
   prompt: {
     color: '#F4EEE0',
-    marginTop: 48,
+    marginTop: 56,
     fontSize: 18,
   },
   row: {
     flexDirection: 'row',
-    gap: 16,
-    marginTop: 24,
+    gap: 14,
+    marginTop: 22,
   },
   choice: {
+    backgroundColor: 'rgba(232, 197, 120, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(232, 197, 120, 0.45)',
+    borderColor: 'rgba(232, 197, 120, 0.5)',
     borderRadius: 999,
-    paddingHorizontal: 22,
-    paddingVertical: 12,
+    paddingHorizontal: 26,
+    paddingVertical: 14,
+    minWidth: 128,
+    alignItems: 'center',
   },
   choiceText: {
     color: '#F4EEE0',
     fontSize: 18,
+    fontWeight: '600',
   },
 });

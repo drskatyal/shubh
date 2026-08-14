@@ -5,6 +5,7 @@ export const GEMINI_MODEL = 'gemini-3.1-flash-lite';
 export function buildAskPrompt(
   sky: SkyState,
   language: Language,
+  dayContext?: Record<string, unknown> | null,
 ): { system: string; userText: string } {
   const tongue = language === 'hi' ? 'Hindi (Devanagari)' : 'English';
   const system = [
@@ -22,8 +23,14 @@ export function buildAskPrompt(
     'Reply with JSON only, matching the schema.',
   ].join('\n');
 
-  const userText = `Language: ${language}\nSky for this city, this minute:\n${JSON.stringify(sky)}`;
-  return { system, userText };
+  const parts = [
+    `Language: ${language}`,
+    `Sky for this city, this minute:\n${JSON.stringify(sky)}`,
+  ];
+  if (dayContext) {
+    parts.push(`TathaAstu day-context:\n${JSON.stringify(dayContext)}`);
+  }
+  return { system, userText: parts.join('\n\n') };
 }
 
 export const VERDICT_SCHEMA = {

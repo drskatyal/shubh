@@ -34,9 +34,10 @@ export async function askGemini(opts: {
   audio: AskAudio;
   sky: SkyState;
   language: Language;
+  dayContext?: Record<string, unknown> | null;
   fetchImpl?: FetchLike;
 }): Promise<AskVerdict> {
-  const { system, userText } = buildAskPrompt(opts.sky, opts.language);
+  const { system, userText } = buildAskPrompt(opts.sky, opts.language, opts.dayContext);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(opts.apiKey)}`;
   const body = {
     systemInstruction: { parts: [{ text: system }] },

@@ -79,13 +79,14 @@ export function CitySearch({
 const styles = StyleSheet.create({
   sheet: {
     flex: 1,
-    backgroundColor: '#0B1020',
+    backgroundColor: '#07080F',
     paddingTop: 64,
     paddingHorizontal: 20,
   },
   title: {
     color: '#F4EEE0',
-    fontSize: 22,
+    fontSize: 26,
+    fontWeight: '700',
     marginBottom: 16,
   },
   input: {

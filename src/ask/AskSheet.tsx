@@ -19,6 +19,7 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   sky: SkyState;
+  dayContext?: Record<string, unknown> | null;
   language: Language;
   wallet: CreditWallet | null;
   onRemainingChange?: (remaining: number) => void;
@@ -35,6 +36,7 @@ export function AskSheet({
   visible,
   onClose,
   sky,
+  dayContext,
   language,
   wallet,
   onRemainingChange,
@@ -76,6 +78,7 @@ export function AskSheet({
         const result = await runAsk({
           audio,
           sky,
+          dayContext,
           language,
           wallet,
           apiKey,
