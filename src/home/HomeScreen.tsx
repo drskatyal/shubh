@@ -6,6 +6,7 @@ import { useCredits } from '../billing';
 import { getSkyState, type SkyState } from '../engine';
 import { useLanguage } from '../i18n/language';
 import { stateLabel, windowLabel } from '../i18n/strings';
+import { KundliScreen, MatchingScreen } from '../kundli';
 import { cityLabel } from '../location/cities';
 import { usePlace } from '../location/usePlace';
 import { SkyBackdrop, useReduceMotion, useVerdictBeat } from '../motion';
@@ -34,6 +35,8 @@ export function HomeScreen() {
   const [now, setNow] = useState(() => new Date());
   const [searchOpen, setSearchOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
+  const [kundliOpen, setKundliOpen] = useState(false);
+  const [matchOpen, setMatchOpen] = useState(false);
 
   useEffect(() => {
     const tick = setInterval(() => setNow(new Date()), 1000);
@@ -113,6 +116,15 @@ export function HomeScreen() {
               </Text>
               <Text style={styles.rule}>{copy.startingSomethingNew}</Text>
             </View>
+            <View style={styles.tools}>
+              <Pressable onPress={() => setKundliOpen(true)} hitSlop={8}>
+                <Text style={styles.tool}>{copy.kundli}</Text>
+              </Pressable>
+              <Text style={styles.toolDot}>·</Text>
+              <Pressable onPress={() => setMatchOpen(true)} hitSlop={8}>
+                <Text style={styles.tool}>{copy.matching}</Text>
+              </Pressable>
+            </View>
             <View style={styles.dock}>
               <AskFAB
                 remaining={credits.remaining}
@@ -136,6 +148,15 @@ export function HomeScreen() {
         ) : (
           <View style={styles.empty}>
             <Text style={styles.emptyText}>{place.locating ? copy.locating : copy.citySearch}</Text>
+            <View style={styles.tools}>
+              <Pressable onPress={() => setKundliOpen(true)} hitSlop={8}>
+                <Text style={styles.tool}>{copy.kundli}</Text>
+              </Pressable>
+              <Text style={styles.toolDot}>·</Text>
+              <Pressable onPress={() => setMatchOpen(true)} hitSlop={8}>
+                <Text style={styles.tool}>{copy.matching}</Text>
+              </Pressable>
+            </View>
           </View>
         )}
 
@@ -155,6 +176,25 @@ export function HomeScreen() {
           onUseLocation={() => {
             void place.requestLocation();
           }}
+        />
+        <KundliScreen
+          visible={kundliOpen}
+          onClose={() => setKundliOpen(false)}
+          copy={copy}
+          language={language}
+          defaultCity={place.city}
+          wallet={credits.wallet}
+          onRemainingChange={credits.refresh}
+          onBuyMonthly={credits.buyMonthly}
+          onBuyPack={credits.buyPack}
+          onRestore={credits.restore}
+        />
+        <MatchingScreen
+          visible={matchOpen}
+          onClose={() => setMatchOpen(false)}
+          copy={copy}
+          language={language}
+          defaultCity={place.city}
         />
       </SafeAreaView>
     </View>
@@ -244,6 +284,22 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: 'rgba(244, 238, 224, 0.6)',
+    fontSize: 16,
+  },
+  tools: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+    paddingBottom: 12,
+  },
+  tool: {
+    color: '#E8C578',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  toolDot: {
+    color: 'rgba(244, 238, 224, 0.35)',
     fontSize: 16,
   },
   dock: {
