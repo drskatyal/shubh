@@ -1,42 +1,164 @@
-# Store listing — paste at submit
+# Store ASO — Play first
 
-Source of truth: `src/store/aso.ts` and `store.config.ts`. Home-screen icon name stays **Shubh** / **शुभ**. These longer titles are App Store Connect / Play Console only.
+Play is the volume store. Treat this file as the Play listing, then copy the same binary to Apple.
 
-**Never** name a model or a lab in any field below.
+Default Play Console language is **Hindi (India)**. `hi-IN` is its own listing, not a translation footnote. Paste `store/play/hi-IN.json` first. Then add `en-IN`.
 
-Review prompt: only after a **successful share**, once per install. Never on first launch. See `src/store/reviewAfterShare.ts`.
+Closed testing in India must go live **before** production. The listing does not index until a closed track exists in India.
 
-Screenshot order (first three — not a chat UI):
-
-1. `01-milan-score-ring.png` — guna milan score ring  
-2. `02-today-panchang.png` — today’s panchang glance  
-3. `03-marriage-muhurat.png` — marriage muhurat  
-
-Frames: `src/store/frames/StoreFrames.tsx`.
+No chat UI in the feature graphic or the first three screenshots. No model names on the listing.
 
 ---
 
-## Apple App Store — English (en-US)
+## Play — Hindi (default, hi-IN)
 
-**Title** (≤30)
+Paste into Play Console → Store presence → Main store listing.
+Default language: Hindi (India).
+
+### Title (≤30)
+
+```
+शुभ: पंचांग और कुंडली
+```
+
+### Short description (≤80)
+
+Hindi-first search line. Keep these words: aaj ka panchang, rahukaal, guna milan, muhurat.
+
+```
+आज का पंचांग, rahukaal, guna milan, muhurat
+```
+
+### Full description
+
+Hindi first, then English. Natural sentences. Includes kundali milan, vivah, janam kundli, choghadiya, shaadi muhurat, festival, rahukaal. Not a keyword dump.
+
+```
+शुभ रोज़ का हिंदू नाउ-ऑर-वेट ऐप है। Play पर भारत में पहले यहीं दिखता है।
+
+खोलते ही आज का पंचांग — तिथि, नक्षत्र, योग, करण, सूर्योदय। राहुकाल उसी कार्ड पर है, ताकि इंतज़ार साफ़ हो। चौघड़िया भी साथ है।
+
+कुंडली मिलान इसलिए डाउनलोड होता है। एक रिकॉर्ड में दोनों नाम, जन्म तिथि, जन्म समय, और शहर बोलिए। दो कार्ड देखिए, गलती हो तो टैप करके ठीक कीजिए। गुण मिलान की रिंग वही है जो विवाह की बात से पहले परिवार को भेजते हैं।
+
+जन्म कुंडली और दशा उसी मिलान के पीछे खुलती हैं। साठ दिन का शादी मुहूर्त वैकल्पिक है। त्योहार साल वाले पेज पर रहते हैं।
+
+जन्म की बात फ़ोन पर रहती है। आवाज़ सेव नहीं होती। मुफ़्त नज़र कभी लॉक नहीं होती।
+
+Shubh is the daily Hindu now-or-wait app.
+
+Open it for aaj ka panchang: tithi, nakshatra, yoga, karana, sunrise. Rahukaal sits on the same card. Choghadiya is there too.
+
+Kundali milan is why people install. Record both names, janam tithi, janam samay, and shehar in one take. Confirm two cards. The guna milan ring is what you send before a vivah talk.
+
+Janam kundli and dasha open from the same match. A 60-day shaadi muhurat window is optional. Festival dates stay on the year page.
+
+Birth stays on the device. Audio is not stored. The free glance is never locked.
+```
+
+### What's new
+
+```
+आवाज़ से कुंडली मिलान: एक रिकॉर्ड, दो कार्ड, गुण रिंग। आज का पंचांग, राहुकाल, और शादी मुहूर्त एक नज़र में।
+```
+
+Machine copy: `store/play/hi-IN.json`.
+
+---
+
+## Play — English (en-IN)
+
+Add as a second locale. Do not make this the default.
+
+### Title (≤30)
 
 ```
 Shubh: Panchang & Kundli
 ```
 
-**Subtitle** (≤30)
+### Short description (≤80)
+
+```
+Aaj ka panchang, rahukaal, guna milan, muhurat
+```
+
+### Full description
+
+```
+Shubh is the daily Hindu now-or-wait app. Play is where India finds it first.
+
+Open it for aaj ka panchang: tithi, nakshatra, yoga, karana, sunrise. Rahukaal sits on the same card so you know when to wait. Choghadiya is there too.
+
+Kundali milan is why people install. Record both names, janam tithi, janam samay, and shehar in one take. Confirm two cards. The guna milan ring is what you send before a vivah talk.
+
+Janam kundli and dasha open from the same match. A 60-day shaadi muhurat window is optional. Festival dates stay on the year page.
+
+Birth stays on the device. Audio is not stored. The free glance is never locked.
+
+शुभ रोज़ का हिंदू नाउ-ऑर-वेट ऐप है।
+
+खोलते ही आज का पंचांग — तिथि, नक्षत्र, सूर्योदय, राहुकाल, चौघड़िया। कुंडली मिलान एक रिकॉर्ड से। गुण मिलान की रिंग विवाह से पहले भेजिए। जन्म कुंडली, शादी मुहूर्त, और त्योहार उसी ऐप में।
+```
+
+### What's new
+
+```
+Voice kundli milan: one take, two cards, the guna ring. Daily panchang, rahukaal, and shaadi muhurat on the same glance.
+```
+
+Machine copy: `store/play/en-IN.json`.
+
+---
+
+## Feature graphic + first 3 screenshots
+
+Export from `src/store/frames/StoreFrames.tsx`.
+
+| Slot | File | What it shows |
+| --- | --- | --- |
+| Feature graphic 1024×500 | `feature-graphic` | Milan ring + aaj ka panchang + muhurat. No chat. |
+| Phone 1 | `01-milan` | Guna milan ring, share-ready |
+| Phone 2 | `02-panchang` | Today's panchang, rahukaal on the card |
+| Phone 3 | `03-muhurat` | Shaadi muhurat, 60-day window |
+
+No Ask page. No chat bubbles. No model names on the frames.
+
+---
+
+## Closed testing (required before production)
+
+1. Create a closed testing track in Play Console.
+2. Country: India.
+3. Add testers. Publish the closed release.
+4. Wait until the listing is indexed (search "शुभ पंचांग कुंडली" from an India account).
+5. Only then promote to production.
+
+The store listing does not index from a draft. Closed testing in India is the index step.
+
+---
+
+## Apple (same binary, second)
+
+### English (en-US / en-IN)
+
+**Name (≤30)**
+
+```
+Shubh: Panchang & Kundli
+```
+
+**Subtitle (≤30)**
 
 ```
 Rahu, muhurat, festivals
 ```
 
-**Keywords** (≤100, comma-separated, no title words)
+**Keywords (≤100, comma-separated, no spaces after commas except inside a phrase)**
 
 ```
 guna milan,kundali,vivah,rahukaal,choghadiya,shaadi,janampatri,ashtakoot,manglik,tithi,nakshatra
 ```
 
-**Promotional text** (≤170)
+**Promotional text**
 
 ```
 Today’s panchang, guna milan, and marriage muhurat — share the card with family on WhatsApp.
@@ -54,35 +176,27 @@ Find a marriage muhurat for the next 60 days. Festival calendar with why-this-da
 The home glance stays free. Extra asks, deeper reports, and further muhurat ranges are optional.
 ```
 
-**What’s New**
+### Hindi (hi)
 
-```
-Voice guna milan, shareable score card, and marriage muhurat for the next 60 days. Daily panchang still on the home glance.
-```
-
----
-
-## Apple App Store — Hindi (hi)
-
-**Title** (≤30)
+**Name (≤30)**
 
 ```
 शुभ: पंचांग और कुंडली
 ```
 
-**Subtitle** (≤30)
+**Subtitle (≤30)**
 
 ```
 राहु, मुहूर्त, त्योहार
 ```
 
-**Keywords** (≤100)
+**Keywords (≤100)**
 
 ```
 गुण मिलान,विवाह,राहुकाल,चौघड़िया,शादी,जन्मपत्री,अष्टकूट,मांगलिक,तिथि,नक्षत्र,मुहूर्त
 ```
 
-**Promotional text** (≤170)
+**Promotional text**
 
 ```
 आज का पंचांग, गुण मिलान और विवाह मुहूर्त — कार्ड परिवार को WhatsApp पर भेजें।
@@ -100,76 +214,19 @@ Voice guna milan, shareable score card, and marriage muhurat for the next 60 day
 होम पर आज का पंचांग मुफ़्त रहता है।
 ```
 
-**What’s New**
+---
 
-```
-आवाज़ से गुण मिलान, शेयर करने वाला अंक कार्ड, और 60 दिन का विवाह मुहूर्त। रोज़ का पंचांग होम पर।
-```
+## Review prompt (both stores)
+
+Ask for a review only after a successful share of the milan ring or the daily panchang card. Once. Never on first launch. Never after a failed share.
 
 ---
 
-## Google Play — Hindi (hi-IN) — ranks the description
+## Source of truth
 
-**Title**
-
-```
-शुभ: पंचांग और कुंडली
-```
-
-**Short description** (≤80)
-
-```
-पंचांग, गुण मिलान, कुंडली, राहुकाल, मुहूर्त, त्योहार, विवाह।
-```
-
-**Full description**
-
-```
-शुभ भारत के लिए रोज़ का हिन्दू पंचांग है। आज की तिथि, नक्षत्र, योग, राहु काल (राहुकाल), चौघड़िया, और यह कि अभी शुभ है या नहीं।
-
-गुण मिलान और कुंडली मिलान: अष्टकूट और मांगलिक। एक बार में दोनों की जन्म कुंडली बोलें — नाम, जन्म तिथि, समय, शहर। मिलान अंक परिवार को WhatsApp पर भेजें।
-
-विवाह / शादी का मुहूर्त अगले 60 दिन। त्योहार कैलेंडर। जन्मपत्री / जन्म कुंडली फ़ोन पर रहती है।
-
-खोज शब्द: पंचांग, कुंडली, कुंडली मिलान, गुण मिलान, राहुकाल, मुहूर्त, चौघड़िया, शादी, विवाह, तिथि, नक्षत्र, जन्म कुंडली।
-
-होम पर आज का पंचांग मुफ़्त। हिन्दी और अंग्रेज़ी।
-```
-
----
-
-## Google Play — English (en-IN)
-
-**Title**
-
-```
-Shubh: Panchang & Kundli
-```
-
-**Short description** (≤80)
-
-```
-Panchang, guna milan, kundli, rahukaal, muhurat, festivals.
-```
-
-**Full description**
-
-```
-Shubh is the daily Hindu panchang for India. See today’s tithi, nakshatra, yoga, Rahu Kaal (rahukaal), choghadiya, and whether now is good.
-
-Guna milan and kundali matching: Ashtakoot + Manglik. Speak both janam kundli details — name, date, time, city — in one take. Share the milan score with family on WhatsApp.
-
-Vivah / shaadi muhurat for the next 60 days. Festival calendar. Janampatri / janam kundli stays on your phone.
-
-Search words this listing is built for: panchang, kundli, kundali, guna milan, rahukaal, muhurat, choghadiya, shaadi, vivah, tithi, nakshatra.
-
-Home glance is free. Hindi and English.
-```
-
----
-
-## Binary / Expo
-
-- `app.config.ts` — `locales.en` / `locales.hi` → `store/locales/*.json` (icon name + permission strings).
-- `store.config.ts` — screenshot order + review policy.
-- Icon label stays Shubh. Do not put the 30-character store title on the home-screen icon.
+- `src/store/aso.ts` — limits and copy
+- `store/play/hi-IN.json` — Play Hindi listing (default)
+- `store/play/en-IN.json` — Play English listing
+- `store.config.ts` — Expo / EAS
+- `store/locales/en.json`, `store/locales/hi.json` — app name on device
+- `src/store/frames/StoreFrames.tsx` — feature graphic + phone frames

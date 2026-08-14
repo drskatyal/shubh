@@ -1,6 +1,7 @@
 /**
- * Store listing + screenshot order. App Store Connect / Play Console
- * paste source is docs/STORE-ASO.md (generated from src/store/aso.ts).
+ * Play is the primary ASO surface. Apple is the same binary, second.
+ * Paste source: docs/STORE-ASO.md (from src/store/aso.ts).
+ * Hindi (hi-IN) is the default Play listing.
  */
 export {
   STORE_SCREENSHOTS,

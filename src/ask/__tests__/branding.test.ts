@@ -43,5 +43,7 @@ describe('ask copy never names a model', () => {
     assert.doesNotMatch(aso, BANNED);
     assert.match(aso, /Shubh: Panchang & Kundli/);
     assert.match(aso, /01-milan/);
+    assert.match(aso, /feature-graphic/);
+    assert.match(aso, /Closed testing in India/);
   });
 });

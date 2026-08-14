@@ -1,6 +1,6 @@
 import type { ExpoConfig } from 'expo/config';
 
-import { STORE_SCREENSHOTS, appleEn, playEn } from './src/store/aso';
+import { STORE_SCREENSHOTS, appleEn, playHi } from './src/store/aso';
 
 const micPermission =
   'Shubh listens so it can record both births or your ask. Audio is used once, then discarded.';
@@ -13,7 +13,7 @@ const config: ExpoConfig = {
   icon: './assets/icon.png',
   userInterfaceStyle: 'dark',
   scheme: 'shubh',
-  description: playEn.shortDescription,
+  description: playHi.shortDescription,
   locales: {
     en: './store/locales/en.json',
     hi: './store/locales/hi.json',
@@ -107,7 +107,11 @@ const config: ExpoConfig = {
       process.env.DIVINE_PROXY_URL ??
       '',
     store: {
+      primary: 'play',
+      defaultPlayLocale: 'hi-IN',
+      playTitle: playHi.title,
       appleTitle: appleEn.title,
+      featureGraphic: 'feature-graphic.png',
       screenshots: STORE_SCREENSHOTS.map((shot) => shot.file),
     },
   },

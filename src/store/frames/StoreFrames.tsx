@@ -18,6 +18,29 @@ function Phone({ kicker, children }: { kicker: string; children: ReactNode }) {
   );
 }
 
+function FeatureGraphic() {
+  return (
+    <View style={styles.feature}>
+      <Text style={styles.featureBrand}>SHUBH</Text>
+      <Text style={styles.featureLine}>कुंडली मिलान · आज का पंचांग · मुहूर्त</Text>
+      <View style={styles.featureRow}>
+        <View style={styles.featureTile}>
+          <Text style={styles.featureTileKicker}>Milan</Text>
+          <Text style={styles.featureTileValue}>28 / 36</Text>
+        </View>
+        <View style={styles.featureTile}>
+          <Text style={styles.featureTileKicker}>Aaj ka panchang</Text>
+          <Text style={styles.featureTileValue}>Rahukaal</Text>
+        </View>
+        <View style={styles.featureTile}>
+          <Text style={styles.featureTileKicker}>Muhurat</Text>
+          <Text style={styles.featureTileValue}>60 days</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 function MilanShot() {
   return (
     <Phone kicker="Guna milan">
@@ -51,8 +74,9 @@ function MuhuratShot() {
   );
 }
 
-/** First three store shots: milan, panchang, muhurat. Never a chat UI. */
+/** Feature graphic + first three store shots: milan, panchang, muhurat. Never a chat UI. */
 export function StoreShot({ id }: { id: (typeof STORE_SCREENSHOTS)[number]['id'] }) {
+  if (id === 'feature-graphic') return <FeatureGraphic />;
   if (id === '01-milan') return <MilanShot />;
   if (id === '02-panchang') return <PanchangShot />;
   return <MuhuratShot />;
@@ -70,6 +94,40 @@ export function StoreFramesStrip() {
 
 const styles = StyleSheet.create({
   strip: { gap: 24, padding: 16, backgroundColor: color.night },
+  feature: {
+    width: 1024,
+    height: 500,
+    borderRadius: 0,
+    backgroundColor: color.night,
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    paddingHorizontal: 56,
+    paddingVertical: 48,
+    justifyContent: 'center',
+    gap: 28,
+  },
+  featureBrand: {
+    color: color.gold,
+    letterSpacing: 8,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  featureLine: {
+    color: color.ivory,
+    fontSize: 36,
+    fontWeight: '700',
+  },
+  featureRow: { flexDirection: 'row', gap: 20 },
+  featureTile: {
+    flex: 1,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    padding: 20,
+    gap: 8,
+  },
+  featureTileKicker: { color: color.ivoryMuted, fontSize: 16 },
+  featureTileValue: { color: color.gold, fontSize: 28, fontWeight: '600' },
   phone: {
     width: 390,
     minHeight: 720,
