@@ -1,107 +1,87 @@
 # Shubh
 
-One question: is now good for this?
+Approved product. Build this. Do not invent a different app.
 
-Not a Hindu calendar. Not a prayer lock. Not a horoscope.
+Free glance at today's sky. Paid voice ask for any task. Hindi or English. The sky moves. TTS later.
 
 ## The job
 
-Hindus already check Rahu Kaal and muhurat the way other people check the weather. Drik Panchang is the encyclopedia. Shubh answers one question for one action, then gets out of the way.
+Hindus already check Rahu Kaal and muhurat the way other people check the weather. Home is that glance: city, current window, now/wait state. No model.
 
-Open the app (or glance at the widget). It already knows the city. You tap what you are about to do. It says:
+Any task is a spoken question. Gemini 3.1 Flash-Lite hears it. Today's computed sky is stuffed into the prompt. The model maps the task onto those windows and answers now / wait / after, in the user's language. It does not invent the clock.
 
-- **Now** — start
-- **Wait 23 min** — next good window
-- **After 2:14** — this window is bad, here is the next one
+## v1 shape
 
-That is the whole product.
+Expo / React Native. iOS + Android.
 
-## Daily habit
+### Free, no LLM
 
-This is not a once-a-year kundli. People check before they leave the house, before a meeting, before they send money, before a haircut, before they start something new. Morning, and again in the day. Like weather.
+- City (device location, city search fallback). Label the city on screen.
+- Current window name and countdown (Choghadiya + Rahu / Yamaganda / Gulika / Abhijit).
+- A simple now/wait state for "starting something new" from rules, not a model.
+- Language: Hindi or English, user preference, persisted.
+- Motion: solar system / astrology animation so the glance feels alive. Not a static card. Not a cheap spinner.
+- Home screen widget with city + current window + now/wait. No tokens.
 
-## Unique mechanic (not a costume)
+### Paid ask
 
-- Not Prayer Lock with a Sanskrit skin. Unlock-by-reciting is already cloned for Christians, Muslims, and Hindus.
-- Not Co-Star with a Ganesha icon. No sun-sign horoscope in v1.
-- Not Drik with a nicer theme. Drik shows a table. We answer one action.
-- Not a time the user picks. Windows come from local sunrise in their city and the weekday. A competitor cannot match this by changing a default time, a skin, or an onboarding label.
+- Mic button. User speaks the task. Audio in to `gemini-3.1-flash-lite`. Text out.
+- Prompt always includes the computed sky for this city, this minute: sunrise, sunset, current slot, Rahu/Yamaganda/Gulika/Abhijit windows, next good window, language.
+- Model is a classifier and explainer, not the priest. It must not invent times. If the sky JSON says Rahu until 14:12, the answer uses 14:12.
+- Output language matches preference (Hindi or English).
+- TTS is out of v1. Text on screen is enough. Leave a clear hook for TTS later.
+- Credits: `shubh_monthly_100` (auto-renew, 100 asks / month) and `shubh_credits_100` (consumable top-up). RevenueCat. Free users get the glance only. One free sample ask on first install is OK.
+- Show remaining credits. Block the mic at 0 with a paywall, not a broken recorder.
 
-## v1 scope (ship this, nothing else)
+### Motion
 
-Expo / React Native. iOS + Android. No backend. On-device calculation.
+- Home and the ask result should feel like astrology: slow orbital motion, sun/moon, the active window lighting up.
+- 60fps on a mid Android. Skia or Reanimated. No WebView planet demo.
+- Respect Reduce Motion.
 
-### Must have
+## Calculation (do not fake)
 
-1. **Location → local sunrise/sunset.** Use device location (with a city search fallback). All windows are local. Wrong city = wrong product.
-2. **Inauspicious windows, computed, not hardcoded IST.**
-   - Rahu Kaal
-   - Yamaganda
-   - Gulika
-   These are the 8-part daytime split from local sunrise. Weekday picks which part. Do not use a fixed 7:30–9:00 IST table.
-3. **One good window:** Abhijit muhurat (midday, local).
-4. **Choghadiya** for the current slot and the next one (Labh / Amrit / Shubh / Udveg / Chal / Rog / Kaal / Laabh). Show the name and the countdown. Do not dump all 16 in a grid as the home screen.
-5. **Actions the user is about to take.** Saved chips, not a blog:
-   - Start something new
-   - Meeting / call
-   - Money / sign / pay
-   - Travel / leave the house
-   - Haircut / personal
-   - Everyday (already in progress — always OK)
-6. **Verdict engine.** Simple, documented rules in code:
-   - Starting something new, money, haircut: never during Rahu / Yamaganda / Gulika. Prefer Labh / Amrit / Shubh / Abhijit.
-   - Travel / leave: same inauspicious block, plus a short note if the weekday is traditionally weak for travel.
-   - Meeting / call: block only Rahu Kaal (strict) and warn on Yamaganda/Gulika.
-   - Everyday: always Now. Routine work already started is allowed.
-   - If now is bad, show the next good start time for that action, with a countdown.
-7. **Home screen is the verdict.** Big Now / Wait / After. Current window name. Next window. Action chips. Nothing else above the fold.
-8. **Widget** (iOS + Android): Now / Wait + minutes + current window name. This is how daily use actually happens.
-9. **Paywall.** Weekly + yearly IAP via RevenueCat. Free: today’s verdict for one action, no widget, no saved actions. Paid: widget, all actions, next-window countdown, no ads. Never put ads in a faith app.
-10. **Onboarding in under 60 seconds.** City (or allow location) → pick 2–3 usual actions → today’s first verdict. No kundli form. No birth time. No religion quiz.
+On-device. Local sunrise/sunset for lat/lon/date (astronomy-engine or equivalent).
 
-### Must not have in v1
+- 8 equal daytime parts from local sunrise → sunset.
+- Rahu Kaal weekday parts (1-indexed from sunrise): Sun=8, Mon=2, Tue=7, Wed=5, Thu=6, Fri=4, Sat=3.
+- Yamaganda and Gulika: standard panchang weekday tables, cited in code comments. Not from memory.
+- Abhijit: middle ~48 minutes of the day. Document the Sunday caveat.
+- Choghadiya: 8 day + 8 night slots, standard weekday sequence, cited.
+- Never use a fixed IST 7:30–9:00 table.
+- Unit tests: London and Mumbai, a weekday and a Sunday, pinned date, Rahu Kaal within 2 minutes of Drik Panchang. Also Leicester, Chennai, New Jersey sunrise sanity.
+- All times in the user's timezone.
 
-- Full panchang table (tithi, nakshatra, yoga, karana as a reference page)
-- Kundli / birth chart / matching
-- Daily rashifal / sun-sign horoscope
-- Aarti, chalisa, mantra audio library
-- Temple booking, pandit chat, seva
-- Prayer lock / app blocking / Screen Time
-- Multi-faith tracks (Muslim / Christian)
-- Social, streaks-as-the-product, journal
-- Backend, accounts, or AI copy
+## Must not have in v1
 
-Tithi/nakshatra can come later if the verdict needs them. They are not the home screen.
+- Kundli / birth time / matching
+- Sun-sign rashifal
+- Full panchang encyclopedia as the home screen
+- Aarti / audio library
+- Temple booking / human pandit chat
+- Prayer lock / Screen Time
+- TTS playback
+- Ads
+- Accounts / backend beyond the Gemini call and RevenueCat
 
-## Calculation notes (do not fake)
+## Privacy
 
-- Get sunrise/sunset for the lat/lon and date (astronomy-engine or equivalent). Test London, Leicester, Mumbai, Chennai, New Jersey.
-- Split sunrise→sunset into 8 equal parts.
-- Rahu Kaal part by weekday (Sun=8, Mon=2, Tue=7, Wed=5, Thu=6, Fri=4, Sat=3), 1-indexed from sunrise.
-- Yamaganda and Gulika have their own weekday parts. Implement from a cited table in code comments (standard panchang), not from memory.
-- Abhijit is the middle 48 minutes of the day (center of sunrise→sunset), with the usual Sunday caveat documented.
-- Choghadiya: 8 day slots sunrise→sunset, 8 night slots sunset→next sunrise, weekday sequence from standard Choghadiya. Cite the sequence in comments.
-- Unit tests for a known city+date against Drik Panchang (London and Mumbai, a weekday and a Sunday). If we disagree with Drik by more than 2 minutes on sunrise, fix ours.
-- All times in the user’s local timezone. Label the city on screen so a wrong location is obvious.
+- Location for sunrise only.
+- Audio is sent to Gemini for that ask, then discarded. Say this in the paywall and a short privacy screen.
+- No account.
+- `GEMINI_API_KEY` from env / EAS secret. Never commit a key.
 
-## Monetization
-
-- Product IDs: `shubh_weekly`, `shubh_yearly`
-- Price like a daily utility, not a $2.49/year ad-remove. Weekly impulse, yearly for people who already check this every morning.
-- Restore purchases. Dev unlock via env for TestFlight.
-
-## Store position
+## Store
 
 - Name: Shubh
 - Subtitle: Is now good for this?
 - Category: Lifestyle
-- Keywords: rahu kaal, muhurat, panchang, choghadiya, hindu calendar, abhijit, shubh muhurat
-- Privacy: location for sunrise only, on-device, no account
+- Keywords: rahu kaal, muhurat, panchang, choghadiya, hindu calendar, shubh muhurat
 
 ## Done when
 
-- Fresh install → city → tap “Leave the house” → a real Now/Wait/After for that city today
-- Widget shows the same verdict
-- London and Mumbai unit tests pass against published Rahu Kaal for a pinned date
-- Paywall actually gates the widget and extra actions
-- No panchang encyclopedia, no horoscope, no lock screen prayer
+- Fresh install → city → Hindi or English → home shows a live window for that city today, with motion
+- Mic ask: "Can I leave the house now?" → now/wait/after in that language, times match the on-device sky
+- Credits gate the mic
+- London/Mumbai engine tests pass
+- No kundli, no horoscope, no TTS, no prayer lock
