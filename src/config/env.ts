@@ -1,6 +1,8 @@
 type Extra = {
   GEMINI_API_KEY?: string;
   REVENUECAT_API_KEY?: string;
+  TATHAASTU_API_KEY?: string;
+  TATHAASTU_PROXY_URL?: string;
 };
 
 function readExtra(): Extra {
@@ -39,4 +41,14 @@ export function getRevenueCatApiKey(): string | null {
 
 export function isDevUnlock(): boolean {
   return process.env.EXPO_PUBLIC_SHUBH_DEV_UNLOCK === '1';
+}
+
+/** Server / EAS secret only. Never EXPO_PUBLIC — the key must not ship in the binary. */
+export function getTathaastuApiKey(): string | null {
+  return trim(process.env.TATHAASTU_API_KEY) ?? trim(readExtra().TATHAASTU_API_KEY);
+}
+
+export function getTathaastuBaseUrl(): string {
+  const proxy = trim(process.env.TATHAASTU_PROXY_URL) ?? trim(readExtra().TATHAASTU_PROXY_URL);
+  return proxy ?? 'https://api.tathaastuapi.com/v1';
 }
