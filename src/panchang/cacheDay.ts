@@ -1,6 +1,7 @@
+import { PANCHANG_TTL_MS, panchangCacheKey } from '../divine/cache';
 import type { NormalizedDay } from '../tathaastu/types';
 
-const TTL_MS = 6 * 60 * 60 * 1000;
+const TTL_MS = PANCHANG_TTL_MS;
 const KEY = 'shubh.day-context';
 
 type Cached = {
@@ -10,7 +11,7 @@ type Cached = {
 };
 
 function cacheId(lat: number, lon: number, lang: string, date: string): string {
-  return `${date}:${lat.toFixed(3)}:${lon.toFixed(3)}:${lang}`;
+  return panchangCacheKey({ lat, lon, lang, date });
 }
 
 async function storage(): Promise<{

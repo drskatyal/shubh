@@ -1,17 +1,16 @@
 import type { FinderEvent } from './types';
 
 /**
- * PRODUCT chips → documented API event names.
- * OpenAPI muhurat/find uses MARRIAGE / NAMKARAN / BUSINESS.
- * docs.html + /v1/events/suitability use marriage / mundan / business_start.
- * naming is not in either list — PRODUCT says map to mundan or education_start.
+ * PRODUCT chips → Divine muhurat routes.
+ * naming has no Divine endpoint — map to marriage (closest life-event calendar).
  */
 export const EVENT_CANDIDATES: Record<FinderEvent, string[]> = {
-  marriage: ['marriage', 'MARRIAGE'],
-  griha_pravesh: ['griha_pravesh', 'GRIHA_PRAVESH'],
-  vehicle_purchase: ['vehicle_purchase', 'VEHICLE_PURCHASE'],
-  business_start: ['business_start', 'BUSINESS_START', 'BUSINESS'],
-  naming: ['naming', 'NAMKARAN', 'namkaran', 'mundan', 'education_start', 'EDUCATION'],
+  marriage: ['marriage'],
+  griha_pravesh: ['griha_pravesh'],
+  vehicle_purchase: ['vehicle_purchase'],
+  business_start: ['business_start'],
+  naming: ['naming', 'marriage'],
+  property_purchase: ['property_purchase'],
 };
 
 export function minRatingForScore(minScore: number): 'EXCELLENT' | 'GOOD' | 'NEUTRAL' {

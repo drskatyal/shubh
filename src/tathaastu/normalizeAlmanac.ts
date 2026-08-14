@@ -111,10 +111,50 @@ export function normalizeRankedDate(value: unknown, fallbackDate?: string): Rank
   };
 }
 
+function divineMuhuratRow(value: unknown): RankedDate | null {
+  const rec = asRecord(value);
+  if (!rec) return null;
+  const date = isIsoDate(rec.date) ? rec.date : undefined;
+  if (!date) return null;
+  const flag = rec.is_muhurat;
+  const isGood = flag === true || flag === 'true' || flag === 1 || flag === '1';
+  if (!isGood && rec.muhurats == null && rec.score == null && rec.rating == null) return null;
+  if (!isGood && rec.score == null && rec.rating == null) return null;
+  const windows = pickArray(rec, ['muhurats']);
+  const first = asRecord(windows[0]);
+  const start = asString(first?.muhurat_start) ?? asString(first?.start_time);
+  const end = asString(first?.muhurat_end) ?? asString(first?.end_time);
+  const reason =
+    asString(rec.reason) ??
+    (start && end ? `${start} – ${end}` : asString(rec.weekday) ?? 'Auspicious muhurat');
+  return {
+    date,
+    score: asNumber(rec.score) ?? (isGood ? 85 : 20),
+    rating: isGood ? 'EXCELLENT' : ((asString(rec.rating) ?? 'AVOID') as EventRating | string),
+    reason,
+    supporting: start && end ? [`${start} – ${end}`] : [],
+    blocking: [],
+  };
+}
+
 export function normalizeRankedDates(payload: unknown): RankedDate[] {
+  const rec = asRecord(payload);
+  const notes = rec ? pickArray(rec, ['month_notes']) : [];
   const rows = pickArray(payload, ['dates', 'results', 'muhurats', 'items', 'days']);
   const ranked = rows
-    .map((row) => normalizeRankedDate(row))
+    .map((row) => {
+      const rec = asRecord(row);
+      const divine = divineMuhuratRow(row);
+      if (divine) {
+        if (!divine.reason && notes.length) {
+          const note = asRecord(notes[0]);
+          return { ...divine, reason: asString(note?.reason) ?? divine.reason };
+        }
+        return divine;
+      }
+      if (rec && rec.is_muhurat != null) return null;
+      return normalizeRankedDate(row);
+    })
     .filter((row): row is RankedDate => row !== null);
   ranked.sort((a, b) => b.score - a.score || a.date.localeCompare(b.date));
   return ranked;
@@ -175,6 +215,54 @@ export function normalizeFestival(value: unknown, fallbackDate?: string): Festiv
   };
 }
 
+function titleFromKey(key: string): string {
+  return key
+    .split('_')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function festivalDateFrom(value: unknown): string | undefined {
+  const rec = asRecord(value);
+  if (!rec) return undefined;
+  if (isIsoDate(rec.date)) return rec.date;
+  const smartas = asRecord(rec.smartas);
+  if (smartas && isIsoDate(smartas.date)) return smartas.date;
+  const vaishnavas = asRecord(rec.vaishnavas);
+  if (vaishnavas && isIsoDate(vaishnavas.date)) return vaishnavas.date;
+  if (Array.isArray(rec) === false && Array.isArray(value)) {
+    const first = asRecord(value[0]);
+    if (first && isIsoDate(first.date)) return first.date;
+  }
+  return undefined;
+}
+
+function festivalsFromDivineMap(payload: unknown, fallbackDate?: string): Festival[] {
+  const rec = asRecord(payload);
+  if (!rec) return [];
+  const out: Festival[] = [];
+  for (const [key, value] of Object.entries(rec)) {
+    if (key === 'success' || key === 'data') continue;
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const row = asRecord(item);
+        const date = (row && isIsoDate(row.date) ? row.date : undefined) ?? fallbackDate;
+        const name = asString(row?.name) ?? titleFromKey(key);
+        if (!date) continue;
+        out.push({ date, key, name, tags: [] });
+      }
+      continue;
+    }
+    const date = festivalDateFrom(value) ?? fallbackDate;
+    if (!date) continue;
+    const nested = asRecord(value);
+    const name = asString(nested?.name) ?? titleFromKey(key);
+    out.push({ date, key, name, tags: [] });
+  }
+  return out;
+}
+
 export function normalizeFestivals(payload: unknown, fallbackDate?: string): Festival[] {
   const rec = asRecord(payload);
   const direct = pickArray(payload, ['festivals', 'results', 'items', 'data']);
@@ -197,7 +285,8 @@ export function normalizeFestivals(payload: unknown, fallbackDate?: string): Fes
   const fromDirect = direct
     .map((item) => normalizeFestival(item, fallbackDate))
     .filter((item): item is Festival => item !== null);
-  const merged = fromDirect.length ? fromDirect : fromDays;
+  const fromMap = !fromDirect.length && !fromDays.length ? festivalsFromDivineMap(payload, fallbackDate) : [];
+  const merged = fromDirect.length ? fromDirect : fromDays.length ? fromDays : fromMap;
   const seen = new Set<string>();
   return merged.filter((fest) => {
     const id = `${fest.date}:${fest.key}`;
@@ -209,6 +298,10 @@ export function normalizeFestivals(payload: unknown, fallbackDate?: string): Fes
 
 export function normalizeExplain(payload: unknown, festival: string, date: string): FestivalExplain {
   const rec = asRecord(payload) ?? {};
+  const dates = asRecord(rec.dates);
+  const firstDate = dates
+    ? Object.values(dates).find((value): value is string => isIsoDate(value))
+    : undefined;
   const conditionsRaw = pickArray(rec, ['conditions']);
   const conditions: FestivalCondition[] = conditionsRaw.map((item) => {
     const row = asRecord(item) ?? {};
@@ -219,16 +312,18 @@ export function normalizeExplain(payload: unknown, festival: string, date: strin
       matched: row.matched === true || row.matched === 'true',
     };
   });
+  const human =
+    asString(rec.human_readable) ??
+    asString(rec.reason) ??
+    asString(rec.explanation) ??
+    asString(rec.content) ??
+    (firstDate ? `${titleFromKey(festival)} falls on ${firstDate}.` : '');
   return {
     festival: asString(rec.festival) ?? festival,
-    date: isIsoDate(rec.date) ? rec.date : date,
+    date: isIsoDate(rec.date) ? rec.date : firstDate ?? date,
     matched: rec.matched !== false,
-    ruleCode: asString(rec.rule_code) ?? asString(rec.rule),
-    humanReadable:
-      asString(rec.human_readable) ??
-      asString(rec.reason) ??
-      asString(rec.explanation) ??
-      '',
+    ruleCode: asString(rec.rule_code) ?? asString(rec.rule) ?? festival,
+    humanReadable: human,
     conditions,
   };
 }

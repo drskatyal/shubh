@@ -169,7 +169,8 @@ export type FinderEvent =
   | 'griha_pravesh'
   | 'vehicle_purchase'
   | 'business_start'
-  | 'naming';
+  | 'naming'
+  | 'property_purchase';
 
 export const FINDER_EVENTS: FinderEvent[] = [
   'marriage',
@@ -177,6 +178,7 @@ export const FINDER_EVENTS: FinderEvent[] = [
   'vehicle_purchase',
   'business_start',
   'naming',
+  'property_purchase',
 ];
 
 export type EventRating = 'AVOID' | 'NEUTRAL' | 'GOOD' | 'EXCELLENT';

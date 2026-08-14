@@ -63,7 +63,7 @@ const KUTA_LABEL: Record<KutaKey, string> = {
   nadi: 'Nadi',
 };
 
-const KUTA_ALIASES: Record<string, KutaKey> = {
+  const KUTA_ALIASES: Record<string, KutaKey> = {
   varna: 'varna',
   vashya: 'vashya',
   tara: 'tara',
@@ -73,6 +73,7 @@ const KUTA_ALIASES: Record<string, KutaKey> = {
   graha_maitri_kuta: 'graha_maitri',
   gana: 'gana',
   bhakoot: 'bhakoot',
+  bhakoota: 'bhakoot',
   bhakut: 'bhakoot',
   nadi: 'nadi',
 };
@@ -229,14 +230,35 @@ export function normalizeChart(raw: unknown, fallbackName: string): NormalizedCh
   ]);
 
   const lagna = signPoint(
-    pick(chart, ['lagna', 'ascendant', 'lagna_rashi', 'ascendant_sign', 'udaya_lagna']),
+    pick(chart, [
+      'lagna',
+      'ascendant',
+      'lagna_rashi',
+      'ascendant_sign',
+      'udaya_lagna',
+      'ascendant_sign_name',
+    ]),
   );
-  const moonDirect = pick(chart, ['moon', 'moon_sign', 'chandra', 'janma_rashi']);
+  const moonDirect = pick(chart, ['moon', 'moon_sign', 'moonsign', 'chandra', 'janma_rashi']);
   const planets = collectPlanets(planetsRaw);
   const moonPlanet = planets.find((p) => p.name === 'Moon');
   const moon = moonDirect
     ? signPoint(moonDirect)
     : { sign: moonPlanet?.sign ?? '—', nakshatra: moonPlanet?.nakshatra ?? null };
+  const lagnaFromPlanets = Array.isArray(planetsRaw)
+    ? planetsRaw
+        .map((item) => (isRecord(item) ? item : null))
+        .find((item) => {
+          const label = asString(pick(item ?? {}, ['name', 'planet', 'graha']));
+          return label ? /ascendant|lagna/i.test(label) : false;
+        })
+    : null;
+  const resolvedLagna =
+    lagna.sign !== '—'
+      ? lagna
+      : lagnaFromPlanets
+        ? signPoint(lagnaFromPlanets)
+        : lagna;
 
   const dasha = dashaTeaser(
     pick(chart, ['dasha', 'dashas', 'vimshottari', 'vimshottari_dasha', 'current_dasha']),
@@ -245,7 +267,7 @@ export function normalizeChart(raw: unknown, fallbackName: string): NormalizedCh
   return {
     name: asString(pick(chart, ['name', 'native', 'person_name'])) ?? fallbackName,
     placeName: asString(pick(chart, ['place_name', 'place', 'location', 'city'])),
-    lagna,
+    lagna: resolvedLagna,
     moon,
     planets,
     dasha,
@@ -258,8 +280,11 @@ function kutaFromUnknown(key: KutaKey, value: unknown): KutaScore {
     return { key, label: KUTA_LABEL[key], score: value, max: KUTA_MAX[key] };
   }
   if (isRecord(value)) {
-    const score = asNumber(pick(value, ['score', 'points', 'guna', 'obtained', 'value'])) ?? 0;
-    const max = asNumber(pick(value, ['max', 'out_of', 'maximum', 'total'])) ?? KUTA_MAX[key];
+    const score =
+      asNumber(pick(value, ['score', 'points', 'guna', 'obtained', 'value', 'points_obtained'])) ?? 0;
+    const max =
+      asNumber(pick(value, ['max', 'out_of', 'maximum', 'total', 'max_ponits', 'max_points'])) ??
+      KUTA_MAX[key];
     return { key, label: KUTA_LABEL[key], score, max };
   }
   return { key, label: KUTA_LABEL[key], score: 0, max: KUTA_MAX[key] };
@@ -300,27 +325,42 @@ export function normalizeMatch(
   const root = isRecord(raw) ? raw : {};
   const milan = isRecord(root.guna_milan)
     ? root.guna_milan
-    : isRecord(root.ashtakoot)
-      ? root.ashtakoot
-      : isRecord(root.ashtakoota)
-        ? root.ashtakoota
-        : root;
+    : isRecord(root.ashtakoot_milan)
+      ? root.ashtakoot_milan
+      : isRecord(root.ashtakoot)
+        ? root.ashtakoot
+        : isRecord(root.ashtakoota)
+          ? root.ashtakoota
+          : isRecord(root.dashakoot_milan)
+            ? root.dashakoot_milan
+            : root;
+
+  const resultBlock = isRecord(root.ashtakoot_milan_result)
+    ? root.ashtakoot_milan_result
+    : isRecord(root.dashakoot_milan_result)
+      ? root.dashakoot_milan_result
+      : milan;
 
   const total =
     asNumber(
-      pick(milan, ['total', 'total_score', 'score', 'guna', 'guna_score', 'obtained']) ??
-        pick(root, ['total', 'total_score', 'score', 'guna_score']),
+      pick(resultBlock, ['total', 'total_score', 'score', 'guna', 'guna_score', 'obtained', 'points_obtained']) ??
+        pick(milan, ['total', 'total_score', 'score', 'guna', 'guna_score', 'obtained', 'points_obtained']) ??
+        pick(root, ['total', 'total_score', 'score', 'guna_score', 'points_obtained']),
     ) ?? 0;
   const max =
-    asNumber(pick(milan, ['max', 'out_of', 'maximum', 'max_score']) ?? pick(root, ['max', 'out_of', 'max_score'])) ??
-    36;
+    asNumber(
+      pick(resultBlock, ['max', 'out_of', 'maximum', 'max_score', 'max_ponits', 'max_points']) ??
+        pick(milan, ['max', 'out_of', 'maximum', 'max_score', 'max_ponits']) ??
+        pick(root, ['max', 'out_of', 'max_score']),
+    ) ?? 36;
   const verdict =
-    asString(pick(root, ['verdict', 'assessment', 'compatibility', 'result', 'summary'])) ??
+    asString(pick(resultBlock, ['content', 'verdict', 'assessment'])) ??
+    asString(pick(root, ['verdict', 'assessment', 'compatibility', 'result', 'summary', 'content'])) ??
     asString(pick(milan, ['verdict', 'assessment'])) ??
     (total >= 18 ? 'Compatible' : 'Needs care');
 
   const kutas = collectKutas(
-    pick(root, ['kutas', 'kuta', 'ashtakoot', 'ashtakoota', 'guna_milan', 'scores']) ??
+    pick(root, ['kutas', 'kuta', 'ashtakoot', 'ashtakoota', 'ashtakoot_milan', 'guna_milan', 'scores']) ??
       pick(milan, ['kutas', 'kuta', 'scores', 'breakdown']),
   );
 
@@ -328,8 +368,8 @@ export function normalizeMatch(
   let a: boolean | null = null;
   let b: boolean | null = null;
   if (isRecord(manglikRaw)) {
-    a = asBool(pick(manglikRaw, ['person_a', 'person1', 'bride', 'a']));
-    b = asBool(pick(manglikRaw, ['person_b', 'person2', 'groom', 'b']));
+    a = asBool(pick(manglikRaw, ['person_a', 'person1', 'bride', 'a', 'p1']));
+    b = asBool(pick(manglikRaw, ['person_b', 'person2', 'groom', 'b', 'p2']));
   }
 
   return {

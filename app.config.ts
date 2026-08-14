@@ -93,8 +93,8 @@ const config: ExpoConfig = {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? '',
     REVENUECAT_API_KEY:
       process.env.REVENUECAT_API_KEY ?? process.env.EXPO_PUBLIC_REVENUECAT_API_KEY ?? '',
-    TATHAASTU_PROXY_URL:
-      process.env.EXPO_PUBLIC_TATHAASTU_PROXY_URL ?? process.env.TATHAASTU_PROXY_URL ?? '',
+    DIVINE_PROXY_URL:
+      process.env.EXPO_PUBLIC_DIVINE_PROXY_URL ?? process.env.DIVINE_PROXY_URL ?? '',
   },
 };
 

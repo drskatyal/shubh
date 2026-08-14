@@ -25,7 +25,7 @@ export function buildAskPrompt(
   ].join('\n');
 
   const dayLine = dayContext
-    ? `\nLive TathaAstu day (limbs only, not clocks):\n${JSON.stringify({
+    ? `\nLive panchang day (limbs only, not clocks):\n${JSON.stringify({
         tithi: dayContext.tithi,
         nakshatra: dayContext.nakshatra,
         yoga: dayContext.yoga,

@@ -1,4 +1,4 @@
-import { explainFestival, getFestivalsMonth, type TathaRequestOptions } from '../tathaastu/client';
+import { findFestival, getEnglishCalendarFestivals, type DivineRequestOptions } from '../divine/client';
 import { civilFromIso, todayIso } from '../tathaastu/dates';
 import { normalizeExplain, normalizeFestivals } from '../tathaastu/normalize';
 import type { Festival, FestivalExplain, TathaSource } from '../tathaastu/types';
@@ -34,10 +34,13 @@ export async function loadUpcomingFestivals(input: {
   const today = todayIso(input.lat, input.lon, input.now);
   const { year, month } = civilFromIso(today);
   const following = nextMonth(year, month);
-  const options: TathaRequestOptions = { fetch: input.fetch };
+  const options: DivineRequestOptions = { fetch: input.fetch };
   const months = [
-    await getFestivalsMonth({ year, month, lat: input.lat, lon: input.lon, lang: input.lang }, options),
-    await getFestivalsMonth(
+    await getEnglishCalendarFestivals(
+      { year, month, lat: input.lat, lon: input.lon, lang: input.lang },
+      options,
+    ),
+    await getEnglishCalendarFestivals(
       { year: following.year, month: following.month, lat: input.lat, lon: input.lon, lang: input.lang },
       options,
     ),
@@ -71,10 +74,19 @@ export async function loadUpcomingFestivals(input: {
 export async function loadFestivalExplain(input: {
   festival: string;
   date: string;
+  lat?: number;
+  lon?: number;
   fetch?: typeof fetch;
 }): Promise<{ ok: boolean; explain?: FestivalExplain; source?: TathaSource; setup?: boolean; error?: string }> {
-  const result = await explainFestival(
-    { festival: input.festival, date: input.date },
+  const civil = civilFromIso(input.date);
+  const result = await findFestival(
+    {
+      festival: input.festival,
+      year: civil.year,
+      month: civil.month,
+      lat: input.lat ?? 28.6139,
+      lon: input.lon ?? 77.209,
+    },
     { fetch: input.fetch },
   );
   if (result.ok) {

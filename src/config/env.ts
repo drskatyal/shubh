@@ -1,7 +1,7 @@
 type Extra = {
   GEMINI_API_KEY?: string;
   REVENUECAT_API_KEY?: string;
-  TATHAASTU_PROXY_URL?: string;
+  DIVINE_PROXY_URL?: string;
 };
 
 function readExtra(): Extra {
@@ -43,11 +43,11 @@ export function isDevUnlock(): boolean {
 }
 
 /** Public proxy URL only. Never an API key. */
-export function getTathaastuProxyUrl(): string | null {
+export function getDivineProxyUrl(): string | null {
   return (
-    trim(process.env.EXPO_PUBLIC_TATHAASTU_PROXY_URL) ??
-    trim(process.env.TATHAASTU_PROXY_URL) ??
-    trim(readExtra().TATHAASTU_PROXY_URL)
+    trim(process.env.EXPO_PUBLIC_DIVINE_PROXY_URL) ??
+    trim(process.env.DIVINE_PROXY_URL) ??
+    trim(readExtra().DIVINE_PROXY_URL)
   );
 }
 
@@ -55,6 +55,11 @@ export function getTathaastuProxyUrl(): string | null {
  * Server / Node-test key only. Not EXPO_PUBLIC_, not written into extra.
  * The app binary must use the proxy instead.
  */
-export function getTathaastuApiKey(): string | null {
-  return trim(process.env.TATHAASTU_API_KEY);
+export function getDivineApiKey(): string | null {
+  return trim(process.env.DIVINE_API_KEY);
+}
+
+/** Optional Bearer token. Defaults to DIVINE_API_KEY when unset. */
+export function getDivineApiToken(): string | null {
+  return trim(process.env.DIVINE_API_TOKEN);
 }
