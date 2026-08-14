@@ -34,7 +34,7 @@ export function LanguageGate({ children }: { children: ReactNode }) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0B1020',
+    backgroundColor: '#06070E',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 28,

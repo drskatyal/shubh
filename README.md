@@ -12,4 +12,4 @@ npm test
 npx expo start
 ```
 
-Ask PR: `import { getSkyState } from './src/engine'`. Motion PR: `src/home/slots/HomeMotionSlot.tsx`.
+Ask PR: `import { getSkyState } from './src/engine'`. Motion: Home mounts `SkyBackdrop` from `src/motion`.

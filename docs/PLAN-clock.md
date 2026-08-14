@@ -1,6 +1,6 @@
 # Clock spine — architecture
 
-This PR owns the free glance: Expo scaffold, on-device sky, home, language, widget. It does **not** own Gemini, credits, TTS, or the solar-system animation.
+This PR owns the free glance: Expo scaffold, on-device sky, home, language, widget. It does **not** own Gemini, credits, or TTS. Motion lives in [PR #1](https://github.com/drskatyal/shubh/pull/1) (`src/motion`). Home mounts that backdrop; it does not draw a second sky.
 
 Read [PRODUCT.md](../PRODUCT.md) first. This file only says how the repo is cut so the other two PRs can land without rewriting the clock.
 
@@ -10,8 +10,9 @@ Read [PRODUCT.md](../PRODUCT.md) first. This file only says how the repo is cut 
 App.tsx                   Boots HomeScreen (ask PR can add a route later)
 src/engine/               On-device sky. The contract the ask PR imports.
 src/engine/RULES.md       Now/wait for "starting something new" — rules only
-src/home/                 Glance UI
-src/home/slots/           Empty hooks the other PRs fill
+src/home/                 Glance UI (mounts `SkyBackdrop` behind the copy)
+src/home/slots/           Mic hook for the ask PR
+src/motion/               Owned by the motion PR — do not fork the animation
 src/i18n/                 Hindi | English copy + persisted preference
 src/location/             GPS + curated city search fallback
 src/storage/              Language + last city
@@ -31,9 +32,12 @@ plugins/                  Expo config plugins (privacy + widget)
 | `tz-lookup` | IANA zone from lat/lon so `getSkyState` stays `(lat, lon, date)` |
 | `expo-location` | Device location; reverse-geocode the city label |
 | `@react-native-async-storage/async-storage` | Language + last city |
+| `@shopify/react-native-skia` `2.6.2` | Same pin as the motion PR |
+| `react-native-reanimated` `4.5.1` | Same pin as the motion PR |
+| `react-native-worklets` `0.10.1` | Reanimated 4 peer, same pin as the motion PR |
 | `vitest` | Engine unit tests (no device) |
 
-Do not add Gemini, RevenueCat, Skia, Reanimated, or TTS here.
+Do not add Gemini, RevenueCat, or TTS here. Do not invent a second animation.
 
 ## Public engine contract
 
@@ -56,12 +60,19 @@ Panchang day starts at local sunrise, not midnight.
 
 ## What the other two PRs should import
 
-### Motion PR
+### Motion PR (`src/motion`)
 
-- Replace the body of `src/home/slots/HomeMotionSlot.tsx`.
-- Props already passed: `sky: SkyState`, `reduceMotion: boolean`.
-- Do not change `getSkyState`. Light the active window from `sky.currentWindow`.
-- Skia or Reanimated. No WebView. Respect Reduce Motion (prop is already wired).
+Home already mounts:
+
+```tsx
+<SkyBackdrop
+  windowKind={toMotionWindow(sky.currentWindow.name)}
+  verdict={sky.startingSomethingNew}
+  locale={language}
+/>
+```
+
+Keep changing the scene in `src/motion`. Do not add another canvas on Home. `chal` / `udveg` / `kaal` / `rog` map to `other`.
 
 ### Ask / Gemini PR
 
@@ -73,7 +84,7 @@ Panchang day starts at local sunrise, not midnight.
 
 ## Home (this PR)
 
-City label, current window name, countdown, now/wait for "starting something new" from `src/engine/RULES.md`. Language toggle Hindi | English. No action-chip encyclopedia, no full panchang table, no Gemini.
+`SkyBackdrop` fills the screen. City, current window, countdown, and now/wait sit on top. Language toggle Hindi | English. No action-chip encyclopedia, no full panchang table, no Gemini.
 
 ## Widget
 

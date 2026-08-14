@@ -1,22 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  AccessibilityInfo,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { getSkyState, type SkyState } from '../engine';
 import { useLanguage } from '../i18n/language';
 import { stateLabel, windowLabel } from '../i18n/strings';
 import { cityLabel } from '../location/cities';
 import { usePlace } from '../location/usePlace';
+import { SkyBackdrop } from '../motion';
 import { syncGlance } from '../widget/syncGlance';
 import { CitySearch } from './CitySearch';
+import { toMotionVerdict, toMotionWindow } from './motionWindow';
 import { HomeMicSlot } from './slots/HomeMicSlot';
-import { HomeMotionSlot } from './slots/HomeMotionSlot';
 
 function formatCountdown(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -35,18 +29,10 @@ export function HomeScreen() {
   const place = usePlace();
   const [now, setNow] = useState(() => new Date());
   const [searchOpen, setSearchOpen] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
     const tick = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(tick);
-  }, []);
-
-  useEffect(() => {
-    const apply = (value: boolean) => setReduceMotion(value);
-    void AccessibilityInfo.isReduceMotionEnabled().then(apply);
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', apply);
-    return () => sub.remove();
   }, []);
 
   useEffect(() => {
@@ -78,71 +64,83 @@ export function HomeScreen() {
     : 0;
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.top}>
+    <View style={styles.root}>
+      {sky ? (
+        <SkyBackdrop
+          windowKind={toMotionWindow(sky.currentWindow.name)}
+          verdict={toMotionVerdict(sky.startingSomethingNew)}
+          locale={language}
+        />
+      ) : null}
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.top}>
         <Pressable onPress={() => setSearchOpen(true)} hitSlop={8}>
           <Text style={styles.city}>
             {place.city ? cityLabel(place.city, language) : copy.citySearch}
           </Text>
           <Text style={styles.change}>{copy.changeCity}</Text>
         </Pressable>
-        <View style={styles.langRow}>
-          <Pressable onPress={() => setLanguage('hi')} style={styles.langBtn}>
-            <Text style={[styles.lang, language === 'hi' && styles.langOn]}>{copy.hindi}</Text>
-          </Pressable>
-          <Text style={styles.langDivider}>|</Text>
-          <Pressable onPress={() => setLanguage('en')} style={styles.langBtn}>
-            <Text style={[styles.lang, language === 'en' && styles.langOn]}>{copy.english}</Text>
-          </Pressable>
-        </View>
-      </View>
-
-      {sky ? (
-        <>
-          <HomeMotionSlot sky={sky} reduceMotion={reduceMotion} label={copy.motionSlot} />
-          <View style={styles.glance}>
-            <Text style={styles.window}>{windowLabel(language, sky.currentWindow.name)}</Text>
-            <Text style={styles.countdown}>
-              {copy.endsIn} {formatCountdown(remaining)}
-            </Text>
-            <Text style={[styles.state, sky.startingSomethingNew === 'now' ? styles.now : styles.wait]}>
-              {stateLabel(language, sky.startingSomethingNew)}
-            </Text>
-            <Text style={styles.rule}>{copy.startingSomethingNew}</Text>
+          <View style={styles.langRow}>
+            <Pressable onPress={() => setLanguage('hi')} style={styles.langBtn}>
+              <Text style={[styles.lang, language === 'hi' && styles.langOn]}>{copy.hindi}</Text>
+            </Pressable>
+            <Text style={styles.langDivider}>|</Text>
+            <Pressable onPress={() => setLanguage('en')} style={styles.langBtn}>
+              <Text style={[styles.lang, language === 'en' && styles.langOn]}>{copy.english}</Text>
+            </Pressable>
           </View>
-          <HomeMicSlot sky={sky} language={language} label={copy.micSlot} />
-        </>
-      ) : (
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>{place.locating ? copy.locating : copy.citySearch}</Text>
         </View>
-      )}
 
-      <Text style={styles.privacy}>{copy.privacyLocation}</Text>
+        {sky ? (
+          <>
+            <View style={styles.glance}>
+              <Text style={styles.window}>{windowLabel(language, sky.currentWindow.name)}</Text>
+              <Text style={styles.countdown}>
+                {copy.endsIn} {formatCountdown(remaining)}
+              </Text>
+              <Text style={[styles.state, sky.startingSomethingNew === 'now' ? styles.now : styles.wait]}>
+                {stateLabel(language, sky.startingSomethingNew)}
+              </Text>
+              <Text style={styles.rule}>{copy.startingSomethingNew}</Text>
+            </View>
+            <HomeMicSlot sky={sky} language={language} label={copy.micSlot} />
+          </>
+        ) : (
+          <View style={styles.empty}>
+            <Text style={styles.emptyText}>{place.locating ? copy.locating : copy.citySearch}</Text>
+          </View>
+        )}
 
-      <CitySearch
-        visible={searchOpen}
-        copy={copy}
-        language={language}
-        locating={place.locating}
-        denied={place.denied}
-        onClose={() => setSearchOpen(false)}
-        onSelect={(city) => {
-          place.setCity(city);
-          setSearchOpen(false);
-        }}
-        onUseLocation={() => {
-          void place.requestLocation();
-        }}
-      />
-    </SafeAreaView>
+        <Text style={styles.privacy}>{copy.privacyLocation}</Text>
+
+        <CitySearch
+          visible={searchOpen}
+          copy={copy}
+          language={language}
+          locating={place.locating}
+          denied={place.denied}
+          onClose={() => setSearchOpen(false)}
+          onSelect={(city) => {
+            place.setCity(city);
+            setSearchOpen(false);
+          }}
+          onUseLocation={() => {
+            void place.requestLocation();
+          }}
+        />
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#06070E',
+  },
   safe: {
     flex: 1,
-    backgroundColor: '#0B1020',
+    backgroundColor: 'transparent',
     paddingHorizontal: 24,
   },
   top: {

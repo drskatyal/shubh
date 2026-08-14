@@ -4,5 +4,6 @@
     "strict": true,
     "types": ["vitest/globals"]
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["src/motion/__tests__"]
 }
