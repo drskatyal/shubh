@@ -31,6 +31,7 @@ yarn-error.*
 # secrets — never commit a Gemini or RevenueCat key
 .env
 .env.*
+.env*.local
 !.env.example
 
 # typescript

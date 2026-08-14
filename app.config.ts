@@ -1,39 +1,26 @@
 import type { ExpoConfig } from 'expo/config';
 
+const shell = require('./app.json') as { expo: ExpoConfig };
+
 const micPermission =
   'Shubh listens to your question so it can map the task onto today’s sky. Audio is sent to Gemini for that ask, then discarded.';
 
 const config: ExpoConfig = {
-  name: 'Shubh',
-  slug: 'shubh',
-  version: '0.1.0',
-  orientation: 'portrait',
-  icon: './assets/icon.png',
-  userInterfaceStyle: 'dark',
-  scheme: 'shubh',
-  splash: {
-    image: './assets/splash-icon.png',
-    resizeMode: 'contain',
-    backgroundColor: '#0B1020',
-  },
+  ...shell.expo,
   ios: {
-    supportsTablet: true,
+    ...shell.expo.ios,
     bundleIdentifier: 'ai.flowrad.shubh',
     infoPlist: {
       NSMicrophoneUsageDescription: micPermission,
     },
   },
   android: {
+    ...shell.expo.android,
     package: 'ai.flowrad.shubh',
-    adaptiveIcon: {
-      backgroundColor: '#0B1020',
-      foregroundImage: './assets/android-icon-foreground.png',
-      backgroundImage: './assets/android-icon-background.png',
-      monochromeImage: './assets/android-icon-monochrome.png',
-    },
     permissions: ['RECORD_AUDIO'],
   },
   plugins: [
+    ...(shell.expo.plugins ?? []),
     [
       'expo-av',
       {

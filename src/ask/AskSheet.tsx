@@ -13,7 +13,7 @@ import type { Language, SkyState } from '../engine';
 import { privacyLine, remainingLabel, setupCopy } from './copy';
 import { createExpoRecorder, type Recorder } from './record';
 import { runAsk } from './runAsk';
-import type { AskVerdict } from './types';
+import type { AskVerdict, VerdictKind } from './types';
 
 type Props = {
   visible: boolean;
@@ -25,6 +25,7 @@ type Props = {
   onBuyMonthly?: () => Promise<void>;
   onBuyPack?: () => Promise<void>;
   onRestore?: () => Promise<void>;
+  onVerdict?: (verdict: VerdictKind) => void;
   recorder?: Recorder;
 };
 
@@ -40,6 +41,7 @@ export function AskSheet({
   onBuyMonthly,
   onBuyPack,
   onRestore,
+  onVerdict,
   recorder,
 }: Props) {
   const apiKey = getGeminiApiKey();
@@ -86,6 +88,7 @@ export function AskSheet({
         setVerdict(result.verdict);
         setPhase('result');
         onRemainingChange?.(result.remaining);
+        onVerdict?.(result.verdict.verdict);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Ask failed');
         setPhase('error');

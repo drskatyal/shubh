@@ -20,7 +20,7 @@ Every clock in a verdict must already appear in that JSON. Client drops any `nex
 6. Missing `GEMINI_API_KEY` → setup copy, no crash.
 7. Privacy line: audio goes to Gemini for that ask, then discarded.
 
-Exports: `AskFAB`, `AskSheet`. Thin `App.tsx` host only if home is absent.
+Exports: `AskFAB`, `AskSheet`, `AskOnSkyScreen`. Sits on the motion shell (`src/motion`). After a verdict the host calls `useVerdictBeat().playVerdict(now|wait|after)`. No TTS.
 
 ## Credits (`src/billing`)
 
