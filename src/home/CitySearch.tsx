@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
   FlatList,
-  Modal,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -36,9 +35,10 @@ export function CitySearch({
   const [query, setQuery] = useState('');
   const results = useMemo(() => searchCities(query), [query]);
 
+  if (!visible) return null;
+
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={styles.sheet}>
+    <View style={styles.sheet} pointerEvents="auto">
         <SafeAreaView style={styles.safe}>
           <View style={styles.top}>
             <Text style={styles.title}>{copy.citySearch}</Text>
@@ -82,13 +82,16 @@ export function CitySearch({
             )}
           />
         </SafeAreaView>
-      </View>
-    </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  sheet: { flex: 1, backgroundColor: color.nightLift },
+  sheet: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 14,
+    backgroundColor: 'rgba(6, 7, 14, 0.28)',
+  },
   safe: { flex: 1, paddingHorizontal: 20, paddingTop: 12 },
   top: {
     flexDirection: 'row',

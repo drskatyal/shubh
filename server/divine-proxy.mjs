@@ -60,6 +60,35 @@ const server = http.createServer(async (req, res) => {
   }
 
   const url = new URL(req.url ?? '/', `http://127.0.0.1:${PORT}`);
+
+  if (url.pathname === '/ask' && req.method === 'POST') {
+    const askKey = process.env.GEMINI_API_KEY?.trim();
+    if (!askKey) {
+      res.writeHead(503, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'ask_not_connected' }));
+      return;
+    }
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    try {
+      const upstream = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${encodeURIComponent(askKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: Buffer.concat(chunks).toString('utf8') || '{}',
+        },
+      );
+      const text = await upstream.text();
+      res.writeHead(upstream.status, { 'Content-Type': 'application/json' });
+      res.end(text);
+    } catch (err) {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'bad_gateway', detail: String(err) }));
+    }
+    return;
+  }
+
   const host = hostFor(url.pathname);
   if (!host || req.method !== 'POST') {
     res.writeHead(404, { 'Content-Type': 'application/json' });

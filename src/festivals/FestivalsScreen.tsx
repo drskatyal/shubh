@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import type { Copy, Language } from '../i18n/strings';
 import { cityLabel, type City } from '../location/cities';
@@ -106,7 +106,7 @@ export function FestivalsScreen({
         ))}
         {rows.length ? <Text style={styles.hint}>{almanac.reminderSet}</Text> : null}
       </ScrollView>
-      <Modal visible={Boolean(open)} animationType="fade" transparent onRequestClose={() => setOpen(null)}>
+      {open ? (
         <Pressable style={styles.overlay} onPress={() => setOpen(null)}>
           <Pressable style={styles.why} onPress={() => undefined}>
             <Text style={styles.whyTitle}>{almanac.whyThisDate}</Text>
@@ -136,7 +136,7 @@ export function FestivalsScreen({
             </Pressable>
           </Pressable>
         </Pressable>
-      </Modal>
+      ) : null}
     </Sheet>
   );
 }

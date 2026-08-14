@@ -1,4 +1,6 @@
 export { MotionPreviewScreen } from './MotionPreviewScreen';
+export { DivineWait } from './DivineWait';
+export { SkyLayerProvider, useOptionalSkyLayer, useSkyLayer } from './SkyLayer';
 export { SkyBackdrop } from './SkyBackdrop';
 export { SkyStage } from './SkyStage';
 export { resolvePalette, windowPalette, INAUSPICIOUS } from './palette';

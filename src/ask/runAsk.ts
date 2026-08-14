@@ -1,32 +1,40 @@
 import type { CreditWallet } from '../billing/credits';
 import type { Language, SkyState } from '../engine';
-import type { NormalizedDay } from '../tathaastu/types';
+import type { ChartAskSummary, NormalizedDay } from '../tathaastu/types';
 import { askGemini } from './gemini';
 import { speakVerdict } from './speakVerdict';
 import type { AskAudio, AskResult } from './types';
 
 export async function runAsk(opts: {
-  audio: AskAudio;
+  audio?: AskAudio | null;
+  text?: string | null;
   sky: SkyState;
   language: Language;
   wallet: CreditWallet;
   apiKey: string | null;
   dayContext?: NormalizedDay | null;
+  chartContext?: ChartAskSummary | null;
   ask?: typeof askGemini;
 }): Promise<AskResult> {
+  if (!opts.audio?.base64 && !opts.text?.trim()) {
+    return {
+      ok: false,
+      error: 'mic',
+      message: 'Speak or write what you want to ask.',
+    };
+  }
   if (!opts.apiKey) {
     return {
       ok: false,
       error: 'missing_key',
-      message:
-        'Gemini is not configured. Set GEMINI_API_KEY in your env or as an EAS secret, then rebuild. The key is never committed.',
+      message: 'Ask is not connected. Point the app at the proxy, then rebuild.',
     };
   }
   if (!opts.wallet.canAsk()) {
     return {
       ok: false,
       error: 'no_credits',
-      message: 'No asks left. Buy a month or a pack to keep going.',
+      message: 'No asks left. Take a month or a pack to keep going.',
     };
   }
 
@@ -35,9 +43,11 @@ export async function runAsk(opts: {
     const verdict = await ask({
       apiKey: opts.apiKey,
       audio: opts.audio,
+      text: opts.text,
       sky: opts.sky,
       language: opts.language,
       dayContext: opts.dayContext,
+      chartContext: opts.chartContext,
     });
     const remaining = await opts.wallet.consume();
     await speakVerdict(verdict);

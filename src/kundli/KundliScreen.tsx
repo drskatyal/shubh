@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { AskPage } from '../ask';
 import type { CreditWallet } from '../billing/credits';
+import { getSkyState } from '../engine';
 import type { Copy, Language } from '../i18n/strings';
-import type { City } from '../location/cities';
+import { cityLabel, type City } from '../location/cities';
 import { loadBirthChart } from '../tathaastu/client';
 import { toChartAskSummary } from '../tathaastu/normalize';
 import type { BirthData, NormalizedChart, TathaLoad } from '../tathaastu/types';
@@ -12,10 +14,9 @@ import { Sheet } from '../ui/Sheet';
 import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
 import { BirthForm, birthFormValid, emptyBirth } from './BirthForm';
-import { ChartAskSheet } from './ChartAskSheet';
 import { ChartView } from './ChartView';
 import { birthPrivacy } from './copy';
-import { loadKundliForm, saveKundliForm } from './storage';
+import { loadKundliForm, saveKundliForm, saveLastChart } from './storage';
 import { useAskAboutChart } from './useAskAboutChart';
 
 export function KundliScreen({
@@ -60,7 +61,9 @@ export function KundliScreen({
     setBusy(true);
     try {
       await saveKundliForm(form);
-      setResult(await loadBirthChart(form, { language }));
+      const next = await loadBirthChart(form, { language });
+      setResult(next);
+      if (next.ok) await saveLastChart(toChartAskSummary(next.data));
     } finally {
       setBusy(false);
     }
@@ -105,18 +108,26 @@ export function KundliScreen({
         ) : null}
       </ScrollView>
 
-      <ChartAskSheet
-        visible={chartAsk.visible}
-        armed={chartAsk.armed}
-        onClose={chartAsk.close}
-        summary={chartAsk.summary}
-        language={language}
-        wallet={wallet}
-        onRemainingChange={onRemainingChange}
-        onBuyMonthly={onBuyMonthly}
-        onBuyPack={onBuyPack}
-        onRestore={onRestore}
-      />
+      {defaultCity ? (
+        <AskPage
+          visible={chartAsk.visible}
+          onClose={chartAsk.close}
+          sky={getSkyState(defaultCity.lat, defaultCity.lon, new Date(), {
+            city: cityLabel(defaultCity, language),
+            language,
+          })}
+          language={language}
+          wallet={wallet}
+          onRemainingChange={onRemainingChange}
+          onBuyMonthly={onBuyMonthly}
+          onBuyPack={onBuyPack}
+          onRestore={onRestore}
+          dayContext={null}
+          chartContext={summary}
+          copy={copy}
+          defaultCity={defaultCity}
+        />
+      ) : null}
     </Sheet>
   );
 }

@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useLanguage } from '../i18n/language';
-import { SkyBackdrop } from '../motion';
 import { color } from '../theme/tokens';
 
 export function LanguageGate({ children }: { children: ReactNode }) {
@@ -14,21 +13,19 @@ export function LanguageGate({ children }: { children: ReactNode }) {
 
   if (!chosen) {
     return (
-      <View style={styles.screen}>
-        <SkyBackdrop windowKind="shubh" verdict="now" locale="en" />
-        <View style={styles.overlay}>
-          <Text style={styles.kicker}>शुभ</Text>
-          <Text style={styles.brand}>{copy.appName}</Text>
-          <Text style={styles.sub}>{copy.subtitle}</Text>
-          <Text style={styles.prompt}>{copy.pickLanguage}</Text>
-          <View style={styles.row}>
-            <Pressable style={styles.choice} onPress={() => setLanguage('hi')}>
-              <Text style={styles.choiceText}>{copy.hindi}</Text>
-            </Pressable>
-            <Pressable style={styles.choice} onPress={() => setLanguage('en')}>
-              <Text style={styles.choiceText}>{copy.english}</Text>
-            </Pressable>
-          </View>
+      <View style={styles.overlay}>
+        <Text style={styles.kicker}>शुभ</Text>
+        <Text style={styles.brand}>{copy.appName}</Text>
+        <Text style={styles.sub}>{copy.subtitle}</Text>
+        <Text style={styles.aso}>{copy.asoLine}</Text>
+        <Text style={styles.prompt}>{copy.pickLanguage}</Text>
+        <View style={styles.row}>
+          <Pressable style={styles.choice} onPress={() => setLanguage('hi')}>
+            <Text style={styles.choiceText}>{copy.hindi}</Text>
+          </Pressable>
+          <Pressable style={styles.choice} onPress={() => setLanguage('en')}>
+            <Text style={styles.choiceText}>{copy.english}</Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -38,10 +35,7 @@ export function LanguageGate({ children }: { children: ReactNode }) {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: color.night,
-  },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   overlay: {
     flex: 1,
     zIndex: 1,
@@ -66,6 +60,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     lineHeight: 26,
+  },
+  aso: {
+    color: color.goldSoft,
+    marginTop: 16,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   prompt: {
     color: color.ivory,

@@ -9,7 +9,7 @@ import {
   grantPack,
   remainingAsks,
 } from '../credits';
-import { PRODUCTS } from '../products';
+import { MONTHLY_PRICE_INR, PACK_PRICE_INR, PRODUCTS } from '../products';
 
 describe('credits', () => {
   it('gives one free sample, then gates at 0', () => {
@@ -49,8 +49,12 @@ describe('credits', () => {
     assert.equal(wallet.snapshot().usedFreeSample, false);
   });
 
-  it('exports the RevenueCat product ids from the brief', () => {
+  it('exports the RevenueCat product ids and India test prices', () => {
     assert.equal(PRODUCTS.monthly, 'shubh_monthly_100');
     assert.equal(PRODUCTS.pack, 'shubh_credits_100');
+    assert.equal(MONTHLY_PRICE_INR.min, 199);
+    assert.equal(MONTHLY_PRICE_INR.max, 299);
+    assert.equal(PACK_PRICE_INR, 799);
+    assert.notEqual(MONTHLY_PRICE_INR.max, 599);
   });
 });

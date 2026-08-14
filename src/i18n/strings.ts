@@ -30,6 +30,7 @@ export type AlmanacCopy = {
 export type Copy = {
   appName: string;
   subtitle: string;
+  asoLine: string;
   pickLanguage: string;
   continue: string;
   hindi: string;
@@ -94,6 +95,7 @@ export const STRINGS: Record<Language, Copy> = {
   en: {
     appName: 'Shubh',
     subtitle: 'Is now good for this?',
+    asoLine: 'Panchang · kundli · guna milan · rahukaal · muhurat',
     pickLanguage: 'Hindi or English',
     continue: 'Continue',
     hindi: 'हिन्दी',
@@ -197,6 +199,7 @@ export const STRINGS: Record<Language, Copy> = {
   hi: {
     appName: 'शुभ',
     subtitle: 'क्या अभी ठीक है?',
+    asoLine: 'पंचांग · कुंडली · गुण मिलान · राहु काल · मुहूर्त',
     pickLanguage: 'हिन्दी या अंग्रेज़ी',
     continue: 'आगे बढ़ें',
     hindi: 'हिन्दी',
@@ -226,7 +229,7 @@ export const STRINGS: Record<Language, Copy> = {
     loadingPanchang: 'आज का पंचांग आ रहा है…',
     shareToday: 'आज का पंचांग शेयर करें',
     motionSlot: 'आकाश की गति यहाँ आएगी',
-    micSlot: 'पूछें',
+    micSlot: 'पूछो',
     privacyLocation: 'लोकेशन केवल स्थानीय सूर्योदय के लिए है।',
     kundli: 'कुंडली',
     matching: 'मिलान',

@@ -159,6 +159,22 @@ export function horoscopeChartPath(chartId: string): string {
   return `${DIVINE_ROUTES['horoscope-chart'].path}/${chartId}`;
 }
 
+/** Documented later routes. Do not call these in v1. Paths from developers.divineapi.com. */
+export const DIVINE_LATER = [
+  { path: '/indian-api/v1/horoscope-chart/D2', why: 'Hora — after D1/D9' },
+  { path: '/indian-api/v1/horoscope-chart/D10', why: 'Dashamsha — after D1/D9' },
+  { path: '/indian-api/v1/horoscope-chart/D60', why: 'Shashtyamsha — after D1/D9' },
+  { path: '/indian-api/v1/matching/manglik-dosha', why: 'Pair Manglik; v1 already reads Manglik from Ashtakoot' },
+  { path: '/indian-api/v1/matching/vimshottari-dasha', why: 'Pair dashas' },
+] as const;
+
+export const DIVINE_NEVER = [
+  '/api/v5/daily-horoscope',
+  'tarot',
+  'numerology',
+  'western',
+] as const;
+
 export function hostForPath(path: string): string | null {
   const clean = path.split('?')[0] ?? path;
   if (DIVINE_HOST_BY_PATH[clean]) return DIVINE_HOST_BY_PATH[clean];

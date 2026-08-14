@@ -1,7 +1,7 @@
 import type { ExpoConfig } from 'expo/config';
 
 const micPermission =
-  'Shubh listens to your question so it can map the task onto today’s sky. Audio is sent to Gemini for that ask, then discarded.';
+  'Shubh listens to your question so it can map the task onto today’s sky. Audio is used for that ask, then discarded.';
 
 const config: ExpoConfig = {
   name: 'Shubh',
@@ -90,11 +90,15 @@ const config: ExpoConfig = {
     eas: {
       projectId: '00000000-0000-0000-0000-000000000000',
     },
-    GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? '',
     REVENUECAT_API_KEY:
       process.env.REVENUECAT_API_KEY ?? process.env.EXPO_PUBLIC_REVENUECAT_API_KEY ?? '',
     DIVINE_PROXY_URL:
       process.env.EXPO_PUBLIC_DIVINE_PROXY_URL ?? process.env.DIVINE_PROXY_URL ?? '',
+    ASK_PROXY_URL:
+      process.env.EXPO_PUBLIC_ASK_PROXY_URL ??
+      process.env.EXPO_PUBLIC_DIVINE_PROXY_URL ??
+      process.env.DIVINE_PROXY_URL ??
+      '',
   },
 };
 

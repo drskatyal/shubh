@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Language } from '../engine';
 import { privacyLine, remainingLabel } from '../ask/copy';
-import { PRODUCTS } from './products';
+import { MONTHLY_PRICE_INR, PACK_PRICE_INR, PRODUCTS } from './products';
 
 type Props = {
   language: Language;
@@ -41,8 +41,8 @@ export function Paywall({
       <Text style={styles.remaining}>{remainingLabel(language, remaining)}</Text>
       <Text style={styles.lead}>
         {hi
-          ? 'एक महीना या एक पैक लो। घर की झलक मुफ़्त रहती है।'
-          : 'Take a month or a pack. The home glance stays free.'}
+          ? 'और पूछ, गहरी कुंडली / गुण मिलान, और आगे के मुहूर्त। घर की झलक मुफ़्त रहती है।'
+          : 'Extra asks, deeper kundli / guna milan, and further muhurat ranges. The home glance stays free.'}
       </Text>
 
       <Pressable
@@ -52,7 +52,9 @@ export function Paywall({
         accessibilityRole="button"
       >
         <Text style={styles.primaryText}>
-          {hi ? 'महीना · 100 पूछ' : 'Monthly · 100 asks'}
+          {hi
+            ? `महीना · ₹${MONTHLY_PRICE_INR.min}–${MONTHLY_PRICE_INR.max} · 100 पूछ`
+            : `Monthly · ₹${MONTHLY_PRICE_INR.min}–${MONTHLY_PRICE_INR.max} · 100 asks`}
         </Text>
         <Text style={styles.sku}>{PRODUCTS.monthly}</Text>
       </Pressable>
@@ -64,7 +66,7 @@ export function Paywall({
         accessibilityRole="button"
       >
         <Text style={styles.secondaryText}>
-          {hi ? 'पैक · 100 पूछ' : 'Pack · 100 asks'}
+          {hi ? `पैक · ₹${PACK_PRICE_INR} · 100 पूछ` : `Pack · ₹${PACK_PRICE_INR} · 100 asks`}
         </Text>
         <Text style={styles.sku}>{PRODUCTS.pack}</Text>
       </Pressable>
@@ -75,9 +77,7 @@ export function Paywall({
         onPress={() => run('restore', onRestore)}
         accessibilityRole="button"
       >
-        <Text style={styles.linkText}>
-          {hi ? 'खरीद वापस लाओ' : 'Restore purchases'}
-        </Text>
+        <Text style={styles.linkText}>{hi ? 'खरीद वापस लाओ' : 'Restore purchases'}</Text>
       </Pressable>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}

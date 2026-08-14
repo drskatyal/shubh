@@ -14,7 +14,8 @@ describe('buildAskPrompt', () => {
     }
     assert.match(system, /Never invent/);
     assert.match(system, /14:12/);
-    assert.equal(GEMINI_MODEL, 'gemini-3.7-flash');
+    assert.equal(GEMINI_MODEL, 'gemini-3.1-flash-lite');
+    assert.match(system, /chart summary/);
   });
 
   it('asks for Hindi display when language is hi', () => {

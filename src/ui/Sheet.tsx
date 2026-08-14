@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { color } from '../theme/tokens';
 
+/** Overlay on the shared sky — never a Modal that remounts SkyStage. */
 export function Sheet({
   visible,
   title,
@@ -16,27 +17,30 @@ export function Sheet({
   closeLabel: string;
   children: ReactNode;
 }) {
+  if (!visible) return null;
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={styles.root}>
-        <SafeAreaView style={styles.safe}>
-          <View style={styles.handle} />
-          <View style={styles.top}>
-            <Text style={styles.title}>{title}</Text>
-            <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button">
-              <Text style={styles.close}>{closeLabel}</Text>
-            </Pressable>
-          </View>
-          <View style={styles.rule} />
-          {children}
-        </SafeAreaView>
-      </View>
-    </Modal>
+    <View style={styles.root} pointerEvents="auto">
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.handle} />
+        <View style={styles.top}>
+          <Text style={styles.title}>{title}</Text>
+          <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button">
+            <Text style={styles.close}>{closeLabel}</Text>
+          </Pressable>
+        </View>
+        <View style={styles.rule} />
+        {children}
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.night },
+  root: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 8,
+    backgroundColor: 'rgba(6, 7, 14, 0.22)',
+  },
   safe: { flex: 1, paddingHorizontal: 22 },
   handle: {
     alignSelf: 'center',

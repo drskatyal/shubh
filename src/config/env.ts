@@ -1,12 +1,11 @@
 type Extra = {
-  GEMINI_API_KEY?: string;
   REVENUECAT_API_KEY?: string;
   DIVINE_PROXY_URL?: string;
+  ASK_PROXY_URL?: string;
 };
 
 function readExtra(): Extra {
   try {
-    // Lazy require so node tests do not load Expo.
     const Constants = require('expo-constants').default as {
       expoConfig?: { extra?: Extra };
     };
@@ -21,12 +20,19 @@ function trim(value: string | undefined): string | null {
   return next ? next : null;
 }
 
-/** GEMINI_API_KEY from env or EAS extra. Never read a committed file. */
+/**
+ * Server / Node-test key only. Never written into Expo extra.
+ * The app binary should call the proxy instead.
+ */
 export function getGeminiApiKey(): string | null {
+  return trim(process.env.GEMINI_API_KEY);
+}
+
+export function getAskProxyUrl(): string | null {
   return (
-    trim(process.env.GEMINI_API_KEY) ??
-    trim(process.env.EXPO_PUBLIC_GEMINI_API_KEY) ??
-    trim(readExtra().GEMINI_API_KEY)
+    trim(process.env.EXPO_PUBLIC_ASK_PROXY_URL) ??
+    trim(readExtra().ASK_PROXY_URL) ??
+    getDivineProxyUrl()
   );
 }
 

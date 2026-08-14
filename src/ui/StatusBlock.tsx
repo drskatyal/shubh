@@ -1,6 +1,7 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { Copy } from '../i18n/strings';
+import { DivineWait } from '../motion/DivineWait';
 import { color } from '../theme/tokens';
 
 export function StatusBlock({
@@ -11,6 +12,7 @@ export function StatusBlock({
   empty,
   emptyText,
   onRetry,
+  locale,
 }: {
   copy: Copy;
   loading?: boolean;
@@ -19,13 +21,15 @@ export function StatusBlock({
   empty?: boolean;
   emptyText?: string;
   onRetry?: () => void;
+  locale?: 'en' | 'hi';
 }) {
   if (loading) {
     return (
-      <View style={styles.block}>
-        <ActivityIndicator color={color.gold} />
-        <Text style={styles.lead}>{copy.loadingPanchang}</Text>
-      </View>
+      <DivineWait
+        compact
+        locale={locale ?? (copy.appName === 'शुभ' ? 'hi' : 'en')}
+        label={locale === 'hi' || copy.appName === 'शुभ' ? 'आकाश पढ़ रहे हैं' : 'Reading the sky'}
+      />
     );
   }
   if (setup) {

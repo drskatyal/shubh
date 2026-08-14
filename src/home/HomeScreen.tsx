@@ -11,18 +11,19 @@ import {
 
 import { AlmanacDock, type AlmanacTab } from '../almanac/AlmanacDock';
 import { AlmanacHost } from '../almanac/AlmanacHost';
-import { AskFAB, AskSheet } from '../ask';
+import { AskFAB, AskPage } from '../ask';
 import { useCredits } from '../billing';
 import { getSkyState, type SkyState } from '../engine';
 import { useLanguage } from '../i18n/language';
 import { choghadiyaLabel, pakshaLabel, windowLabel } from '../i18n/strings';
+import { loadLastChart, loadLastMatch } from '../kundli/storage';
 import { cityLabel } from '../location/cities';
 import { usePlace } from '../location/usePlace';
-import { SkyBackdrop, useReduceMotion, useVerdictBeat } from '../motion';
+import { useReduceMotion, useSkyLayer, useVerdictBeat } from '../motion';
 import { readCachedDay, writeCachedDay } from '../panchang/cacheDay';
 import { loadLiveDay } from '../panchang/loadDay';
 import { todayIso } from '../tathaastu/dates';
-import type { NormalizedDay } from '../tathaastu/types';
+import type { ChartAskSummary, NormalizedDay, NormalizedMatch } from '../tathaastu/types';
 import { color } from '../theme/tokens';
 import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
@@ -84,7 +85,8 @@ export function HomeScreen() {
   const place = usePlace();
   const credits = useCredits();
   const reduceMotion = useReduceMotion();
-  const { intensity, activeVerdict, playVerdict } = useVerdictBeat(reduceMotion);
+  const { activeVerdict, playVerdict } = useVerdictBeat(reduceMotion);
+  const skyLayer = useSkyLayer();
   const [now, setNow] = useState(() => new Date());
   const [searchOpen, setSearchOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
@@ -95,6 +97,8 @@ export function HomeScreen() {
   const [dayFailed, setDayFailed] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [reload, setReload] = useState(0);
+  const [chartContext, setChartContext] = useState<ChartAskSummary | null>(null);
+  const [matchContext, setMatchContext] = useState<NormalizedMatch | null>(null);
   const cardRef = useRef<ViewType>(null);
 
   useEffect(() => {
@@ -107,6 +111,11 @@ export function HomeScreen() {
       setSearchOpen(true);
     }
   }, [place.city, place.ready, place.locating]);
+
+  useEffect(() => {
+    void loadLastChart().then(setChartContext);
+    void loadLastMatch().then(setMatchContext);
+  }, [askOpen]);
 
   const sky: SkyState | null = useMemo(() => {
     if (!place.city) return null;
@@ -158,6 +167,19 @@ export function HomeScreen() {
   }, [place.city, language, reload]);
 
   useEffect(() => {
+    if (!sky) {
+      skyLayer.setSky({ locale: language, waiting: dayLoading && !day });
+      return;
+    }
+    skyLayer.setSky({
+      windowKind: toMotionWindow(sky.currentWindow.name),
+      verdict: activeVerdict ?? toMotionVerdict(sky.startingSomethingNew),
+      locale: language,
+      waiting: dayLoading && !day,
+    });
+  }, [sky, language, dayLoading, day, askOpen, activeVerdict, skyLayer]);
+
+  useEffect(() => {
     if (!place.city || !sky || !day?.tithi?.name) return;
     void syncGlance({
       city: cityLabel(place.city, language),
@@ -198,15 +220,6 @@ export function HomeScreen() {
 
   return (
     <View style={styles.root}>
-      {sky ? (
-        <SkyBackdrop
-          windowKind={toMotionWindow(sky.currentWindow.name)}
-          verdict={activeVerdict ?? toMotionVerdict(sky.startingSomethingNew)}
-          locale={language}
-          beatIntensity={intensity}
-          beatVerdict={activeVerdict}
-        />
-      ) : null}
       <SafeAreaView style={styles.safe}>
         <View style={styles.top}>
           <Pressable onPress={() => setSearchOpen(true)} hitSlop={8} style={styles.cityHit}>
@@ -319,10 +332,10 @@ export function HomeScreen() {
 
               <StatusBlock
                 copy={copy}
-                loading={dayLoading && !day}
                 setup={daySetup && !day}
                 failed={dayFailed && !day}
                 onRetry={() => setReload((n) => n + 1)}
+                locale={language}
               />
 
               {card ? (
@@ -351,7 +364,7 @@ export function HomeScreen() {
                 onPress={() => setAskOpen(true)}
               />
             </View>
-            <AskSheet
+            <AskPage
               visible={askOpen}
               onClose={() => setAskOpen(false)}
               sky={sky}
@@ -363,6 +376,11 @@ export function HomeScreen() {
               onRestore={credits.restore}
               onVerdict={(verdict) => playVerdict(verdict)}
               dayContext={day}
+              chartContext={chartContext}
+              matchContext={matchContext}
+              copy={copy}
+              defaultCity={place.city}
+              onMatch={setMatchContext}
             />
           </>
         ) : (
@@ -384,6 +402,9 @@ export function HomeScreen() {
           onBuyMonthly={credits.buyMonthly}
           onBuyPack={credits.buyPack}
           onRestore={credits.restore}
+          sky={sky}
+          dayContext={day}
+          onMatch={setMatchContext}
         />
 
         <CitySearch
@@ -407,7 +428,7 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.night },
+  root: { flex: 1, backgroundColor: 'transparent' },
   safe: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 20 },
   top: {
     flexDirection: 'row',

@@ -21,13 +21,13 @@ export function AskFAB({ remaining, language, onPress }: Props) {
               ? 'पूछ बंद। खरीद खोलो।'
               : 'Ask locked. Open paywall.'
             : language === 'hi'
-              ? 'माइक से पूछो'
-              : 'Ask with the mic'
+              ? 'पूछो'
+              : 'Ask'
         }
         style={[styles.fab, gated && styles.gated]}
       >
         <View style={styles.ring}>
-          <Text style={styles.mic}>{language === 'hi' ? 'पूछें' : 'Ask'}</Text>
+          <Text style={styles.mic}>{language === 'hi' ? 'पूछो' : 'Ask'}</Text>
         </View>
       </Pressable>
       <Text style={styles.caption}>{remainingLabel(language, remaining)}</Text>

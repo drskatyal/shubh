@@ -1,10 +1,12 @@
 import type { CreditWallet } from '../billing/credits';
 import { CalendarScreen } from '../calendar/CalendarScreen';
+import type { SkyState } from '../engine';
 import { FestivalsScreen } from '../festivals/FestivalsScreen';
 import type { Copy, Language } from '../i18n/strings';
 import { KundliScreen, MatchingScreen } from '../kundli';
 import type { City } from '../location/cities';
 import { MuhuratScreen } from '../muhurat/MuhuratScreen';
+import type { NormalizedDay, NormalizedMatch } from '../tathaastu/types';
 import type { AlmanacTab } from './AlmanacDock';
 
 export function AlmanacHost({
@@ -18,6 +20,9 @@ export function AlmanacHost({
   onBuyMonthly,
   onBuyPack,
   onRestore,
+  sky,
+  dayContext,
+  onMatch,
 }: {
   tab: AlmanacTab | null;
   onClose: () => void;
@@ -29,6 +34,9 @@ export function AlmanacHost({
   onBuyMonthly?: () => Promise<void>;
   onBuyPack?: () => Promise<void>;
   onRestore?: () => Promise<void>;
+  sky?: SkyState | null;
+  dayContext?: NormalizedDay | null;
+  onMatch?: (match: NormalizedMatch) => void;
 }) {
   return (
     <>
@@ -71,6 +79,14 @@ export function AlmanacHost({
         copy={copy}
         language={language}
         defaultCity={city}
+        wallet={wallet}
+        sky={sky}
+        dayContext={dayContext}
+        onRemainingChange={onRemainingChange}
+        onBuyMonthly={onBuyMonthly}
+        onBuyPack={onBuyPack}
+        onRestore={onRestore}
+        onMatch={onMatch}
       />
     </>
   );
