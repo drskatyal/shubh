@@ -8,11 +8,6 @@ const config: ExpoConfig = {
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   scheme: 'shubh',
-  splash: {
-    image: './assets/splash-icon.png',
-    resizeMode: 'contain',
-    backgroundColor: '#0B1020',
-  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'ai.flowrad.shubh',

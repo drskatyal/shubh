@@ -28,14 +28,15 @@ const SUNDAY = { year: 2026, month: 8, day: 16 };
  * London Fri 14 Aug 2026: 11:16–13:06
  *   https://r-astro.com/london/2026-08-14
  *
- * London Sun 16 Aug 2026: 18:27–20:15
- *   https://rahukaal.com/2643743/london-england-united-kingdom
+ * London Sun 16 Aug 2026: 18:32–20:21
+ *   https://www.drikpanchang.com/panchang/rahu-kaal.html?date=16%2F08%2F2026
+ *   (London, 51°30′30″N 00°07′32″W)
  */
-const DRIK_RAHU = {
-  mumbaiFriday: { start: [11, 7], end: [12, 43] as [number, number] },
-  mumbaiSunday: { start: [17, 31], end: [19, 7] as [number, number] },
-  londonFriday: { start: [11, 16], end: [13, 6] as [number, number] },
-  londonSunday: { start: [18, 27], end: [20, 15] as [number, number] },
+const DRIK_RAHU: Record<string, { start: [number, number]; end: [number, number] }> = {
+  mumbaiFriday: { start: [11, 7], end: [12, 43] },
+  mumbaiSunday: { start: [17, 31], end: [19, 7] },
+  londonFriday: { start: [11, 16], end: [13, 6] },
+  londonSunday: { start: [18, 32], end: [20, 21] },
 };
 
 function noonOn(
