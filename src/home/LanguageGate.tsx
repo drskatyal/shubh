@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useLanguage } from '../i18n/language';
+import { SkyBackdrop } from '../motion';
 import { color } from '../theme/tokens';
 
 export function LanguageGate({ children }: { children: ReactNode }) {
@@ -14,17 +15,20 @@ export function LanguageGate({ children }: { children: ReactNode }) {
   if (!chosen) {
     return (
       <View style={styles.screen}>
-        <Text style={styles.kicker}>शुभ</Text>
-        <Text style={styles.brand}>{copy.appName}</Text>
-        <Text style={styles.sub}>{copy.subtitle}</Text>
-        <Text style={styles.prompt}>{copy.pickLanguage}</Text>
-        <View style={styles.row}>
-          <Pressable style={styles.choice} onPress={() => setLanguage('hi')}>
-            <Text style={styles.choiceText}>{copy.hindi}</Text>
-          </Pressable>
-          <Pressable style={styles.choice} onPress={() => setLanguage('en')}>
-            <Text style={styles.choiceText}>{copy.english}</Text>
-          </Pressable>
+        <SkyBackdrop windowKind="shubh" verdict="now" locale="en" />
+        <View style={styles.overlay}>
+          <Text style={styles.kicker}>शुभ</Text>
+          <Text style={styles.brand}>{copy.appName}</Text>
+          <Text style={styles.sub}>{copy.subtitle}</Text>
+          <Text style={styles.prompt}>{copy.pickLanguage}</Text>
+          <View style={styles.row}>
+            <Pressable style={styles.choice} onPress={() => setLanguage('hi')}>
+              <Text style={styles.choiceText}>{copy.hindi}</Text>
+            </Pressable>
+            <Pressable style={styles.choice} onPress={() => setLanguage('en')}>
+              <Text style={styles.choiceText}>{copy.english}</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     );
@@ -37,6 +41,10 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: color.night,
+  },
+  overlay: {
+    flex: 1,
+    zIndex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,

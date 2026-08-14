@@ -5,6 +5,7 @@ import type { Copy, Language } from '../i18n/strings';
 import { cityLabel, type City } from '../location/cities';
 import { festivalShareText } from '../share/cardText';
 import { ShareImageCard } from '../share/ShareImageCard';
+import { formatDateLabel } from '../home/shareDay';
 import { todayIso } from '../tathaastu/dates';
 import type { Festival, FestivalExplain } from '../tathaastu/types';
 import { color } from '../theme/tokens';
@@ -98,8 +99,9 @@ export function FestivalsScreen({
             }}
             style={styles.row}
           >
-            <Text style={styles.date}>{fest.date}</Text>
+            <Text style={styles.date}>{formatDateLabel(fest.date, language)}</Text>
             <Text style={styles.name}>{fest.name}</Text>
+            {fest.type ? <Text style={styles.tag}>{fest.type}</Text> : null}
           </Pressable>
         ))}
         {rows.length ? <Text style={styles.hint}>{almanac.reminderSet}</Text> : null}
@@ -143,14 +145,17 @@ const styles = StyleSheet.create({
   lead: { color: color.ivoryMuted, fontSize: 16, marginBottom: 8 },
   body: { gap: 10, paddingBottom: 48 },
   row: {
-    borderRadius: 18,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(244, 238, 224, 0.12)',
-    padding: 16,
-    gap: 4,
+    backgroundColor: color.card,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    gap: 6,
   },
-  date: { color: color.gold, fontSize: 13 },
-  name: { color: color.ivory, fontSize: 20, fontWeight: '600', lineHeight: 26 },
+  date: { color: color.gold, fontSize: 13, letterSpacing: 0.6, textTransform: 'capitalize' },
+  name: { color: color.ivory, fontSize: 24, fontWeight: '600', lineHeight: 30 },
+  tag: { color: color.ivoryDim, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 },
   hint: { color: color.ivoryDim, fontSize: 13, lineHeight: 18, marginTop: 8 },
   overlay: {
     flex: 1,

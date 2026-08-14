@@ -12,15 +12,15 @@ export function ChartView({ chart, copy }: { chart: NormalizedChart; copy: Copy 
   return (
     <View style={styles.card}>
       <Text style={styles.name}>{chart.name}</Text>
-      <View style={styles.row}>
+      <View style={styles.hero}>
         <View style={styles.cell}>
           <Text style={styles.kicker}>{copy.lagna}</Text>
-          <Text style={styles.value}>{chart.lagna.sign}</Text>
+          <Text style={styles.display}>{chart.lagna.sign}</Text>
           {chart.lagna.nakshatra ? <Text style={styles.meta}>{chart.lagna.nakshatra}</Text> : null}
         </View>
         <View style={styles.cell}>
           <Text style={styles.kicker}>{copy.moon}</Text>
-          <Text style={styles.value}>{chart.moon.sign}</Text>
+          <Text style={styles.display}>{chart.moon.sign}</Text>
           {chart.moon.nakshatra ? <Text style={styles.meta}>{chart.moon.nakshatra}</Text> : null}
         </View>
       </View>
@@ -49,10 +49,11 @@ const styles = StyleSheet.create({
     padding: 22,
     gap: 8,
   },
-  name: { color: color.ivory, fontSize: 24, fontWeight: '700' },
-  row: { flexDirection: 'row', gap: 16, marginVertical: 8 },
+  name: { color: color.ivory, fontSize: 28, fontWeight: '700' },
+  hero: { flexDirection: 'row', gap: 16, marginVertical: 12 },
   cell: { flex: 1, gap: 4 },
-  kicker: { color: color.goldSoft, fontSize: 13, letterSpacing: 0.4 },
+  kicker: { color: color.goldSoft, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase' },
+  display: { color: color.ivory, fontSize: 32, fontWeight: '300', lineHeight: 38 },
   value: { color: color.ivory, fontSize: 20, fontWeight: '600', lineHeight: 26 },
   meta: { color: color.ivoryMuted, fontSize: 14 },
   gap: { marginTop: 12 },

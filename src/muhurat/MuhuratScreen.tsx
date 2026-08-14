@@ -12,6 +12,29 @@ import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
 import { findMuhuratDates } from './findMuhurat';
 
+function ratingTone(rating: string): string {
+  const key = rating.toUpperCase();
+  if (key === 'EXCELLENT' || key === 'GOOD') return color.now;
+  if (key === 'AVOID') return color.danger;
+  return color.wait;
+}
+
+function DateRow({ row, copy, hero }: { row: RankedDate; copy: Copy; hero?: boolean }) {
+  return (
+    <View style={[styles.row, hero && styles.heroRow]}>
+      <View style={styles.rowTop}>
+        <Text style={[styles.date, hero && styles.heroDate]}>{row.date}</Text>
+        <Text style={[styles.rating, { color: ratingTone(String(row.rating)) }]}>{row.rating}</Text>
+      </View>
+      <Text style={[styles.score, hero && styles.heroScore]}>
+        {row.score}
+        <Text style={styles.scoreMeta}>  {copy.almanac.score}</Text>
+      </Text>
+      <Text style={styles.reason}>{row.reason}</Text>
+    </View>
+  );
+}
+
 export function MuhuratScreen({
   visible,
   onClose,
@@ -96,25 +119,22 @@ export function MuhuratScreen({
           onRetry={() => setTick((n) => n + 1)}
         />
         {best ? (
-          <ShareImageCard
-            kicker={
-              language === 'hi' ? `${eventLabel} के लिए सबसे अच्छी तारीख` : `Best date for ${eventLabel}`
-            }
-            title={best.date}
-            lines={[`${almanac.score} ${best.score}`, best.reason, city ? cityLabel(city, language) : '']}
-            shareLabel={almanac.shareImage}
-            language={language}
-            payload={share}
-          />
+          <>
+            <DateRow row={best} copy={copy} hero />
+            <ShareImageCard
+              kicker={
+                language === 'hi' ? `${eventLabel} के लिए सबसे अच्छी तारीख` : `Best date for ${eventLabel}`
+              }
+              title={best.date}
+              lines={[`${almanac.score} ${best.score}`, best.reason, city ? cityLabel(city, language) : '']}
+              shareLabel={almanac.shareImage}
+              language={language}
+              payload={share}
+            />
+          </>
         ) : null}
         {rows.slice(1).map((row) => (
-          <View key={row.date} style={styles.row}>
-            <Text style={styles.date}>{row.date}</Text>
-            <Text style={styles.score}>
-              {almanac.score} {row.score}
-            </Text>
-            <Text style={styles.reason}>{row.reason}</Text>
-          </View>
+          <DateRow key={row.date} row={row} copy={copy} />
         ))}
       </ScrollView>
     </Sheet>
@@ -135,13 +155,23 @@ const styles = StyleSheet.create({
   chipTextOn: { color: color.ink, fontWeight: '700' },
   body: { gap: 12, paddingBottom: 48 },
   row: {
-    borderRadius: 18,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(244, 238, 224, 0.12)',
+    backgroundColor: color.card,
     padding: 16,
-    gap: 4,
+    gap: 6,
   },
+  heroRow: {
+    borderColor: color.goldLine,
+    paddingVertical: 22,
+  },
+  rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
   date: { color: color.ivory, fontSize: 18, fontWeight: '600' },
-  score: { color: color.gold, fontSize: 14 },
+  heroDate: { fontSize: 22 },
+  rating: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase' },
+  score: { color: color.gold, fontSize: 22, fontWeight: '700' },
+  heroScore: { color: color.ivory, fontSize: 56, fontWeight: '300', lineHeight: 62 },
+  scoreMeta: { color: color.ivoryDim, fontSize: 14, fontWeight: '600' },
   reason: { color: color.ivoryMuted, fontSize: 14, lineHeight: 20 },
 });
