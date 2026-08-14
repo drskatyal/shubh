@@ -6,6 +6,7 @@ export type GlancePayload = {
   windowName: string;
   state: StartSomethingState;
   language: Language;
+  tithi?: string;
 };
 
 export function buildGlance(input: GlancePayload): GlancePayload {
@@ -14,5 +15,6 @@ export function buildGlance(input: GlancePayload): GlancePayload {
     windowName: input.windowName,
     state: input.state,
     language: input.language,
+    tithi: input.tithi,
   };
 }

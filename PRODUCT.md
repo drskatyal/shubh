@@ -5,7 +5,7 @@ Build this. TathaAstuAPI is the backbone. On-device `getSkyState` is the offline
 Docs: https://www.tathaastuapi.com/docs.html
 OpenAPI: https://api.tathaastuapi.com/openapi.json
 Base: `https://api.tathaastuapi.com/v1`
-Auth: `X-API-Key` header. Never put the key in the app binary. Client talks to a thin proxy (`TATHAASTU_API_KEY` on the server / EAS secret). Missing key → fixtures + setup state, no crash.
+Auth: `X-API-Key` header. Never put the key in the app binary. Client talks to a thin proxy (`TATHAASTU_API_KEY` on the server / EAS secret). Missing key or a failed call → calm retry / setup state. Never ship a fake panchang, sample Arjun/Priya chart, or mock festival as the happy path.
 
 `lang` on TathaAstu is phonetic transliteration (hi, en, ta, te, mr, kn, bn, gu, ml…). Launch hi + en. Leave i18n keys for the rest.
 
@@ -56,7 +56,7 @@ More regional languages, community, PDF reports, premium muhurat unlock if Tatha
 - No ads. No prayer lock. No sun-sign horoscope.
 
 ## Done when (Phase 1)
-- Home shows a real TathaAstu (or fixture) day for the city, with motion + share card.
+- Home shows a real TathaAstu day for the city, with motion + image share card.
 - Muhurat finder returns ranked dates and a share card.
 - Festival list + explain sheet.
 - Kundli generate + matching score + share card.

@@ -6,11 +6,12 @@ struct GlanceEntry: TimelineEntry {
     let city: String
     let windowName: String
     let state: String
+    let tithi: String
 }
 
 struct GlanceProvider: TimelineProvider {
     func placeholder(in context: Context) -> GlanceEntry {
-        GlanceEntry(date: Date(), city: "Shubh", windowName: "Rahu Kaal", state: "Wait")
+        GlanceEntry(date: Date(), city: "Shubh", windowName: "Rahu Kaal", state: "Wait", tithi: "")
     }
 
     func getSnapshot(in context: Context, completion: @escaping (GlanceEntry) -> Void) {
@@ -29,10 +30,11 @@ struct GlanceProvider: TimelineProvider {
         let windowName = defaults?.string(forKey: "windowName") ?? ""
         let stateKey = defaults?.string(forKey: "state") ?? "wait"
         let language = defaults?.string(forKey: "language") ?? "en"
+        let tithi = defaults?.string(forKey: "tithi") ?? ""
         let state = stateKey == "now"
             ? (language == "hi" ? "अभी" : "Now")
             : (language == "hi" ? "रुकें" : "Wait")
-        return GlanceEntry(date: Date(), city: city, windowName: windowName, state: state)
+        return GlanceEntry(date: Date(), city: city, windowName: windowName, state: state, tithi: tithi)
     }
 }
 
@@ -50,6 +52,11 @@ struct ShubhWidgetView: View {
             Text(entry.state)
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(Color(red: 0.78, green: 0.90, blue: 0.75))
+            if !entry.tithi.isEmpty {
+                Text(entry.tithi)
+                    .font(.caption)
+                    .foregroundStyle(Color(red: 0.91, green: 0.77, blue: 0.47))
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .padding()

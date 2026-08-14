@@ -1,5 +1,6 @@
 import { getGeminiApiKey } from '../config/env';
 import type { Language, SkyState } from '../engine';
+import type { NormalizedDay } from '../tathaastu/types';
 import { GEMINI_MODEL, VERDICT_SCHEMA, buildAskPrompt } from './prompt';
 import { parseVerdict } from './parseVerdict';
 import type { AskAudio, AskVerdict } from './types';
@@ -34,9 +35,10 @@ export async function askGemini(opts: {
   audio: AskAudio;
   sky: SkyState;
   language: Language;
+  dayContext?: NormalizedDay | null;
   fetchImpl?: FetchLike;
 }): Promise<AskVerdict> {
-  const { system, userText } = buildAskPrompt(opts.sky, opts.language);
+  const { system, userText } = buildAskPrompt(opts.sky, opts.language, opts.dayContext);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(opts.apiKey)}`;
   const body = {
     systemInstruction: { parts: [{ text: system }] },

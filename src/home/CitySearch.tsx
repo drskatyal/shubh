@@ -3,6 +3,7 @@ import {
   FlatList,
   Modal,
   Pressable,
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -11,6 +12,7 @@ import {
 
 import type { Copy, Language } from '../i18n/strings';
 import { cityLabel, searchCities, type City } from '../location/cities';
+import { color } from '../theme/tokens';
 
 export function CitySearch({
   visible,
@@ -37,90 +39,83 @@ export function CitySearch({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={styles.sheet}>
-        <Text style={styles.title}>{copy.citySearch}</Text>
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder={copy.citySearchPlaceholder}
-          placeholderTextColor="rgba(244, 238, 224, 0.35)"
-          autoFocus
-          style={styles.input}
-        />
-        <Pressable onPress={onUseLocation} style={styles.locationBtn}>
-          <Text style={styles.locationText}>
-            {locating ? copy.locating : copy.useLocation}
-          </Text>
-        </Pressable>
-        {denied ? <Text style={styles.denied}>{copy.locationDenied}</Text> : null}
-        <FlatList
-          data={results}
-          keyExtractor={(item) => item.id}
-          keyboardShouldPersistTaps="handled"
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => {
-                onSelect(item);
-                setQuery('');
-              }}
-              style={styles.row}
-            >
-              <Text style={styles.city}>{cityLabel(item, language)}</Text>
-              <Text style={styles.country}>
-                {language === 'hi' ? item.countryHi : item.countryEn}
-              </Text>
+        <SafeAreaView style={styles.safe}>
+          <View style={styles.top}>
+            <Text style={styles.title}>{copy.citySearch}</Text>
+            <Pressable onPress={onClose} hitSlop={8}>
+              <Text style={styles.close}>{copy.close}</Text>
             </Pressable>
-          )}
-        />
+          </View>
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder={copy.citySearchPlaceholder}
+            placeholderTextColor={color.ivoryDim}
+            autoFocus
+            autoCorrect={false}
+            style={styles.input}
+          />
+          <Pressable onPress={onUseLocation} style={styles.locationBtn}>
+            <Text style={styles.locationText}>
+              {locating ? copy.locating : copy.useLocation}
+            </Text>
+          </Pressable>
+          {denied ? <Text style={styles.denied}>{copy.locationDenied}</Text> : null}
+          <FlatList
+            data={results}
+            keyExtractor={(item) => item.id}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => {
+                  onSelect(item);
+                  setQuery('');
+                }}
+                style={styles.row}
+              >
+                <Text style={styles.city}>{cityLabel(item, language)}</Text>
+                <Text style={styles.country}>
+                  {language === 'hi' ? item.countryHi : item.countryEn}
+                </Text>
+              </Pressable>
+            )}
+          />
+        </SafeAreaView>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  sheet: {
-    flex: 1,
-    backgroundColor: '#0B1020',
-    paddingTop: 64,
-    paddingHorizontal: 20,
-  },
-  title: {
-    color: '#F4EEE0',
-    fontSize: 22,
+  sheet: { flex: 1, backgroundColor: color.nightLift },
+  safe: { flex: 1, paddingHorizontal: 20, paddingTop: 12 },
+  top: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
   },
+  title: { color: color.ivory, fontSize: 28, fontWeight: '700' },
+  close: { color: color.gold, fontSize: 16, fontWeight: '600' },
   input: {
     borderWidth: 1,
-    borderColor: 'rgba(232, 197, 120, 0.3)',
-    borderRadius: 12,
-    color: '#F4EEE0',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-  },
-  locationBtn: {
-    marginTop: 12,
-    marginBottom: 8,
-    alignSelf: 'flex-start',
-  },
-  locationText: {
-    color: '#E8C578',
-    fontSize: 15,
-  },
-  denied: {
-    color: 'rgba(244, 238, 224, 0.6)',
-    marginBottom: 8,
-  },
-  row: {
+    borderColor: color.goldLine,
+    borderRadius: 16,
+    color: color.ivory,
+    paddingHorizontal: 16,
     paddingVertical: 14,
+    fontSize: 17,
+    backgroundColor: color.card,
+  },
+  locationBtn: { marginTop: 14, marginBottom: 8, alignSelf: 'flex-start' },
+  locationText: { color: color.gold, fontSize: 16, fontWeight: '600' },
+  denied: { color: color.ivoryMuted, marginBottom: 8, lineHeight: 20 },
+  row: {
+    paddingVertical: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: 'rgba(244, 238, 224, 0.12)',
   },
-  city: {
-    color: '#F4EEE0',
-    fontSize: 17,
-  },
-  country: {
-    color: 'rgba(244, 238, 224, 0.5)',
-    marginTop: 2,
-  },
+  city: { color: color.ivory, fontSize: 18, fontWeight: '600' },
+  country: { color: color.ivoryDim, marginTop: 3, fontSize: 14 },
 });

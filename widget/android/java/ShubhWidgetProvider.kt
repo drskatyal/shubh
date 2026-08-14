@@ -24,7 +24,13 @@ class ShubhWidgetProvider : AppWidgetProvider() {
         if (raw != null) {
             val json = JSONObject(raw)
             city = json.optString("city", "Shubh")
-            window = json.optString("windowName", "")
+            val tithi = json.optString("tithi", "")
+            window =
+                if (tithi.isNotEmpty()) {
+                    "${json.optString("windowName", "")} · $tithi"
+                } else {
+                    json.optString("windowName", "")
+                }
             val key = json.optString("state", "wait")
             val lang = json.optString("language", "en")
             state =

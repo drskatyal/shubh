@@ -1,5 +1,6 @@
 import type { CreditWallet } from '../billing/credits';
 import type { Language, SkyState } from '../engine';
+import type { NormalizedDay } from '../tathaastu/types';
 import { askGemini } from './gemini';
 import { speakVerdict } from './speakVerdict';
 import type { AskAudio, AskResult } from './types';
@@ -10,6 +11,7 @@ export async function runAsk(opts: {
   language: Language;
   wallet: CreditWallet;
   apiKey: string | null;
+  dayContext?: NormalizedDay | null;
   ask?: typeof askGemini;
 }): Promise<AskResult> {
   if (!opts.apiKey) {
@@ -35,6 +37,7 @@ export async function runAsk(opts: {
       audio: opts.audio,
       sky: opts.sky,
       language: opts.language,
+      dayContext: opts.dayContext,
     });
     const remaining = await opts.wallet.consume();
     await speakVerdict(verdict);

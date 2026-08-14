@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useLanguage } from '../i18n/language';
+import { color } from '../theme/tokens';
 
 export function LanguageGate({ children }: { children: ReactNode }) {
   const { ready, chosen, copy, setLanguage } = useLanguage();
@@ -13,6 +14,7 @@ export function LanguageGate({ children }: { children: ReactNode }) {
   if (!chosen) {
     return (
       <View style={styles.screen}>
+        <Text style={styles.kicker}>शुभ</Text>
         <Text style={styles.brand}>{copy.appName}</Text>
         <Text style={styles.sub}>{copy.subtitle}</Text>
         <Text style={styles.prompt}>{copy.pickLanguage}</Text>
@@ -34,40 +36,52 @@ export function LanguageGate({ children }: { children: ReactNode }) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#06070E',
+    backgroundColor: color.night,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 28,
+    padding: 32,
+  },
+  kicker: {
+    color: color.gold,
+    fontSize: 16,
+    letterSpacing: 6,
+    marginBottom: 8,
   },
   brand: {
-    color: '#E8C578',
-    fontSize: 40,
+    color: color.ivory,
+    fontSize: 52,
     fontWeight: '700',
   },
   sub: {
-    color: 'rgba(244, 238, 224, 0.7)',
-    marginTop: 8,
-    fontSize: 16,
+    color: color.ivoryMuted,
+    marginTop: 10,
+    fontSize: 18,
+    textAlign: 'center',
+    lineHeight: 26,
   },
   prompt: {
-    color: '#F4EEE0',
-    marginTop: 48,
+    color: color.ivory,
+    marginTop: 56,
     fontSize: 18,
   },
   row: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: 16,
     marginTop: 24,
   },
   choice: {
     borderWidth: 1,
-    borderColor: 'rgba(232, 197, 120, 0.45)',
+    borderColor: color.goldLine,
     borderRadius: 999,
-    paddingHorizontal: 22,
-    paddingVertical: 12,
+    paddingHorizontal: 26,
+    paddingVertical: 14,
+    backgroundColor: color.card,
   },
   choiceText: {
-    color: '#F4EEE0',
+    color: color.ivory,
     fontSize: 18,
+    fontWeight: '600',
   },
 });

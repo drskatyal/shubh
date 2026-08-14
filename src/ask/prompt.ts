@@ -1,10 +1,12 @@
 import type { Language, SkyState } from '../engine';
+import type { NormalizedDay } from '../tathaastu/types';
 
 export const GEMINI_MODEL = 'gemini-3.1-flash-lite';
 
 export function buildAskPrompt(
   sky: SkyState,
   language: Language,
+  dayContext?: NormalizedDay | null,
 ): { system: string; userText: string } {
   const tongue = language === 'hi' ? 'Hindi (Devanagari)' : 'English';
   const system = [
@@ -22,7 +24,17 @@ export function buildAskPrompt(
     'Reply with JSON only, matching the schema.',
   ].join('\n');
 
-  const userText = `Language: ${language}\nSky for this city, this minute:\n${JSON.stringify(sky)}`;
+  const dayLine = dayContext
+    ? `\nLive TathaAstu day (limbs only, not clocks):\n${JSON.stringify({
+        tithi: dayContext.tithi,
+        nakshatra: dayContext.nakshatra,
+        yoga: dayContext.yoga,
+        karana: dayContext.karana,
+        good: dayContext.good,
+        avoid: dayContext.avoid,
+      })}`
+    : '';
+  const userText = `Language: ${language}\nSky for this city, this minute:\n${JSON.stringify(sky)}${dayLine}`;
   return { system, userText };
 }
 
