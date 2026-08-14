@@ -17,6 +17,7 @@ public class ShubhGlanceModule: Module {
       defaults?.set(json["windowName"] as? String ?? "", forKey: "windowName")
       defaults?.set(json["state"] as? String ?? "wait", forKey: "state")
       defaults?.set(json["language"] as? String ?? "en", forKey: "language")
+      defaults?.set(json["tithi"] as? String ?? "", forKey: "tithi")
       if #available(iOS 14.0, *) {
         WidgetCenter.shared.reloadAllTimelines()
       }

@@ -1,6 +1,6 @@
 # PLAN: paid ask + credits
 
-Lane: mic → `gemini-3.1-flash-lite` (audio in, text out) → structured verdict. Credits via RevenueCat. Clock/home/motion stay in parallel PRs.
+Lane: mic → `gemini-3.7-flash` (audio in, text out) → structured verdict. Credits via RevenueCat. Clock/home/motion stay in parallel PRs.
 
 ## Contract with the engine
 
@@ -14,7 +14,7 @@ Every clock in a verdict must already appear in that JSON. Client drops any `nex
 
 1. Mic records a short clip (`expo-av`).
 2. Prompt = system rules + this-minute sky JSON + `hi|en`.
-3. POST audio + prompt to `gemini-3.1-flash-lite`. Text only.
+3. POST audio + prompt to `gemini-3.7-flash`. Text only. Thinking level `LOW` (classifier, not a long agent).
 4. Parse `{ verdict: now|wait|after, nextTime, reason, displayText }`.
 5. `speakVerdict()` is an empty hook. No TTS.
 6. Missing `GEMINI_API_KEY` → setup copy, no crash.

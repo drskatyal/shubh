@@ -10,6 +10,7 @@ import { Paywall } from '../billing/Paywall';
 import type { CreditWallet } from '../billing/credits';
 import { getGeminiApiKey } from '../config/env';
 import type { Language, SkyState } from '../engine';
+import type { NormalizedDay } from '../tathaastu/types';
 import { privacyLine, remainingLabel, setupCopy } from './copy';
 import { createExpoRecorder, type Recorder } from './record';
 import { runAsk } from './runAsk';
@@ -27,6 +28,7 @@ type Props = {
   onRestore?: () => Promise<void>;
   onVerdict?: (verdict: VerdictKind) => void;
   recorder?: Recorder;
+  dayContext?: NormalizedDay | null;
 };
 
 type Phase = 'idle' | 'recording' | 'sending' | 'result' | 'error';
@@ -43,6 +45,7 @@ export function AskSheet({
   onRestore,
   onVerdict,
   recorder,
+  dayContext,
 }: Props) {
   const apiKey = getGeminiApiKey();
   const remaining = wallet?.remaining() ?? 0;
@@ -79,6 +82,7 @@ export function AskSheet({
           language,
           wallet,
           apiKey,
+          dayContext,
         });
         if (!result.ok) {
           setError(result.message);
