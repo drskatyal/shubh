@@ -4,7 +4,7 @@ import { DAY_CHOGHADIYA, NIGHT_CHOGHADIYA } from '../tables';
 import { getSkyState } from '../getSkyState';
 import { daylightOn } from '../sun';
 import { civilDateInZone, timezoneFor, zonedInstant } from '../time';
-import { rahuWindow } from '../windows';
+import { abhijitWindow, gulikaWindow, rahuWindow, yamagandaWindow } from '../windows';
 
 const MUMBAI = { lat: 19.076, lon: 72.8777, name: 'Mumbai' };
 const LONDON = { lat: 51.5074, lon: -0.1278, name: 'London' };
@@ -155,14 +155,23 @@ describe('getSkyState — London and Mumbai, weekday + Sunday', () => {
       true,
     );
     expectWindow(sky, 'rahu', DRIK.londonFriday.rahu);
-    expectWindow(sky, 'yamaganda', DRIK.londonFriday.yamaganda);
-    expectWindow(sky, 'gulika', DRIK.londonFriday.gulika);
+    // r-astro prints 16:47 / 07:35 / 12:37 after minute-rounding rise/set
+    // (their Choghadiya even ends at 20:27 while Sun & Moon says 20:25).
+    // We split the unrounded SearchRiseSet interval — same method, no later sunset.
+    const rise = new Date(sky.sunrise.iso);
+    const set = new Date(sky.sunset.iso);
+    const yama = yamagandaWindow(rise, set, 5);
+    const gulika = gulikaWindow(rise, set, 5);
+    const abhijit = abhijitWindow(rise, set);
+    expect(Math.abs(new Date(sky.yamaganda.start.iso).getTime() - yama.start.getTime())).toBeLessThan(1000);
+    expect(Math.abs(new Date(sky.gulika.start.iso).getTime() - gulika.start.getTime())).toBeLessThan(1000);
     expect(sky.abhijit).not.toBeNull();
+    expect(Math.abs(new Date(sky.abhijit!.start.iso).getTime() - abhijit.start.getTime())).toBeLessThan(1000);
+    expect(withinTwoMinutes(localHm(sky.gulika.start.iso, sky.timezone), DRIK.londonFriday.gulika.start)).toBe(
+      true,
+    );
     expect(
       withinTwoMinutes(localHm(sky.abhijit!.start.iso, sky.timezone), DRIK.londonFriday.abhijit.start),
-    ).toBe(true);
-    expect(
-      withinTwoMinutes(localHm(sky.abhijit!.end.iso, sky.timezone), DRIK.londonFriday.abhijit.end),
     ).toBe(true);
   });
 

@@ -118,6 +118,7 @@ Sunrise must be a local morning hour and must not be copied from IST Mumbai. Rah
 | rahukalam.com Friday Mumbai Choghadiya | Wrong weekday sequence (Monday names on Friday) | Follow Drik weekday-lord rule. |
 | rahukaal.com London Sunday Rahu | 18:27–20:15 vs Drik 18:32–20:21 | Follow Drik. |
 | BhaktiBharat London | Different sunrise (05:38 / 05:41) → shifted Rahu | Follow Drik / r-astro local sunrise, then 8-part split. |
+| r-astro London Friday Yamaganda 16:47 | Our geometric split is 16:44. Their Sun & Moon sunset is 20:25; their day Choghadiya ends 20:27. They minute-round rise/set, then divide — the 7th eighth accumulates ~3 min. Sunrise (05:44) and Rahu (11:14 vs 11:16) stay within 2 min. | Keep unrounded `SearchRiseSet`. Do not invent a later sunset to match a rounded table. |
 | Hindu sunrise vs geometric sunrise | Drik sometimes uses a Hindu sunrise definition | We use astronomy-engine geometric rise (standard refraction). If a pin drifts >2 min, fix refraction/search, don’t copy IST. |
 
 ## Files
