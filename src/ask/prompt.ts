@@ -1,7 +1,7 @@
 import type { Language, SkyState } from '../engine';
 import type { NormalizedDay } from '../tathaastu/types';
 
-export const GEMINI_MODEL = 'gemini-3.1-flash-lite';
+export const GEMINI_MODEL = 'gemini-3.7-flash';
 
 export function buildAskPrompt(
   sky: SkyState,

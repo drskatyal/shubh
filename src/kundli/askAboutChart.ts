@@ -78,6 +78,7 @@ export async function askGeminiAboutChart(opts: {
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema: VERDICT_SCHEMA,
+      thinkingConfig: { thinkingLevel: 'LOW' },
     },
   };
 

@@ -40,7 +40,7 @@ Auth: `X-API-Key` header. Never put the key in the app binary. Client talks to a
 - Birth data stays on device. Do not invent a user account.
 
 ### Voice ask (already in repo)
-- Keep Gemini 3.1 Flash-Lite mic. Stuff TathaAstu day-context (plus on-device fallback sky) into the prompt. Credits unchanged. TTS still later.
+- Keep Gemini 3.7 Flash mic. Stuff TathaAstu day-context (plus on-device fallback sky) into the prompt. Credits unchanged. TTS still later.
 
 ## Phase 2 (structure, don’t block Phase 1)
 Personalized daily insight, family profiles, more share cards, streaks, Amanta/Purnimanta toggle.
