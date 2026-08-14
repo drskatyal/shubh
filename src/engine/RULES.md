@@ -27,7 +27,7 @@ NOW if not waiting, and either:
 - **Sunday caveat** (PRODUCT): do not treat Sunday Abhijit as independently auspicious.
 - **Wednesday**: classical Muhurta Chintamani / Drik — Abhijit is not used.
 
-On those days Abhijit still appears on the clock; it does not flip WAIT → NOW by itself.
+On those days `SkyState.abhijit` is `null` (Ask must not copy a Sunday/Wednesday Abhijit clock). The interval is still computed internally; it does not flip WAIT → NOW by itself.
 
 ## Night
 

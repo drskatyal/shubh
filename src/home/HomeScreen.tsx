@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
+import { AskFAB, AskSheet } from '../ask';
+import { useCredits } from '../billing';
 import { getSkyState, type SkyState } from '../engine';
 import { useLanguage } from '../i18n/language';
 import { stateLabel, windowLabel } from '../i18n/strings';
 import { cityLabel } from '../location/cities';
 import { usePlace } from '../location/usePlace';
-import { SkyBackdrop } from '../motion';
+import { SkyBackdrop, useReduceMotion, useVerdictBeat } from '../motion';
 import { syncGlance } from '../widget/syncGlance';
 import { CitySearch } from './CitySearch';
 import { toMotionVerdict, toMotionWindow } from './motionWindow';
-import { HomeMicSlot } from './slots/HomeMicSlot';
 
 function formatCountdown(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -27,8 +28,12 @@ function formatCountdown(ms: number): string {
 export function HomeScreen() {
   const { language, copy, setLanguage } = useLanguage();
   const place = usePlace();
+  const credits = useCredits();
+  const reduceMotion = useReduceMotion();
+  const { intensity, activeVerdict, playVerdict } = useVerdictBeat(reduceMotion);
   const [now, setNow] = useState(() => new Date());
   const [searchOpen, setSearchOpen] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
 
   useEffect(() => {
     const tick = setInterval(() => setNow(new Date()), 1000);
@@ -45,8 +50,11 @@ export function HomeScreen() {
     if (!place.city) {
       return null;
     }
-    return getSkyState(place.city.lat, place.city.lon, now);
-  }, [place.city, now]);
+    return getSkyState(place.city.lat, place.city.lon, now, {
+      city: cityLabel(place.city, language),
+      language,
+    });
+  }, [place.city, now, language]);
 
   useEffect(() => {
     if (place.city && sky) {
@@ -68,8 +76,10 @@ export function HomeScreen() {
       {sky ? (
         <SkyBackdrop
           windowKind={toMotionWindow(sky.currentWindow.name)}
-          verdict={toMotionVerdict(sky.startingSomethingNew)}
+          verdict={activeVerdict ?? toMotionVerdict(sky.startingSomethingNew)}
           locale={language}
+          beatIntensity={intensity}
+          beatVerdict={activeVerdict}
         />
       ) : null}
       <SafeAreaView style={styles.safe}>
@@ -103,7 +113,25 @@ export function HomeScreen() {
               </Text>
               <Text style={styles.rule}>{copy.startingSomethingNew}</Text>
             </View>
-            <HomeMicSlot sky={sky} language={language} label={copy.micSlot} />
+            <View style={styles.dock}>
+              <AskFAB
+                remaining={credits.remaining}
+                language={language}
+                onPress={() => setAskOpen(true)}
+              />
+            </View>
+            <AskSheet
+              visible={askOpen}
+              onClose={() => setAskOpen(false)}
+              sky={sky}
+              language={language}
+              wallet={credits.wallet}
+              onRemainingChange={credits.refresh}
+              onBuyMonthly={credits.buyMonthly}
+              onBuyPack={credits.buyPack}
+              onRestore={credits.restore}
+              onVerdict={(verdict) => playVerdict(verdict)}
+            />
           </>
         ) : (
           <View style={styles.empty}>
@@ -217,6 +245,10 @@ const styles = StyleSheet.create({
   emptyText: {
     color: 'rgba(244, 238, 224, 0.6)',
     fontSize: 16,
+  },
+  dock: {
+    alignItems: 'center',
+    paddingBottom: 20,
   },
   privacy: {
     textAlign: 'center',

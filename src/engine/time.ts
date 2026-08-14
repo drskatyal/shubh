@@ -1,6 +1,6 @@
 import tzLookup from 'tz-lookup';
 
-import type { CivilDate } from './types';
+import type { CivilDate, SkyClock } from './types';
 
 export function timezoneFor(lat: number, lon: number): string {
   return tzLookup(lat, lon);
@@ -102,4 +102,73 @@ export function contains(start: Date, end: Date, at: Date): boolean {
 
 export function toIso(date: Date): string {
   return date.toISOString();
+}
+
+export function zonedParts(
+  date: Date,
+  timeZone: string,
+): {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+} {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    })
+      .formatToParts(date)
+      .map((part) => [part.type, part.value]),
+  );
+  return {
+    year: Number(parts.year),
+    month: Number(parts.month),
+    day: Number(parts.day),
+    hour: Number(parts.hour),
+    minute: Number(parts.minute),
+    second: Number(parts.second),
+  };
+}
+
+export function formatClock(date: Date, timeZone: string): string {
+  const { hour, minute } = zonedParts(date, timeZone);
+  return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+}
+
+/** ISO-8601 in the city's offset, e.g. 2026-08-14T11:07:00+05:30. */
+export function toOffsetIso(date: Date, timeZone: string): string {
+  const zoned = zonedParts(date, timeZone);
+  const asUtc = Date.UTC(
+    zoned.year,
+    zoned.month - 1,
+    zoned.day,
+    zoned.hour,
+    zoned.minute,
+    zoned.second,
+  );
+  const offsetMin = Math.round((asUtc - date.getTime()) / 60000);
+  const sign = offsetMin >= 0 ? '+' : '-';
+  const abs = Math.abs(offsetMin);
+  const hours = Math.floor(abs / 60)
+    .toString()
+    .padStart(2, '0');
+  const minutes = (abs % 60).toString().padStart(2, '0');
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${zoned.year}-${pad(zoned.month)}-${pad(zoned.day)}T${pad(zoned.hour)}:${pad(zoned.minute)}:${pad(zoned.second)}${sign}${hours}:${minutes}`;
+}
+
+export function toSkyClock(date: Date, timeZone: string): SkyClock {
+  return {
+    iso: toOffsetIso(date, timeZone),
+    clock: formatClock(date, timeZone),
+  };
 }

@@ -2,6 +2,8 @@
 
 This PR owns the free glance: Expo scaffold, on-device sky, home, language, widget. It does **not** own Gemini, credits, or TTS. Motion lives in [PR #1](https://github.com/drskatyal/shubh/pull/1) (`src/motion`). Home mounts that backdrop; it does not draw a second sky.
 
+The daily Drik-method engine (Rahu / Yamaganda / Gulika / Abhijit / Choghadiya, test oracle, `SkyState` clocks) is specified in [PLAN-drik.md](./PLAN-drik.md).
+
 Read [PRODUCT.md](../PRODUCT.md) first. This file only says how the repo is cut so the other two PRs can land without rewriting the clock.
 
 ## Folders
