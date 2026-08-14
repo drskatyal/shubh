@@ -22,6 +22,31 @@ export type Copy = {
   motionSlot: string;
   micSlot: string;
   privacyLocation: string;
+  kundli: string;
+  matching: string;
+  kundliTitle: string;
+  matchingTitle: string;
+  birthName: string;
+  birthNamePlaceholder: string;
+  dateOfBirth: string;
+  timeOfBirth: string;
+  birthPlace: string;
+  generateKundli: string;
+  generating: string;
+  lagna: string;
+  moon: string;
+  dasha: string;
+  dashaUnknown: string;
+  planets: string;
+  house: string;
+  askAboutChart: string;
+  personA: string;
+  personB: string;
+  matchScore: string;
+  matchingInProgress: string;
+  shareScore: string;
+  scoreCardTitle: string;
+  close: string;
   windows: Record<WindowKind, string>;
 };
 
@@ -46,6 +71,31 @@ export const STRINGS: Record<Language, Copy> = {
     motionSlot: 'Sky motion lands here',
     micSlot: 'Ask',
     privacyLocation: 'Location is used only to compute local sunrise.',
+    kundli: 'Kundli',
+    matching: 'Match',
+    kundliTitle: 'Birth chart',
+    matchingTitle: 'Guna milan',
+    birthName: 'Name',
+    birthNamePlaceholder: 'Arjun',
+    dateOfBirth: 'Date of birth',
+    timeOfBirth: 'Time of birth',
+    birthPlace: 'Place',
+    generateKundli: 'Generate kundli',
+    generating: 'Computing…',
+    lagna: 'Lagna',
+    moon: 'Moon',
+    dasha: 'Current dasha',
+    dashaUnknown: 'Dasha not in this payload',
+    planets: 'Key planets',
+    house: 'House',
+    askAboutChart: 'Ask about this chart',
+    personA: 'Person 1',
+    personB: 'Person 2',
+    matchScore: 'Get matching score',
+    matchingInProgress: 'Matching…',
+    shareScore: 'Share score card',
+    scoreCardTitle: 'Shubh · Guna milan',
+    close: 'Close',
     windows: {
       rahu: 'Rahu Kaal',
       yamaganda: 'Yamaganda',
@@ -80,6 +130,31 @@ export const STRINGS: Record<Language, Copy> = {
     motionSlot: 'आकाश की गति यहाँ आएगी',
     micSlot: 'पूछें',
     privacyLocation: 'लोकेशन केवल स्थानीय सूर्योदय के लिए है।',
+    kundli: 'कुंडली',
+    matching: 'मिलान',
+    kundliTitle: 'जन्म कुंडली',
+    matchingTitle: 'गुण मिलान',
+    birthName: 'नाम',
+    birthNamePlaceholder: 'अर्जुन',
+    dateOfBirth: 'जन्म तिथि',
+    timeOfBirth: 'जन्म समय',
+    birthPlace: 'स्थान',
+    generateKundli: 'कुंडली बनाएँ',
+    generating: 'गणना हो रही है…',
+    lagna: 'लग्न',
+    moon: 'चंद्र',
+    dasha: 'वर्तमान दशा',
+    dashaUnknown: 'दशा इस उत्तर में नहीं है',
+    planets: 'मुख्य ग्रह',
+    house: 'भाव',
+    askAboutChart: 'इस कुंडली के बारे में पूछें',
+    personA: 'व्यक्ति 1',
+    personB: 'व्यक्ति 2',
+    matchScore: 'मिलान अंक देखें',
+    matchingInProgress: 'मिलान हो रहा है…',
+    shareScore: 'अंक कार्ड साझा करें',
+    scoreCardTitle: 'शुभ · गुण मिलान',
+    close: 'बंद',
     windows: {
       rahu: 'राहु काल',
       yamaganda: 'यमगंड',
