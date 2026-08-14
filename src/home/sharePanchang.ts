@@ -1,5 +1,7 @@
 import { Share, type View } from 'react-native';
 
+import { noteSuccessfulShare } from '../store/reviewAfterShare';
+
 export type ShareCapture = () => Promise<string | null>;
 
 async function writePng(base64: string): Promise<string> {
@@ -73,6 +75,7 @@ export async function sharePanchang(
   const uri = capture ? await capture() : null;
   if (uri) {
     await shareImageUri(uri, title);
+    await noteSuccessfulShare();
     return { uri };
   }
   throw new Error('Share card image was not ready');

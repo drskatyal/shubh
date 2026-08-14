@@ -1,7 +1,9 @@
 import type { ExpoConfig } from 'expo/config';
 
+import { STORE_SCREENSHOTS, appleEn, playEn } from './src/store/aso';
+
 const micPermission =
-  'Shubh listens to your question so it can map the task onto today’s sky. Audio is used for that ask, then discarded.';
+  'Shubh listens so it can record both births or your ask. Audio is used once, then discarded.';
 
 const config: ExpoConfig = {
   name: 'Shubh',
@@ -11,6 +13,11 @@ const config: ExpoConfig = {
   icon: './assets/icon.png',
   userInterfaceStyle: 'dark',
   scheme: 'shubh',
+  description: playEn.shortDescription,
+  locales: {
+    en: './store/locales/en.json',
+    hi: './store/locales/hi.json',
+  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'ai.flowrad.shubh',
@@ -99,6 +106,10 @@ const config: ExpoConfig = {
       process.env.EXPO_PUBLIC_DIVINE_PROXY_URL ??
       process.env.DIVINE_PROXY_URL ??
       '',
+    store: {
+      appleTitle: appleEn.title,
+      screenshots: STORE_SCREENSHOTS.map((shot) => shot.file),
+    },
   },
 };
 

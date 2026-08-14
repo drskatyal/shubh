@@ -12,7 +12,7 @@ The app is layered, not a tab dump: home glance → almanac (muhurat / festivals
 - Share cards: today’s panchang, match score, festival why-this-date. Image + text. WhatsApp-ready.
 - Hindi + English via Divine `lan`. Other Indian codes pluggable.
 - Ask: full-screen temple of cards (not a chat box). Mic + optional text, labeled **पूछो / Record**. Credits decrement per ask (and per first marriage extract).
-- Play Store India first. iOS same binary second.
+- Play Store India first. iOS same binary second. Listing copy: [docs/STORE-ASO.md](docs/STORE-ASO.md). No model names in store text. Review prompt only after a successful share.
 
 ## Money
 

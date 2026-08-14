@@ -1,0 +1,12 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "शुभ",
+    "NSLocationWhenInUseUsageDescription": "शुभ आपकी लोकेशन केवल स्थानीय सूर्योदय और आज की खिड़कियाँ निकालने के लिए इस्तेमाल करता है।",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "शुभ आपकी लोकेशन केवल स्थानीय सूर्योदय और आज की खिड़कियाँ निकालने के लिए इस्तेमाल करता है।",
+    "NSMicrophoneUsageDescription": "शुभ दोनों जन्म या आपकी पूछ रिकॉर्ड करने के लिए सुनता है। आवाज़ एक बार जाती है, फिर हट जाती है।",
+    "NSUserNotificationsUsageDescription": "शुभ अगले त्योहार की सुबह याद दिलाता है। खाता नहीं बनता।"
+  },
+  "android": {
+    "app_name": "शुभ"
+  }
+}

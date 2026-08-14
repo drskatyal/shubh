@@ -37,4 +37,11 @@ describe('ask copy never names a model', () => {
     assert.match(marriageCopy, /Record/);
     assert.match(dock, /Record/);
   });
+
+  it('store listing paste doc stays provider-silent', () => {
+    const aso = readFileSync(new URL('../../../docs/STORE-ASO.md', import.meta.url), 'utf8');
+    assert.doesNotMatch(aso, BANNED);
+    assert.match(aso, /Shubh: Panchang & Kundli/);
+    assert.match(aso, /01-milan/);
+  });
 });

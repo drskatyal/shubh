@@ -1,0 +1,12 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Shubh",
+    "NSLocationWhenInUseUsageDescription": "Shubh uses your location only to compute local sunrise and today’s sky windows.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Shubh uses your location only to compute local sunrise and today’s sky windows.",
+    "NSMicrophoneUsageDescription": "Shubh listens so it can record both births or your ask. Audio is used once, then discarded.",
+    "NSUserNotificationsUsageDescription": "Shubh sends a local reminder for the next festival. No account."
+  },
+  "android": {
+    "app_name": "Shubh"
+  }
+}
