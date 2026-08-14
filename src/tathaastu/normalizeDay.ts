@@ -19,6 +19,7 @@ function limb(value: unknown): DayLimb | null {
   return {
     name,
     end: asString(rec.end) ?? asString(rec.ends_at) ?? asString(rec.end_time),
+    paksha: asString(rec.paksha) ?? asString(rec.paksha_name),
   };
 }
 

@@ -51,6 +51,11 @@ export type Copy = {
   yoga: string;
   karana: string;
   rahu: string;
+  brahma: string;
+  choghadiya: string;
+  shukla: string;
+  krishna: string;
+  paksha: string;
   loadingPanchang: string;
   shareToday: string;
   motionSlot: string;
@@ -110,8 +115,13 @@ export const STRINGS: Record<Language, Copy> = {
     yoga: 'Yoga',
     karana: 'Karana',
     rahu: 'Rahu',
+    brahma: 'Brahma',
+    choghadiya: 'Choghadiya',
+    shukla: 'Shukla',
+    krishna: 'Krishna',
+    paksha: 'Paksha',
     loadingPanchang: 'Fetching today’s panchang…',
-    shareToday: 'Share today',
+    shareToday: 'Share today’s panchang',
     motionSlot: 'Sky motion lands here',
     micSlot: 'Ask',
     privacyLocation: 'Location is used only to compute local sunrise.',
@@ -207,8 +217,13 @@ export const STRINGS: Record<Language, Copy> = {
     yoga: 'योग',
     karana: 'करण',
     rahu: 'राहु',
+    brahma: 'ब्रह्म',
+    choghadiya: 'चौघड़िया',
+    shukla: 'शुक्ल',
+    krishna: 'कृष्ण',
+    paksha: 'पक्ष',
     loadingPanchang: 'आज का पंचांग आ रहा है…',
-    shareToday: 'आज शेयर करें',
+    shareToday: 'आज का पंचांग शेयर करें',
     motionSlot: 'आकाश की गति यहाँ आएगी',
     micSlot: 'पूछें',
     privacyLocation: 'लोकेशन केवल स्थानीय सूर्योदय के लिए है।',
@@ -288,4 +303,18 @@ export function windowLabel(language: Language, name: WindowKind): string {
 
 export function stateLabel(language: Language, state: StartSomethingState): string {
   return state === 'now' ? STRINGS[language].now : STRINGS[language].wait;
+}
+
+export function pakshaLabel(language: Language, paksha?: string | null): string | null {
+  if (!paksha) return null;
+  const key = paksha.toUpperCase();
+  const copy = STRINGS[language];
+  if (key.includes('SHUKLA') || key.includes('शुक्ल')) return `${copy.shukla} ${copy.paksha}`;
+  if (key.includes('KRISHNA') || key.includes('कृष्ण')) return `${copy.krishna} ${copy.paksha}`;
+  return paksha;
+}
+
+export function choghadiyaLabel(language: Language, name: string): string {
+  const key = name.toLowerCase() as WindowKind;
+  return STRINGS[language].windows[key] ?? name;
 }

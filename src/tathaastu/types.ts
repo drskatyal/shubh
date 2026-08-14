@@ -234,6 +234,7 @@ export type CalendarMonth = {
 export type DayLimb = {
   name: string;
   end?: string | null;
+  paksha?: string | null;
 };
 
 export type DayWindow = {

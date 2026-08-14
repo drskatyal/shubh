@@ -84,6 +84,7 @@ const config: ExpoConfig = {
       },
     ],
     '@react-native-community/datetimepicker',
+    'expo-sharing',
   ],
   extra: {
     eas: {
