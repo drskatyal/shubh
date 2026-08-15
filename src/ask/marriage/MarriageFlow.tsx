@@ -300,7 +300,9 @@ export function MarriageFlow({
         />
       ) : focusResult ? null : (
         <>
-          {!connected && !extract && !match ? <ConnectLater language={language} surface="ask" /> : null}
+          {!connected && !extract && !match && !isShotMode() ? (
+            <ConnectLater language={language} surface="ask" />
+          ) : null}
           <RecordDock
             language={language}
             phase={phase}

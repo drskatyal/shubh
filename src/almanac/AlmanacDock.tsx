@@ -31,9 +31,9 @@ export function AlmanacDock({
             tapHaptic();
             onOpen(item.tab);
           }}
-          style={[styles.chip, item.tab === 'match' && styles.matchChip]}
+          style={styles.chip}
         >
-          <Text style={[styles.label, item.tab === 'match' && styles.matchLabel]}>{item.label}</Text>
+          <Text style={styles.label}>{item.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -62,9 +62,4 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   label: { color: color.gold, fontSize: 13, fontWeight: '600' },
-  matchChip: {
-    backgroundColor: color.gold,
-    borderColor: color.gold,
-  },
-  matchLabel: { color: color.ink, fontWeight: '800' },
 });

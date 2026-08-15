@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getSkyState } from '../../engine';
 import type { NormalizedDay } from '../../tathaastu/types';
-import { buildShareCard, formatDateLabel } from '../shareDay';
+import { buildShareCard, formatBirthLabel, formatDateLabel } from '../shareDay';
 
 function day(): NormalizedDay {
   return {
@@ -53,5 +53,12 @@ describe('buildShareCard', () => {
 describe('formatDateLabel', () => {
   it('formats a civil date', () => {
     expect(formatDateLabel('2026-08-14', 'en')).toMatch(/14/);
+  });
+});
+
+describe('formatBirthLabel', () => {
+  it('writes a Hindi birth date without ISO dashes', () => {
+    expect(formatBirthLabel('1994-03-12', 'hi')).toMatch(/1994/);
+    expect(formatBirthLabel('1994-03-12', 'hi')).not.toMatch(/1994-03-12/);
   });
 });

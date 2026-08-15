@@ -11,6 +11,7 @@ import { Sheet } from '../ui/Sheet';
 import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
 import { FREE_MUHURAT_DAYS } from '../billing/products';
+import { formatDateLabel } from '../home/shareDay';
 import { findMuhuratDates } from './findMuhurat';
 
 function ratingTone(rating: string): string {
@@ -48,7 +49,7 @@ function DateRow({
   return (
     <View style={[styles.row, hero && styles.heroRow]}>
       <View style={styles.rowTop}>
-        <Text style={[styles.date, hero && styles.heroDate]}>{row.date}</Text>
+        <Text style={[styles.date, hero && styles.heroDate]}>{formatDateLabel(row.date, language)}</Text>
         <Text style={[styles.rating, { color: ratingTone(String(row.rating)) }]}>
           {ratingLabel(String(row.rating), language)}
         </Text>
@@ -187,7 +188,7 @@ export function MuhuratScreen({
               kicker={
                 language === 'hi' ? `${eventLabel} के लिए सबसे अच्छी तारीख` : `Best date for ${eventLabel}`
               }
-              title={best.date}
+              title={formatDateLabel(best.date, language)}
               lines={[`${almanac.score} ${best.score}`, best.reason, city ? cityLabel(city, language) : '']}
               shareLabel={almanac.shareImage}
               language={language}

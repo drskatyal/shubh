@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   date: { color: color.gold, fontSize: 13, letterSpacing: 0.6, textTransform: 'capitalize' },
   name: { color: color.ivory, fontSize: 24, fontWeight: '600', lineHeight: 30 },
-  tag: { color: color.ivoryDim, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 },
+  tag: { color: color.ivoryDim, fontSize: 13, letterSpacing: 0.4 },
   hint: { color: color.ivoryDim, fontSize: 13, lineHeight: 18, marginTop: 8 },
   overlay: {
     flex: 1,

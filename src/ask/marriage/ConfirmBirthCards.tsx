@@ -3,14 +3,25 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { Language } from '../../engine';
 import { color } from '../../theme/tokens';
+import { formatBirthLabel } from '../../home/shareDay';
 import { fieldLabel, personTitle, understoodLabel } from './copy';
 import { applyField, formatDate, formatTime, missingFields } from './parse';
 import type { MarriageExtract, PersonField, PersonSide } from './types';
 
-function displayValue(extract: MarriageExtract, side: PersonSide, field: PersonField): string {
+function displayValue(
+  extract: MarriageExtract,
+  side: PersonSide,
+  field: PersonField,
+  language: Language,
+  editing: boolean,
+): string {
   const person = side === 'a' ? extract.person_a : extract.person_b;
   if (field === 'name') return person.name ?? '';
-  if (field === 'date') return formatDate(person);
+  if (field === 'date') {
+    const iso = formatDate(person);
+    if (!iso) return '';
+    return editing ? iso : formatBirthLabel(iso, language);
+  }
   if (field === 'time') return formatTime(person);
   return person.place ?? '';
 }
@@ -34,7 +45,7 @@ function Row({
   onEdit: () => void;
   onChange: (value: string) => void;
 }) {
-  const value = displayValue(extract, side, field);
+  const value = displayValue(extract, side, field, language, editing);
   const placeholder =
     field === 'date'
       ? '1990-05-15'
