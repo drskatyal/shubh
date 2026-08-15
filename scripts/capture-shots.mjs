@@ -16,6 +16,10 @@ const shots = [
   'kundli',
   'ask',
   'paywall',
+  'firstopen',
+  'privacy',
+  'terms',
+  'support',
 ];
 
 const waitFor = {
@@ -23,17 +27,24 @@ const waitFor = {
   match: /Yeh sab record kar dijiye|रिकॉर्ड/,
   confirm: /हमने यह समझा|Rohan|Ananya/,
   milan: /28|अच्छा मेल|\/ 36/,
-  muhurat: /मुहूर्त|EXCELLENT|विवाह/,
+  muhurat: /मुहूर्त|उत्तम|विवाह|Excellent/,
   festivals: /त्योहार|जन्माष्टमी/,
   kundli: /कुंडली|Rohan|Taurus/,
   ask: /पूछो|रुकें|Rahu/,
   paywall: /शुभ खोलो|₹199/,
+  firstopen: /इसी जगह से|हिन्दी/,
+  privacy: /जन्म की बात|Birth details/,
+  terms: /पंचांग है, पुजारी|almanac, not a priest/,
+  support: /खरीद वापस|Restore/,
 };
 
 const devices = [
-  { name: 'iphone', width: 390, height: 844 },
-  { name: 'pixel', width: 412, height: 915 },
-  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'iphone', width: 390, height: 844, scale: 3 },
+  { name: 'pixel', width: 412, height: 915, scale: 3 },
+  { name: 'desktop', width: 1440, height: 900, scale: 2 },
+  { name: 'ios67', width: 440, height: 956, scale: 3 },
+  { name: 'ios65', width: 430, height: 932, scale: 3 },
+  { name: 'ipad13', width: 1032, height: 1376, scale: 2 },
 ];
 
 const profile = mkdtempSync(join(tmpdir(), 'shubh-chrome-'));
@@ -51,7 +62,11 @@ const browser = await puppeteer.launch({
 
 for (const device of devices) {
   const page = await browser.newPage();
-  await page.setViewport({ width: device.width, height: device.height, deviceScaleFactor: 2 });
+  await page.setViewport({
+    width: device.width,
+    height: device.height,
+    deviceScaleFactor: device.scale,
+  });
   for (const shot of shots) {
     const url = `http://127.0.0.1:8081/?shot=${shot}`;
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 120000 });

@@ -20,12 +20,38 @@ function ratingTone(rating: string): string {
   return color.wait;
 }
 
-function DateRow({ row, copy, hero }: { row: RankedDate; copy: Copy; hero?: boolean }) {
+function ratingLabel(rating: string, language: Language): string {
+  const key = rating.toUpperCase();
+  if (language === 'hi') {
+    if (key === 'EXCELLENT') return 'उत्तम';
+    if (key === 'GOOD') return 'अच्छा';
+    if (key === 'AVOID') return 'टालें';
+    return 'सामान्य';
+  }
+  if (key === 'EXCELLENT') return 'Excellent';
+  if (key === 'GOOD') return 'Good';
+  if (key === 'AVOID') return 'Avoid';
+  return 'Fair';
+}
+
+function DateRow({
+  row,
+  copy,
+  language,
+  hero,
+}: {
+  row: RankedDate;
+  copy: Copy;
+  language: Language;
+  hero?: boolean;
+}) {
   return (
     <View style={[styles.row, hero && styles.heroRow]}>
       <View style={styles.rowTop}>
         <Text style={[styles.date, hero && styles.heroDate]}>{row.date}</Text>
-        <Text style={[styles.rating, { color: ratingTone(String(row.rating)) }]}>{row.rating}</Text>
+        <Text style={[styles.rating, { color: ratingTone(String(row.rating)) }]}>
+          {ratingLabel(String(row.rating), language)}
+        </Text>
       </View>
       <Text style={[styles.score, hero && styles.heroScore]}>
         {row.score}
@@ -156,7 +182,7 @@ export function MuhuratScreen({
         />
         {best ? (
           <>
-            <DateRow row={best} copy={copy} hero />
+            <DateRow row={best} copy={copy} language={language} hero />
             <ShareImageCard
               kicker={
                 language === 'hi' ? `${eventLabel} के लिए सबसे अच्छी तारीख` : `Best date for ${eventLabel}`
@@ -170,7 +196,7 @@ export function MuhuratScreen({
           </>
         ) : null}
         {rows.slice(1).map((row) => (
-          <DateRow key={row.date} row={row} copy={copy} />
+          <DateRow key={row.date} row={row} copy={copy} language={language} />
         ))}
       </ScrollView>
     </Sheet>

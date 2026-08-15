@@ -13,6 +13,7 @@ import { AlmanacDock, type AlmanacTab } from '../almanac/AlmanacDock';
 import { AlmanacHost } from '../almanac/AlmanacHost';
 import { AskFAB, AskPage } from '../ask';
 import { Paywall, useCredits } from '../billing';
+import { LegalScreen, type LegalPage } from '../legal';
 import { PREVIEW_ASK_TURN } from '../preview/fixtures';
 import { readShotId } from '../preview/shot';
 import { getSkyState, type SkyState } from '../engine';
@@ -33,12 +34,14 @@ import { syncGlance } from '../widget/syncGlance';
 import { isWebRuntime } from '../web/platform';
 import {
   almanacTabForLevel,
+  isLegalLevel,
   levelForAlmanacTab,
   pushWebLevel,
   readWebLevel,
 } from '../web/route';
 import { useTempleLayout } from '../web/temple';
 import { CitySearch } from './CitySearch';
+import { FirstOpenSheet } from './FirstOpenSheet';
 import { toMotionVerdict, toMotionWindow } from './motionWindow';
 import { ShareCard } from './ShareCard';
 import { buildShareCard } from './shareDay';
@@ -91,7 +94,7 @@ function TimingChip({
 }
 
 export function HomeScreen() {
-  const { language, copy, setLanguage } = useLanguage();
+  const { language, copy, setLanguage, chosen } = useLanguage();
   const place = usePlace();
   const credits = useCredits();
   const reduceMotion = useReduceMotion();
@@ -110,6 +113,10 @@ export function HomeScreen() {
     return null;
   });
   const [paywallOpen, setPaywallOpen] = useState(() => shot === 'paywall');
+  const [legal, setLegal] = useState<LegalPage | null>(() =>
+    shot === 'privacy' || shot === 'terms' || shot === 'support' ? shot : null,
+  );
+  const [menuOpen, setMenuOpen] = useState(false);
   const [day, setDay] = useState<NormalizedDay | null>(null);
   const [dayLoading, setDayLoading] = useState(false);
   const [daySetup, setDaySetup] = useState(false);
@@ -126,12 +133,6 @@ export function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    if (!place.city && place.ready && !place.locating && !shot) {
-      setSearchOpen(true);
-    }
-  }, [place.city, place.ready, place.locating, shot]);
-
-  useEffect(() => {
     if (!shot) return;
     if (shot === 'match' || shot === 'confirm' || shot === 'milan') setAlmanac('match');
     if (shot === 'muhurat') setAlmanac('muhurat');
@@ -139,6 +140,7 @@ export function HomeScreen() {
     if (shot === 'kundli') setAlmanac('kundli');
     if (shot === 'ask') setAskOpen(true);
     if (shot === 'paywall') setPaywallOpen(true);
+    if (shot === 'privacy' || shot === 'terms' || shot === 'support') setLegal(shot);
   }, [shot]);
 
   useEffect(() => {
@@ -219,8 +221,9 @@ export function HomeScreen() {
     });
   }, [place.city, sky, language, day]);
 
-  const overlayOpen = Boolean(almanac || askOpen || paywallOpen);
-  const hidePhoneChrome = overlayOpen && !temple;
+  const firstOpen = (!chosen || !place.city) && (!shot || shot === 'firstopen');
+  const overlayOpen = Boolean(almanac || askOpen || paywallOpen || legal);
+  const hidePhoneChrome = (overlayOpen || firstOpen) && !temple;
 
   useEffect(() => {
     if (shot || !isWebRuntime()) return;
@@ -229,6 +232,7 @@ export function HomeScreen() {
       setAlmanac(almanacTabForLevel(level));
       setAskOpen(level === 'ask');
       setPaywallOpen(level === 'paywall');
+      setLegal(isLegalLevel(level) ? level : null);
     };
     apply();
     window.addEventListener('hashchange', apply);
@@ -243,6 +247,8 @@ export function HomeScreen() {
     setAlmanac(null);
     setAskOpen(false);
     setPaywallOpen(false);
+    setLegal(null);
+    setMenuOpen(false);
     if (isWebRuntime() && !shot) pushWebLevel('home');
   };
 
@@ -262,7 +268,18 @@ export function HomeScreen() {
 
   const openPaywall = () => {
     setPaywallOpen(true);
+    setLegal(null);
+    setMenuOpen(false);
     if (isWebRuntime() && !shot) pushWebLevel('paywall');
+  };
+
+  const openLegal = (page: LegalPage) => {
+    setLegal(page);
+    setPaywallOpen(false);
+    setAskOpen(false);
+    setAlmanac(null);
+    setMenuOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel(page);
   };
   const remaining = sky ? new Date(sky.currentWindow.end).getTime() - now.getTime() : 0;
   const cityName = place.city ? cityLabel(place.city, language) : '';
@@ -326,11 +343,49 @@ export function HomeScreen() {
                 <Text style={[styles.segText, language === 'en' && styles.segTextOn]}>{copy.english}</Text>
               </Pressable>
             </View>
+            <Pressable
+              onPress={() => setMenuOpen((open) => !open)}
+              style={styles.moreHit}
+              accessibilityRole="button"
+              accessibilityLabel={copy.more}
+            >
+              <Text style={styles.moreMark}>⋯</Text>
+            </Pressable>
+          </View>
+        ) : null}
+        {menuOpen && !hidePhoneChrome ? (
+          <View style={styles.menu}>
+            {(
+              [
+                ['privacy', copy.privacy],
+                ['terms', copy.terms],
+                ['support', copy.support],
+              ] as const
+            ).map(([page, label]) => (
+              <Pressable key={page} onPress={() => openLegal(page)} style={styles.menuRow}>
+                <Text style={styles.menuText}>{label}</Text>
+              </Pressable>
+            ))}
           </View>
         ) : null}
 
         <View style={temple ? styles.sanctum : styles.phoneMain}>
-        {sky ? (
+        {firstOpen ? (
+          <FirstOpenSheet
+            copy={copy}
+            language={language}
+            locating={place.locating}
+            denied={place.denied}
+            onLanguage={setLanguage}
+            onUsePlace={() => {
+              void place.requestLocation();
+            }}
+            onSelectCity={(city) => {
+              if (!chosen) setLanguage(language);
+              place.setCity(city);
+            }}
+          />
+        ) : sky ? (
           <>
             {!overlayOpen ? (
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -474,7 +529,11 @@ export function HomeScreen() {
           </View>
         )}
 
-        {overlayOpen ? <View style={styles.overlayHold} /> : <Text style={styles.privacy}>{copy.privacyLocation}</Text>}
+        {overlayOpen || firstOpen ? (
+          <View style={styles.overlayHold} />
+        ) : (
+          <Text style={styles.privacy}>{copy.privacyLocation}</Text>
+        )}
 
         <AlmanacHost
           tab={almanac}
@@ -505,8 +564,12 @@ export function HomeScreen() {
             onBuyPack={credits.buyPack}
             onRestore={credits.restore}
             onClose={goHome}
+            onOpenLegal={openLegal}
             embedded={temple}
           />
+        ) : null}
+        {legal ? (
+          <LegalScreen page={legal} language={language} onClose={goHome} embedded={temple} />
         ) : null}
         </View>
 
@@ -573,7 +636,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingTop: 8,
+    gap: 6,
   },
+  moreHit: { paddingHorizontal: 6, paddingVertical: 4, marginTop: 2 },
+  moreMark: { color: color.gold, fontSize: 22, fontWeight: '700', lineHeight: 22 },
+  menu: {
+    alignSelf: 'flex-end',
+    backgroundColor: color.cardSolid,
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    borderRadius: 16,
+    paddingVertical: 6,
+    minWidth: 160,
+    zIndex: 18,
+  },
+  menuRow: { paddingHorizontal: 16, paddingVertical: 10 },
+  menuText: { color: color.ivory, fontSize: 15, fontWeight: '600' },
   cityHit: { flex: 1, paddingRight: 12 },
   brand: {
     color: color.gold,

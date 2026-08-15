@@ -1,3 +1,7 @@
+/**
+ * Divine Vedic Prakash types + normalizers.
+ * One vendor. This barrel is the alias screens already import — not a second live client.
+ */
 export {
   explainFestival,
   findMuhurat,

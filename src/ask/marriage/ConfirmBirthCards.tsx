@@ -36,7 +36,17 @@ function Row({
 }) {
   const value = displayValue(extract, side, field);
   const placeholder =
-    field === 'date' ? '1990-05-15' : field === 'time' ? '06:30' : field === 'place' ? 'Delhi' : 'Naam';
+    field === 'date'
+      ? '1990-05-15'
+      : field === 'time'
+        ? '06:30'
+        : field === 'place'
+          ? language === 'hi'
+            ? 'दिल्ली'
+            : 'Delhi'
+          : language === 'hi'
+            ? 'नाम'
+            : 'Name';
   return (
     <View style={styles.row}>
       <Text style={styles.field}>{fieldLabel(language, field)}</Text>

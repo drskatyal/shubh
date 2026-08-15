@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { isShotMode } from '../preview/shot';
+import { isShotMode, readShotId } from '../preview/shot';
 import { loadLanguage, saveLanguage } from '../storage/preferences';
 import { STRINGS, type Copy, type Language } from './strings';
 
@@ -24,7 +24,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isShotMode()) {
       setLanguageState('hi');
-      setChosen(true);
+      setChosen(readShotId() !== 'firstopen');
       setReady(true);
       return;
     }

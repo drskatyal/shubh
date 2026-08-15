@@ -9,6 +9,9 @@ export const WEB_LEVELS = [
   'matching',
   'ask',
   'paywall',
+  'privacy',
+  'terms',
+  'support',
 ] as const;
 
 export type WebLevel = (typeof WEB_LEVELS)[number];
@@ -23,6 +26,10 @@ const SHOT_LEVEL: Record<ShotId, WebLevel> = {
   kundli: 'kundli',
   ask: 'ask',
   paywall: 'paywall',
+  firstopen: 'home',
+  privacy: 'privacy',
+  terms: 'terms',
+  support: 'support',
 };
 
 export function pathToLevel(pathname: string, hash = '', search = ''): WebLevel {
@@ -61,6 +68,10 @@ export function pushWebLevel(level: WebLevel): void {
   const next = `${window.location.pathname}${window.location.search}${levelToHash(level)}`;
   if (`${window.location.pathname}${window.location.search}${window.location.hash}` === next) return;
   window.history.pushState({ level }, '', next);
+}
+
+export function isLegalLevel(level: WebLevel): level is 'privacy' | 'terms' | 'support' {
+  return level === 'privacy' || level === 'terms' || level === 'support';
 }
 
 export function almanacTabForLevel(

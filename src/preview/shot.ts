@@ -1,6 +1,6 @@
 /**
  * Screenshot routing only. Not the in-app happy path.
- * Open Expo web with ?shot=home|match|confirm|milan|muhurat|festivals|kundli|ask|paywall
+ * Open Expo web with ?shot=home|match|confirm|milan|muhurat|festivals|kundli|ask|paywall|firstopen|privacy|terms|support
  * or set EXPO_PUBLIC_SHUBH_SHOT.
  */
 export const SHOT_IDS = [
@@ -13,6 +13,10 @@ export const SHOT_IDS = [
   'kundli',
   'ask',
   'paywall',
+  'firstopen',
+  'privacy',
+  'terms',
+  'support',
 ] as const;
 
 export type ShotId = (typeof SHOT_IDS)[number];

@@ -8,8 +8,8 @@ export function privacyLine(language: Language): string {
 
 export function setupCopy(language: Language): string {
   return language === 'hi'
-    ? 'पूछ बाद में जुड़ेगी। चाबी कल। आज की नज़र फ़ोन पर है।'
-    : 'Ask connects later. Keys come tomorrow. Today’s glance is already on the phone.';
+    ? 'पूछ बाद में जुड़ेगी। आज की नज़र फ़ोन पर है।'
+    : 'Ask connects later. Today’s glance is already on the phone.';
 }
 
 export function remainingLabel(language: Language, remaining: number): string {

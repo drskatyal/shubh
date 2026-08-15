@@ -165,6 +165,13 @@ export const STORE_SCREENSHOTS = [
 
 export const STORE_PHONE_SHOTS = STORE_SCREENSHOTS.filter((shot) => shot.kind !== 'feature');
 
+/** After the locked first three. Never in the Play lead slots. */
+export const STORE_OPTIONAL_SHOTS = [
+  { id: '04-festivals', file: '04-festivals.png', captionHi: 'त्योहार', captionEn: 'Festivals' },
+  { id: '05-kundli', file: '05-kundli.png', captionHi: 'जन्म कुंडली', captionEn: 'Janam kundli' },
+  { id: '06-paywall', file: '06-paywall.png', captionHi: 'शुभ खोलो', captionEn: 'Open Shubh' },
+] as const;
+
 export function titleWords(title: string): string[] {
   return title
     .toLowerCase()

@@ -14,12 +14,17 @@ describe('web routes', () => {
     expect(pathToLevel('/matching', '', '')).toBe('matching');
     expect(pathToLevel('/', '', '?level=ask')).toBe('ask');
     expect(pathToLevel('/', '#/', '')).toBe('home');
+    expect(pathToLevel('/', '#/privacy', '')).toBe('privacy');
+    expect(pathToLevel('/', '#/terms', '')).toBe('terms');
+    expect(pathToLevel('/', '#/support', '')).toBe('support');
   });
 
   it('maps shots onto product levels', () => {
     expect(shotToLevel('milan')).toBe('matching');
     expect(shotToLevel('confirm')).toBe('matching');
     expect(shotToLevel('home')).toBe('home');
+    expect(shotToLevel('firstopen')).toBe('home');
+    expect(shotToLevel('privacy')).toBe('privacy');
   });
 
   it('round-trips almanac tabs', () => {

@@ -3,6 +3,7 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 
 import type { Language } from '../engine';
 import { privacyLine, remainingLabel } from '../ask/copy';
+import type { LegalPage } from '../legal';
 import { color } from '../theme/tokens';
 import { LevelFrame } from '../ui/LevelFrame';
 import { ANNUAL_PRICE_INR, MONTHLY_PRICE_INR, PACK_PRICE_INR } from './products';
@@ -16,6 +17,7 @@ type Props = {
   onBuyPack: () => Promise<void>;
   onRestore: () => Promise<void>;
   onClose?: () => void;
+  onOpenLegal?: (page: LegalPage) => void;
   embedded?: boolean;
 };
 
@@ -47,6 +49,7 @@ export function Paywall({
   onBuyPack,
   onRestore,
   onClose,
+  onOpenLegal,
   embedded,
 }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
@@ -63,8 +66,8 @@ export function Paywall({
       setError(
         raw === STORE_LATER
           ? hi
-            ? 'स्टोर बाद में जुड़ेगा। चाबी कल।'
-            : 'Store connects later. Keys come tomorrow.'
+            ? 'स्टोर बाद में जुड़ेगा। झलक मुफ़्त रहती है।'
+            : 'Store connects later. The glance stays free.'
           : raw,
       );
     } finally {
@@ -110,7 +113,7 @@ export function Paywall({
                 ? `महीना · ₹${MONTHLY_PRICE_INR.min}–${MONTHLY_PRICE_INR.max}`
                 : `Monthly · ₹${MONTHLY_PRICE_INR.min}–${MONTHLY_PRICE_INR.max}`}
             </Text>
-            <Text style={styles.sku}>{hi ? '100 पूछ · टेस्ट कीमत' : '100 asks · test price'}</Text>
+            <Text style={styles.sku}>{hi ? '100 पूछ / महीना' : '100 asks a month'}</Text>
           </Pressable>
 
           <Pressable
@@ -149,6 +152,21 @@ export function Paywall({
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <Text style={styles.privacy}>{privacyLine(language)}</Text>
+          {onOpenLegal ? (
+            <View style={styles.legalRow}>
+              <Pressable onPress={() => onOpenLegal('privacy')} accessibilityRole="button">
+                <Text style={styles.legalLink}>{hi ? 'गोपनीयता' : 'Privacy'}</Text>
+              </Pressable>
+              <Text style={styles.legalDot}>·</Text>
+              <Pressable onPress={() => onOpenLegal('terms')} accessibilityRole="button">
+                <Text style={styles.legalLink}>{hi ? 'नियम' : 'Terms'}</Text>
+              </Pressable>
+              <Text style={styles.legalDot}>·</Text>
+              <Pressable onPress={() => onOpenLegal('support')} accessibilityRole="button">
+                <Text style={styles.legalLink}>{hi ? 'सहायता' : 'Support'}</Text>
+              </Pressable>
+            </View>
+          ) : null}
         </ScrollView>
       </SafeAreaView>
     </LevelFrame>
@@ -209,4 +227,13 @@ const styles = StyleSheet.create({
   linkText: { color: color.gold, fontSize: 15 },
   error: { color: color.danger, fontSize: 14, textAlign: 'center' },
   privacy: { color: color.ivoryDim, fontSize: 12, lineHeight: 18, textAlign: 'center' },
+  legalRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  legalLink: { color: color.gold, fontSize: 13, fontWeight: '600' },
+  legalDot: { color: color.ivoryDim, fontSize: 13 },
 });

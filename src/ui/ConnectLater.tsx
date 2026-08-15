@@ -5,12 +5,12 @@ import { color } from '../theme/tokens';
 
 export function connectLaterLine(language: Language, surface: 'ask' | 'live' | 'store'): string {
   if (language === 'hi') {
-    if (surface === 'ask') return 'पूछ बाद में जुड़ेगी। चाबी कल। आज की नज़र फ़ोन पर है।';
-    if (surface === 'store') return 'स्टोर बाद में जुड़ेगा। चाबी कल।';
+    if (surface === 'ask') return 'पूछ बाद में जुड़ेगी। आज की नज़र फ़ोन पर है।';
+    if (surface === 'store') return 'स्टोर बाद में जुड़ेगा। झलक मुफ़्त रहती है।';
     return 'लाइव आकाश बाद में जुड़ेगा। आज की नज़र फ़ोन पर है।';
   }
-  if (surface === 'ask') return 'Ask connects later. Keys come tomorrow. Today’s glance is already on the phone.';
-  if (surface === 'store') return 'Store connects later. Keys come tomorrow.';
+  if (surface === 'ask') return 'Ask connects later. Today’s glance is already on the phone.';
+  if (surface === 'store') return 'Store connects later. The glance stays free.';
   return 'Live sky connects later. Today’s glance is already on the phone.';
 }
 

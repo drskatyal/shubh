@@ -32,6 +32,12 @@ export type Copy = {
   subtitle: string;
   asoLine: string;
   pickLanguage: string;
+  firstOpenLead: string;
+  useThisPlace: string;
+  more: string;
+  privacy: string;
+  terms: string;
+  support: string;
   continue: string;
   hindi: string;
   english: string;
@@ -97,6 +103,12 @@ export const STRINGS: Record<Language, Copy> = {
     subtitle: 'Is now good for this?',
     asoLine: 'Panchang · kundli · guna milan · rahukaal · muhurat',
     pickLanguage: 'Hindi or English',
+    firstOpenLead: 'City for today’s sky. Then the glance. No account.',
+    useThisPlace: 'Use this place',
+    more: 'More',
+    privacy: 'Privacy',
+    terms: 'Terms',
+    support: 'Support',
     continue: 'Continue',
     hindi: 'हिन्दी',
     english: 'English',
@@ -201,6 +213,12 @@ export const STRINGS: Record<Language, Copy> = {
     subtitle: 'क्या अभी ठीक है?',
     asoLine: 'पंचांग · कुंडली · गुण मिलान · राहु काल · मुहूर्त',
     pickLanguage: 'हिन्दी या अंग्रेज़ी',
+    firstOpenLead: 'आज के आकाश के लिए शहर। फिर झलक। खाता नहीं।',
+    useThisPlace: 'इसी जगह से',
+    more: 'और',
+    privacy: 'गोपनीयता',
+    terms: 'नियम',
+    support: 'सहायता',
     continue: 'आगे बढ़ें',
     hindi: 'हिन्दी',
     english: 'English',
