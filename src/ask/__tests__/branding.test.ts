@@ -51,7 +51,9 @@ describe('ask copy never names a model', () => {
     assert.doesNotMatch(paywall, BANNED);
     assert.match(paywall, /Open Shubh|शुभ खोलो/);
     const aso = readFileSync(new URL('../../../docs/STORE-ASO.md', import.meta.url), 'utf8');
+    const backend = readFileSync(new URL('../../../docs/BACKEND.md', import.meta.url), 'utf8');
     assert.doesNotMatch(aso, BANNED);
+    assert.doesNotMatch(backend, BANNED);
     assert.match(aso, /Shubh: Panchang & Kundli/);
     assert.match(aso, /01-milan/);
     assert.match(aso, /feature-graphic/);

@@ -3,6 +3,8 @@ type Extra = {
   DIVINE_PROXY_URL?: string;
   ASK_PROXY_URL?: string;
   SHUBH_DEV_UNLOCK?: string;
+  SUPABASE_URL?: string;
+  SUPABASE_ANON_KEY?: string;
 };
 
 function readExtra(): Extra {
@@ -72,4 +74,20 @@ export function getDivineApiKey(): string | null {
 /** Optional Bearer token. Defaults to DIVINE_API_KEY when unset. */
 export function getDivineApiToken(): string | null {
   return trim(process.env.DIVINE_API_TOKEN);
+}
+
+/** Public project URL only. Empty in this branch. Never a live placeholder. */
+export function getSupabaseUrl(): string | null {
+  return trim(process.env.EXPO_PUBLIC_SUPABASE_URL) ?? trim(readExtra().SUPABASE_URL);
+}
+
+/** Publishable / anon key only. Never the service role. */
+export function getSupabaseAnonKey(): string | null {
+  return (
+    trim(process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY) ?? trim(readExtra().SUPABASE_ANON_KEY)
+  );
+}
+
+export function isSupabaseConfigured(): boolean {
+  return Boolean(getSupabaseUrl() && getSupabaseAnonKey());
 }

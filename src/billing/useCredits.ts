@@ -9,7 +9,7 @@ import {
   restorePurchases,
   syncEntitlements,
 } from './revenuecat';
-import { createAsyncStorageStore } from './store';
+import { createAppCreditStore } from './supabaseStore';
 
 export function useCredits() {
   const [wallet, setWallet] = useState<CreditWallet | null>(null);
@@ -19,7 +19,7 @@ export function useCredits() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const next = await CreditWallet.open(createAsyncStorageStore(), {
+      const next = await CreditWallet.open(await createAppCreditStore(), {
         devUnlock: isDevUnlock(),
       });
       await syncEntitlements(next);

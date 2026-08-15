@@ -7,7 +7,10 @@ import {
   getDivineProxyUrl,
   getGeminiApiKey,
   getRevenueCatApiKey,
+  getSupabaseAnonKey,
+  getSupabaseUrl,
   isDevUnlock,
+  isSupabaseConfigured,
 } from '../env';
 
 describe('empty-key boot', () => {
@@ -17,6 +20,9 @@ describe('empty-key boot', () => {
     expect(getRevenueCatApiKey()).toBeNull();
     expect(getDivineProxyUrl()).toBeNull();
     expect(getAskProxyUrl()).toBeNull();
+    expect(getSupabaseUrl()).toBeNull();
+    expect(getSupabaseAnonKey()).toBeNull();
+    expect(isSupabaseConfigured()).toBe(false);
     expect(isDevUnlock()).toBe(false);
   });
 
@@ -31,10 +37,14 @@ describe('empty-key boot', () => {
       'EXPO_PUBLIC_DIVINE_PROXY_URL',
       'EXPO_PUBLIC_ASK_PROXY_URL',
       'EXPO_PUBLIC_SHUBH_DEV_UNLOCK',
+      'EXPO_PUBLIC_SUPABASE_URL',
+      'EXPO_PUBLIC_SUPABASE_ANON_KEY',
     ]) {
       expect(example).toContain(name);
       expect(keys).toContain(name);
     }
     expect(example).not.toMatch(/AIza|sk-|rc_live|rc_sb_/);
+    expect(example).not.toMatch(/SERVICE_ROLE|service_role/);
+    expect(keys).toMatch(/Never put the service role/);
   });
 });
