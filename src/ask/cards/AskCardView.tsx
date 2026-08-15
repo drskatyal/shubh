@@ -41,11 +41,18 @@ function VerdictBody({ card }: { card: Extract<AskCard, { kind: 'verdict' }> }) 
   );
 }
 
-function PanchangBody({ card }: { card: Extract<AskCard, { kind: 'panchang' }> }) {
+function PanchangBody({
+  card,
+  language,
+}: {
+  card: Extract<AskCard, { kind: 'panchang' }>;
+  language: Language;
+}) {
+  const hi = language === 'hi';
   const cells = [
-    ['Tithi', card.tithi],
-    ['Nakshatra', card.nakshatra],
-    ['Yoga', card.yoga],
+    [hi ? 'तिथि' : 'Tithi', card.tithi],
+    [hi ? 'नक्षत्र' : 'Nakshatra', card.nakshatra],
+    [hi ? 'योग' : 'Yoga', card.yoga],
   ];
   return (
     <View style={styles.leaf}>
@@ -59,7 +66,13 @@ function PanchangBody({ card }: { card: Extract<AskCard, { kind: 'panchang' }> }
   );
 }
 
-function TimelineBody({ card }: { card: Extract<AskCard, { kind: 'timeline' }> }) {
+function TimelineBody({
+  card,
+  language,
+}: {
+  card: Extract<AskCard, { kind: 'timeline' }>;
+  language: Language;
+}) {
   return (
     <View style={styles.thread}>
       {card.slots.map((slot) => (
@@ -71,7 +84,7 @@ function TimelineBody({ card }: { card: Extract<AskCard, { kind: 'timeline' }> }
               {slot.start}–{slot.end}
             </Text>
           </View>
-          {slot.now ? <Text style={styles.nowMark}>NOW</Text> : null}
+          {slot.now ? <Text style={styles.nowMark}>{language === 'hi' ? 'अभी' : 'Now'}</Text> : null}
         </View>
       ))}
     </View>
@@ -124,8 +137,8 @@ export function AskCardView({ card, language }: { card: AskCard; language: Langu
     <View ref={ref as never} collapsable={false}>
       <Plate>
         {card.kind === 'verdict' ? <VerdictBody card={card} /> : null}
-        {card.kind === 'panchang' ? <PanchangBody card={card} /> : null}
-        {card.kind === 'timeline' ? <TimelineBody card={card} /> : null}
+        {card.kind === 'panchang' ? <PanchangBody card={card} language={language} /> : null}
+        {card.kind === 'timeline' ? <TimelineBody card={card} language={language} /> : null}
         {card.kind === 'verse' ? <Text style={styles.verse}>{card.text}</Text> : null}
         {card.kind === 'goodAvoid' ? (
           <View style={styles.split}>

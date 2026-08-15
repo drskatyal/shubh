@@ -23,5 +23,8 @@ describe('Hindi-first store shots', () => {
     expect(PREVIEW_CHART.planets[0]?.name).toBe('सूर्य');
     expect(PREVIEW_ASK_TURN.question).toMatch(/घर/);
     expect(PREVIEW_FESTIVALS[0]?.name).toBe('जन्माष्टमी');
+    const askCard = readFileSync(new URL('../../ask/cards/AskCardView.tsx', import.meta.url), 'utf8');
+    expect(askCard).toMatch(/तिथि/);
+    expect(askCard).not.toMatch(/'TITHI'/);
   });
 });
