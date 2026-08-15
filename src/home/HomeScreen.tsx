@@ -223,7 +223,7 @@ export function HomeScreen() {
 
   const firstOpen = (!chosen || !place.city) && (!shot || shot === 'firstopen');
   const overlayOpen = Boolean(almanac || askOpen || paywallOpen || legal);
-  const hidePhoneChrome = (overlayOpen || firstOpen) && !temple;
+  const hidePhoneChrome = overlayOpen && !temple || firstOpen;
 
   useEffect(() => {
     if (shot || !isWebRuntime()) return;

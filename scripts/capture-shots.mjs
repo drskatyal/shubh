@@ -39,12 +39,12 @@ const waitFor = {
 };
 
 const devices = [
-  { name: 'iphone', width: 390, height: 844, scale: 3 },
-  { name: 'pixel', width: 412, height: 915, scale: 3 },
-  { name: 'desktop', width: 1440, height: 900, scale: 2 },
-  { name: 'ios67', width: 440, height: 956, scale: 3 },
-  { name: 'ios65', width: 430, height: 932, scale: 3 },
-  { name: 'ipad13', width: 1032, height: 1376, scale: 2 },
+  { name: 'iphone', width: 390, height: 844, scale: 3, shots },
+  { name: 'pixel', width: 412, height: 915, scale: 3, shots },
+  { name: 'desktop', width: 1440, height: 900, scale: 2, shots },
+  { name: 'ios67', width: 440, height: 956, scale: 3, shots: ['milan', 'home', 'muhurat'] },
+  { name: 'ios65', width: 430, height: 932, scale: 3, shots: ['milan', 'home', 'muhurat'] },
+  { name: 'ipad13', width: 1032, height: 1376, scale: 2, shots: ['milan', 'home', 'muhurat'] },
 ];
 
 const profile = mkdtempSync(join(tmpdir(), 'shubh-chrome-'));
@@ -67,7 +67,7 @@ for (const device of devices) {
     height: device.height,
     deviceScaleFactor: device.scale,
   });
-  for (const shot of shots) {
+  for (const shot of device.shots) {
     const url = `http://127.0.0.1:8081/?shot=${shot}`;
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 120000 });
     await page.waitForFunction(

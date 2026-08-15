@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
   date: { color: color.ivory, fontSize: 18, fontWeight: '600' },
   heroDate: { fontSize: 22 },
-  rating: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase' },
+  rating: { fontSize: 12, fontWeight: '800', letterSpacing: 0.4 },
   score: { color: color.gold, fontSize: 22, fontWeight: '700' },
   heroScore: { color: color.ivory, fontSize: 56, fontWeight: '300', lineHeight: 62 },
   scoreMeta: { color: color.ivoryDim, fontSize: 14, fontWeight: '600' },

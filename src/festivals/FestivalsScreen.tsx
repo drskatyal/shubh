@@ -116,7 +116,11 @@ export function FestivalsScreen({
           >
             <Text style={styles.date}>{formatDateLabel(fest.date, language)}</Text>
             <Text style={styles.name}>{fest.name}</Text>
-            {fest.type ? <Text style={styles.tag}>{fest.type}</Text> : null}
+            {fest.type ? (
+              <Text style={styles.tag}>
+                {language === 'hi' ? 'त्योहार' : 'Festival'}
+              </Text>
+            ) : null}
           </Pressable>
         ))}
         {rows.length && canRemind ? <Text style={styles.hint}>{almanac.reminderSet}</Text> : null}
