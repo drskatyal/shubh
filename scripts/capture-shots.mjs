@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer-core';
-import { mkdirSync } from 'node:fs';
-import { mkdtempSync } from 'node:os';
+import { mkdirSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const OUT = '/opt/cursor/artifacts/screenshots';
@@ -35,7 +35,7 @@ const devices = [
   { name: 'pixel', width: 412, height: 915 },
 ];
 
-const profile = mkdtempSync(join('/tmp', 'shubh-chrome-'));
+const profile = mkdtempSync(join(tmpdir(), 'shubh-chrome-'));
 
 const browser = await puppeteer.launch({
   executablePath: '/usr/local/bin/google-chrome',
