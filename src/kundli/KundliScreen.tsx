@@ -28,8 +28,10 @@ export function KundliScreen({
   wallet,
   onRemainingChange,
   onBuyMonthly,
+  onBuyAnnual,
   onBuyPack,
   onRestore,
+  previewChart,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -39,12 +41,16 @@ export function KundliScreen({
   wallet: CreditWallet | null;
   onRemainingChange?: (remaining: number) => void;
   onBuyMonthly?: () => Promise<void>;
+  onBuyAnnual?: () => Promise<void>;
   onBuyPack?: () => Promise<void>;
   onRestore?: () => Promise<void>;
+  previewChart?: import('../tathaastu/types').NormalizedChart;
 }) {
   const [form, setForm] = useState<BirthData>(() => emptyBirth({ city: defaultCity }));
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<TathaLoad<NormalizedChart> | null>(null);
+  const [result, setResult] = useState<TathaLoad<NormalizedChart> | null>(
+    previewChart ? { ok: true, data: previewChart, source: 'fallback', status: 200 } : null,
+  );
   const chartAsk = useAskAboutChart();
 
   useEffect(() => {
@@ -120,6 +126,7 @@ export function KundliScreen({
           wallet={wallet}
           onRemainingChange={onRemainingChange}
           onBuyMonthly={onBuyMonthly}
+          onBuyAnnual={onBuyAnnual}
           onBuyPack={onBuyPack}
           onRestore={onRestore}
           dayContext={null}

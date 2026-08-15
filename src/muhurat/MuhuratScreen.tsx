@@ -10,6 +10,7 @@ import { color } from '../theme/tokens';
 import { Sheet } from '../ui/Sheet';
 import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
+import { FREE_MUHURAT_DAYS } from '../billing/products';
 import { findMuhuratDates } from './findMuhurat';
 
 function ratingTone(rating: string): string {
@@ -41,12 +42,18 @@ export function MuhuratScreen({
   city,
   language,
   copy,
+  days,
+  previewDates,
+  onUnlock,
 }: {
   visible: boolean;
   onClose: () => void;
   city: City | null;
   language: Language;
   copy: Copy;
+  days?: number;
+  previewDates?: RankedDate[];
+  onUnlock?: () => Promise<void>;
 }) {
   const [event, setEvent] = useState<FinderEvent>('marriage');
   const [rows, setRows] = useState<RankedDate[]>([]);
@@ -54,12 +61,26 @@ export function MuhuratScreen({
   const [setup, setSetup] = useState(false);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
+  const range = days ?? FREE_MUHURAT_DAYS;
+  const lockedExtra = range < 60;
 
   useEffect(() => {
     if (!visible || !city) return;
+    if (previewDates?.length) {
+      setRows(previewDates);
+      setSetup(false);
+      setFailed(false);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     setLoading(true);
-    void findMuhuratDates({ event, lat: city.lat, lon: city.lon }).then((result) => {
+    void findMuhuratDates({
+      event,
+      lat: city.lat,
+      lon: city.lon,
+      days: range,
+    }).then((result) => {
       if (cancelled) return;
       setRows(result.dates);
       setSetup(Boolean(result.setup));
@@ -69,7 +90,7 @@ export function MuhuratScreen({
     return () => {
       cancelled = true;
     };
-  }, [visible, event, city, tick]);
+  }, [visible, event, city, tick, previewDates, range]);
 
   const almanac = copy.almanac;
   const eventLabel = almanac.events[event];
@@ -108,6 +129,19 @@ export function MuhuratScreen({
           </Pressable>
         ))}
       </ScrollView>
+      {lockedExtra ? (
+        <Pressable
+          onPress={() => {
+            tapHaptic();
+            void onUnlock?.();
+          }}
+          style={styles.unlock}
+        >
+          <Text style={styles.unlockText}>
+            {language === 'hi' ? 'साठ दिन का मुहूर्त खोलो' : 'Open the sixty-day window'}
+          </Text>
+        </Pressable>
+      ) : null}
       <ScrollView contentContainerStyle={styles.body}>
         <StatusBlock
           copy={copy}
@@ -142,6 +176,16 @@ export function MuhuratScreen({
 }
 
 const styles = StyleSheet.create({
+  unlock: {
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  unlockText: { color: color.gold, fontSize: 13, fontWeight: '700' },
   chips: { gap: 8, paddingVertical: 16, flexDirection: 'row' },
   chip: {
     borderRadius: 999,

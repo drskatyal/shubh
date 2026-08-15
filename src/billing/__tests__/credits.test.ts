@@ -9,7 +9,7 @@ import {
   grantPack,
   remainingAsks,
 } from '../credits';
-import { MONTHLY_PRICE_INR, PACK_PRICE_INR, PRODUCTS } from '../products';
+import { ANNUAL_PRICE_INR, MONTHLY_PRICE_INR, PACK_PRICE_INR, PRODUCTS } from '../products';
 
 describe('credits', () => {
   it('gives one free sample, then gates at 0', () => {
@@ -49,12 +49,21 @@ describe('credits', () => {
     assert.equal(wallet.snapshot().usedFreeSample, false);
   });
 
-  it('exports the RevenueCat product ids and India test prices', () => {
+  it('exports the RevenueCat product ids and India test prices', async () => {
     assert.equal(PRODUCTS.monthly, 'shubh_monthly_100');
+    assert.equal(PRODUCTS.annual, 'shubh_annual_1200');
     assert.equal(PRODUCTS.pack, 'shubh_credits_100');
     assert.equal(MONTHLY_PRICE_INR.min, 199);
     assert.equal(MONTHLY_PRICE_INR.max, 299);
+    assert.equal(ANNUAL_PRICE_INR.min, 1999);
+    assert.equal(ANNUAL_PRICE_INR.max, 2499);
     assert.equal(PACK_PRICE_INR, 799);
     assert.notEqual(MONTHLY_PRICE_INR.max, 599);
+    const wallet = await CreditWallet.open(new MemoryCreditStore());
+    assert.equal(wallet.isPro(), false);
+    assert.equal(wallet.muhuratDays(), 30);
+    await wallet.setMonthly(true, 'period-a');
+    assert.equal(wallet.isPro(), true);
+    assert.equal(wallet.muhuratDays(), 60);
   });
 });

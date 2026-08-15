@@ -3,12 +3,12 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { ShareCardModel } from './shareDay';
 
 /** 1:1 WhatsApp / Instagram card. Gold on night. No ads. */
-export function ShareCard({ card }: { card: ShareCardModel }) {
+export function ShareCard({ card, branded = true }: { card: ShareCardModel; branded?: boolean }) {
   const good = card.startSomething === 'good';
   return (
     <View style={styles.square} testID="share-card" collapsable={false}>
       <View style={styles.inner} collapsable={false}>
-        <Text style={styles.app}>{card.app}</Text>
+        {branded ? <Text style={styles.app}>{card.app}</Text> : null}
         <Text style={styles.city}>{card.city}</Text>
         <Text style={styles.date}>{card.dateLabel}</Text>
         <View style={styles.rule} />

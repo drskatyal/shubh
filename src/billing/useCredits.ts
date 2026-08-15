@@ -3,6 +3,7 @@ import { isDevUnlock } from '../config/env';
 import { CreditWallet } from './credits';
 import {
   applyCustomerInfo,
+  purchaseAnnual,
   purchaseMonthly,
   purchasePack,
   restorePurchases,
@@ -43,6 +44,13 @@ export function useCredits() {
     refresh();
   }, [wallet, refresh]);
 
+  const buyAnnual = useCallback(async () => {
+    if (!wallet) return;
+    const info = await purchaseAnnual();
+    if (info) await applyCustomerInfo(wallet, info);
+    refresh();
+  }, [wallet, refresh]);
+
   const buyPack = useCallback(async () => {
     if (!wallet) return;
     const info = await purchasePack();
@@ -63,6 +71,7 @@ export function useCredits() {
     ready,
     refresh,
     buyMonthly,
+    buyAnnual,
     buyPack,
     restore,
   };

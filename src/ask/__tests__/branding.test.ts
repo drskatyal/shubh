@@ -39,6 +39,9 @@ describe('ask copy never names a model', () => {
   });
 
   it('store listing paste doc stays provider-silent', () => {
+    const paywall = readFileSync(new URL('../../billing/Paywall.tsx', import.meta.url), 'utf8');
+    assert.doesNotMatch(paywall, BANNED);
+    assert.match(paywall, /Open Shubh|शुभ खोलो/);
     const aso = readFileSync(new URL('../../../docs/STORE-ASO.md', import.meta.url), 'utf8');
     assert.doesNotMatch(aso, BANNED);
     assert.match(aso, /Shubh: Panchang & Kundli/);

@@ -55,13 +55,14 @@ export async function findMuhuratDates(input: {
   lon: number;
   startDate?: string;
   endDate?: string;
+  days?: number;
   minScore?: number;
   place?: string;
   fetch?: typeof fetch;
 }): Promise<FinderResult> {
   const minScore = input.minScore ?? 60;
   const startDate = input.startDate ?? todayIso(input.lat, input.lon);
-  const endDate = input.endDate ?? addIsoDays(startDate, 60);
+  const endDate = input.endDate ?? addIsoDays(startDate, input.days ?? 60);
   const options: DivineRequestOptions = { fetch: input.fetch };
   const candidates = EVENT_CANDIDATES[input.event];
 

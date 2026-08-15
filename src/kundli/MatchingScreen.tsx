@@ -21,9 +21,12 @@ export function MatchingScreen({
   dayContext,
   onRemainingChange,
   onBuyMonthly,
+  onBuyAnnual,
   onBuyPack,
   onRestore,
   onMatch,
+  initialExtract,
+  initialMatch,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -35,9 +38,12 @@ export function MatchingScreen({
   dayContext?: NormalizedDay | null;
   onRemainingChange?: (remaining: number) => void;
   onBuyMonthly?: () => Promise<void>;
+  onBuyAnnual?: () => Promise<void>;
   onBuyPack?: () => Promise<void>;
   onRestore?: () => Promise<void>;
   onMatch?: (match: NormalizedMatch) => void;
+  initialExtract?: import('../ask/marriage/types').MarriageExtract | null;
+  initialMatch?: NormalizedMatch | null;
 }) {
   if (!visible) return null;
   const hi = language === 'hi';
@@ -67,9 +73,12 @@ export function MatchingScreen({
             defaultCity={defaultCity}
             onRemainingChange={onRemainingChange}
             onBuyMonthly={onBuyMonthly}
+            onBuyAnnual={onBuyAnnual}
             onBuyPack={onBuyPack}
             onRestore={onRestore}
             onMatch={onMatch}
+            initialExtract={initialExtract}
+            initialMatch={initialMatch}
           />
         </ScrollView>
       </SafeAreaView>

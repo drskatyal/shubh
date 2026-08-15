@@ -4,6 +4,7 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 import { Paywall } from '../billing/Paywall';
 import type { CreditWallet } from '../billing/credits';
 import { getAskProxyUrl, getGeminiApiKey } from '../config/env';
+import { ConnectLater } from '../ui/ConnectLater';
 import type { Language, SkyState } from '../engine';
 import { toMotionVerdict, toMotionWindow } from '../home/motionWindow';
 import type { Copy } from '../i18n/strings';
@@ -16,7 +17,7 @@ import { AskComposer } from './AskComposer';
 import { AskCardView } from './cards/AskCardView';
 import { composeAskCards } from './cards/composeCards';
 import type { AskTurn } from './cards/types';
-import { privacyLine, remainingLabel, setupCopy } from './copy';
+import { privacyLine, remainingLabel } from './copy';
 import { MarriageFlow } from './marriage/MarriageFlow';
 import { looksLikeMarriageAsk } from './marriage/shaadiNow';
 import { createExpoRecorder, type Recorder } from './record';
@@ -32,6 +33,7 @@ type Props = {
   wallet: CreditWallet | null;
   onRemainingChange?: (remaining: number) => void;
   onBuyMonthly?: () => Promise<void>;
+  onBuyAnnual?: () => Promise<void>;
   onBuyPack?: () => Promise<void>;
   onRestore?: () => Promise<void>;
   onVerdict?: (verdict: VerdictKind) => void;
@@ -43,6 +45,7 @@ type Props = {
   defaultCity?: City | null;
   onMatch?: (match: NormalizedMatch) => void;
   initialMode?: 'ask' | 'marriage';
+  initialTurns?: AskTurn[];
 };
 
 type Phase = 'idle' | 'recording' | 'sending';
@@ -55,6 +58,7 @@ export function AskPage({
   wallet,
   onRemainingChange,
   onBuyMonthly,
+  onBuyAnnual,
   onBuyPack,
   onRestore,
   onVerdict,
@@ -66,6 +70,7 @@ export function AskPage({
   defaultCity,
   onMatch,
   initialMode = 'ask',
+  initialTurns,
 }: Props) {
   const remaining = wallet?.remaining() ?? 0;
   const hi = language === 'hi';
@@ -74,7 +79,7 @@ export function AskPage({
   const [phase, setPhase] = useState<Phase>('idle');
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [turns, setTurns] = useState<AskTurn[]>([]);
+  const [turns, setTurns] = useState<AskTurn[]>(initialTurns ?? []);
   const [mode, setMode] = useState<'ask' | 'marriage'>(initialMode);
   const recRef = useRef<Recorder>(recorder ?? createExpoRecorder());
   const strings = copy ?? STRINGS[language];
@@ -222,6 +227,7 @@ export function AskPage({
                 recorder={recRef.current}
                 onRemainingChange={onRemainingChange}
                 onBuyMonthly={onBuyMonthly}
+                onBuyAnnual={onBuyAnnual}
                 onBuyPack={onBuyPack}
                 onRestore={onRestore}
                 onMatch={onMatch}
@@ -245,15 +251,17 @@ export function AskPage({
             )}
           </ScrollView>
 
-          {!connected ? (
-            <Text style={styles.body}>{setupCopy(language)}</Text>
-          ) : showPaywall ? (
+          {!connected && turns.length === 0 && mode !== 'marriage' ? (
+            <ConnectLater language={language} surface="ask" />
+          ) : showPaywall && turns.length === 0 ? (
             <Paywall
               language={language}
               remaining={remaining}
               onBuyMonthly={onBuyMonthly ?? (async () => undefined)}
+              onBuyAnnual={onBuyAnnual}
               onBuyPack={onBuyPack ?? (async () => undefined)}
               onRestore={onRestore ?? (async () => undefined)}
+              onClose={onClose}
             />
           ) : mode === 'marriage' ? null : (
             <AskComposer

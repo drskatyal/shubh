@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Paywall } from '../../billing/Paywall';
 import type { CreditWallet } from '../../billing/credits';
 import { askBackendKey, askBackendReady } from '../backend';
+import { ConnectLater } from '../../ui/ConnectLater';
 import type { Language, SkyState } from '../../engine';
 import type { City } from '../../location/cities';
 import { DivineWait, useOptionalSkyLayer } from '../../motion';
@@ -45,10 +46,13 @@ export function MarriageFlow({
   recorder,
   onRemainingChange,
   onBuyMonthly,
+  onBuyAnnual,
   onBuyPack,
   onRestore,
   onMatch,
   seedText,
+  initialExtract,
+  initialMatch,
 }: {
   language: Language;
   copy: Copy;
@@ -59,10 +63,13 @@ export function MarriageFlow({
   recorder?: Recorder;
   onRemainingChange?: (remaining: number) => void;
   onBuyMonthly?: () => Promise<void>;
+  onBuyAnnual?: () => Promise<void>;
   onBuyPack?: () => Promise<void>;
   onRestore?: () => Promise<void>;
   onMatch?: (match: NormalizedMatch) => void;
   seedText?: string;
+  initialExtract?: MarriageExtract | null;
+  initialMatch?: NormalizedMatch | null;
 }) {
   const hi = language === 'hi';
   const remaining = wallet?.remaining() ?? 0;
@@ -71,9 +78,9 @@ export function MarriageFlow({
   const [phase, setPhase] = useState<Phase>('idle');
   const [text, setText] = useState(seedText ?? '');
   const [error, setError] = useState<string | null>(null);
-  const [extract, setExtract] = useState<MarriageExtract | null>(null);
+  const [extract, setExtract] = useState<MarriageExtract | null>(initialExtract ?? null);
   const [typedFallback, setTypedFallback] = useState(false);
-  const [match, setMatch] = useState<NormalizedMatch | null>(null);
+  const [match, setMatch] = useState<NormalizedMatch | null>(initialMatch ?? null);
   const [muhurat, setMuhurat] = useState<RankedDate[] | null>(null);
   const [muhuratBusy, setMuhuratBusy] = useState(false);
   const recRef = useRef<Recorder>(recorder ?? createExpoRecorder());
@@ -119,7 +126,9 @@ export function MarriageFlow({
     setError(null);
     try {
       await saveMatchForms({ personA: pair.a, personB: pair.b });
-      const loaded = await matchPeople(pair.a, pair.b);
+      const loaded = await matchPeople(pair.a, pair.b, {
+        includeDashakoot: wallet?.isPro() ?? false,
+      });
       if (!loaded.ok) {
         setError(loaded.setup ? copy.almanac.liveNeedsKey : copy.almanac.liveFailed);
         setPhase('idle');
@@ -279,17 +288,21 @@ export function MarriageFlow({
           language={language}
           remaining={remaining}
           onBuyMonthly={onBuyMonthly ?? (async () => undefined)}
+          onBuyAnnual={onBuyAnnual}
           onBuyPack={onBuyPack ?? (async () => undefined)}
           onRestore={onRestore ?? (async () => undefined)}
         />
       ) : (
-        <RecordDock
-          language={language}
-          phase={phase}
-          hint={extract ? hint : undefined}
-          onMic={() => void onMic()}
-          disabled={waiting || !connected || !wallet}
-        />
+        <>
+          {!connected && !extract && !match ? <ConnectLater language={language} surface="ask" /> : null}
+          <RecordDock
+            language={language}
+            phase={phase}
+            hint={extract ? hint : undefined}
+            onMic={() => void onMic()}
+            disabled={waiting || !connected || !wallet}
+          />
+        </>
       )}
 
       {!typedFallback ? (

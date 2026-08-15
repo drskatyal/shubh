@@ -2,6 +2,7 @@ type Extra = {
   REVENUECAT_API_KEY?: string;
   DIVINE_PROXY_URL?: string;
   ASK_PROXY_URL?: string;
+  SHUBH_DEV_UNLOCK?: string;
 };
 
 function readExtra(): Extra {
@@ -45,7 +46,10 @@ export function getRevenueCatApiKey(): string | null {
 }
 
 export function isDevUnlock(): boolean {
-  return process.env.EXPO_PUBLIC_SHUBH_DEV_UNLOCK === '1';
+  return (
+    process.env.EXPO_PUBLIC_SHUBH_DEV_UNLOCK === '1' ||
+    readExtra().SHUBH_DEV_UNLOCK === '1'
+  );
 }
 
 /** Public proxy URL only. Never an API key. */

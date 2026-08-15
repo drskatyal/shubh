@@ -21,12 +21,18 @@ export function FestivalsScreen({
   city,
   language,
   copy,
+  canRemind,
+  previewFestivals,
+  onUnlock,
 }: {
   visible: boolean;
   onClose: () => void;
   city: City | null;
   language: Language;
   copy: Copy;
+  canRemind?: boolean;
+  previewFestivals?: Festival[];
+  onUnlock?: () => Promise<void>;
 }) {
   const [rows, setRows] = useState<Festival[]>([]);
   const [setup, setSetup] = useState(false);
@@ -38,6 +44,13 @@ export function FestivalsScreen({
 
   useEffect(() => {
     if (!visible || !city) return;
+    if (previewFestivals?.length) {
+      setRows(previewFestivals);
+      setSetup(false);
+      setFailed(false);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     setLoading(true);
     void loadUpcomingFestivals({ lat: city.lat, lon: city.lon, lang: language }).then((result) => {
@@ -46,7 +59,7 @@ export function FestivalsScreen({
       setSetup(Boolean(result.setup));
       setFailed(!result.ok && !result.setup);
       setLoading(false);
-      if (result.ok) {
+      if (result.ok && canRemind) {
         void scheduleNextFestival(result.festivals, {
           lat: city.lat,
           lon: city.lon,
@@ -58,7 +71,7 @@ export function FestivalsScreen({
     return () => {
       cancelled = true;
     };
-  }, [visible, city, language, tick]);
+  }, [visible, city, language, tick, canRemind, previewFestivals]);
 
   useEffect(() => {
     if (!open) {
@@ -104,7 +117,19 @@ export function FestivalsScreen({
             {fest.type ? <Text style={styles.tag}>{fest.type}</Text> : null}
           </Pressable>
         ))}
-        {rows.length ? <Text style={styles.hint}>{almanac.reminderSet}</Text> : null}
+        {rows.length && canRemind ? <Text style={styles.hint}>{almanac.reminderSet}</Text> : null}
+        {rows.length && !canRemind ? (
+          <Pressable
+            onPress={() => {
+              tapHaptic();
+              void onUnlock?.();
+            }}
+          >
+            <Text style={styles.hint}>
+              {language === 'hi' ? 'त्योहार की सुबह याद — शुभ खोलो' : 'Festival morning reminder — open Shubh'}
+            </Text>
+          </Pressable>
+        ) : null}
       </ScrollView>
       {open ? (
         <Pressable style={styles.overlay} onPress={() => setOpen(null)}>
@@ -117,6 +142,7 @@ export function FestivalsScreen({
                 lines={[explain?.humanReadable ?? '', cityName]}
                 shareLabel={almanac.shareImage}
                 language={language}
+                branded={!canRemind}
                 payload={festivalShareText({
                   language,
                   name: open.name,

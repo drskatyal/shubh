@@ -1,5 +1,5 @@
 import { isDevUnlock } from '../config/env';
-import { MONTHLY_ASKS, PACK_ASKS } from './products';
+import { EXTRA_MUHURAT_DAYS, FREE_MUHURAT_DAYS, MONTHLY_ASKS, PACK_ASKS } from './products';
 
 export type CreditSnapshot = {
   usedFreeSample: boolean;
@@ -109,6 +109,14 @@ export class CreditWallet {
 
   canAsk(): boolean {
     return this.remaining() > 0;
+  }
+
+  isPro(): boolean {
+    return this.devUnlock || this.snap.monthlyActive;
+  }
+
+  muhuratDays(): number {
+    return this.isPro() ? EXTRA_MUHURAT_DAYS : FREE_MUHURAT_DAYS;
   }
 
   snapshot(): CreditSnapshot {

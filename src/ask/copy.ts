@@ -8,8 +8,8 @@ export function privacyLine(language: Language): string {
 
 export function setupCopy(language: Language): string {
   return language === 'hi'
-    ? 'पूछ अभी जुड़ा नहीं है। ऐप को प्रॉक्सी से जोड़ें, फिर दोबारा बनाएँ।'
-    : 'Ask is not connected. Point the app at the proxy, then rebuild.';
+    ? 'पूछ बाद में जुड़ेगी। चाबी कल। आज की नज़र फ़ोन पर है।'
+    : 'Ask connects later. Keys come tomorrow. Today’s glance is already on the phone.';
 }
 
 export function remainingLabel(language: Language, remaining: number): string {

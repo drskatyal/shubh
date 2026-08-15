@@ -12,7 +12,10 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_SHUBH_DEV_UNLOCK": "0"
+      }
     }
   },
   "submit": {

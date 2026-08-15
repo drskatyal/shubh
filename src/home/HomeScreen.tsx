@@ -12,7 +12,9 @@ import {
 import { AlmanacDock, type AlmanacTab } from '../almanac/AlmanacDock';
 import { AlmanacHost } from '../almanac/AlmanacHost';
 import { AskFAB, AskPage } from '../ask';
-import { useCredits } from '../billing';
+import { Paywall, useCredits } from '../billing';
+import { PREVIEW_ASK_TURN } from '../preview/fixtures';
+import { readShotId } from '../preview/shot';
 import { getSkyState, type SkyState } from '../engine';
 import { useLanguage } from '../i18n/language';
 import { choghadiyaLabel, pakshaLabel, windowLabel } from '../i18n/strings';
@@ -91,6 +93,8 @@ export function HomeScreen() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
   const [almanac, setAlmanac] = useState<AlmanacTab | null>(null);
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const shot = readShotId();
   const [day, setDay] = useState<NormalizedDay | null>(null);
   const [dayLoading, setDayLoading] = useState(false);
   const [daySetup, setDaySetup] = useState(false);
@@ -107,10 +111,20 @@ export function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    if (!place.city && place.ready && !place.locating) {
+    if (!place.city && place.ready && !place.locating && !shot) {
       setSearchOpen(true);
     }
-  }, [place.city, place.ready, place.locating]);
+  }, [place.city, place.ready, place.locating, shot]);
+
+  useEffect(() => {
+    if (!shot) return;
+    if (shot === 'match' || shot === 'confirm' || shot === 'milan') setAlmanac('match');
+    if (shot === 'muhurat') setAlmanac('muhurat');
+    if (shot === 'festivals') setAlmanac('festivals');
+    if (shot === 'kundli') setAlmanac('kundli');
+    if (shot === 'ask') setAskOpen(true);
+    if (shot === 'paywall') setPaywallOpen(true);
+  }, [shot]);
 
   useEffect(() => {
     void loadLastChart().then(setChartContext);
@@ -227,6 +241,14 @@ export function HomeScreen() {
             <Text style={styles.city}>
               {place.city ? cityName : copy.citySearch} ▾
             </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setPaywallOpen(true)}
+            style={styles.payChip}
+            accessibilityRole="button"
+            accessibilityLabel={language === 'hi' ? 'शुभ खोलो' : 'Open Shubh'}
+          >
+            <Text style={styles.payChipText}>{language === 'hi' ? 'शुभ' : 'Shubh'}</Text>
           </Pressable>
           <View style={styles.seg}>
             <Pressable
@@ -351,7 +373,7 @@ export function HomeScreen() {
                     <Text style={styles.shareCtaText}>{sharing ? '…' : copy.shareToday}</Text>
                   </Pressable>
                   <View style={styles.cardWrap} ref={cardRef} collapsable={false}>
-                    <ShareCard card={card} />
+                    <ShareCard card={card} branded={!credits.wallet?.isPro()} />
                   </View>
                 </>
               ) : null}
@@ -372,9 +394,11 @@ export function HomeScreen() {
               wallet={credits.wallet}
               onRemainingChange={credits.refresh}
               onBuyMonthly={credits.buyMonthly}
+              onBuyAnnual={credits.buyAnnual}
               onBuyPack={credits.buyPack}
               onRestore={credits.restore}
               onVerdict={(verdict) => playVerdict(verdict)}
+              initialTurns={shot === 'ask' ? [PREVIEW_ASK_TURN] : undefined}
               dayContext={day}
               chartContext={chartContext}
               matchContext={matchContext}
@@ -400,12 +424,27 @@ export function HomeScreen() {
           wallet={credits.wallet}
           onRemainingChange={credits.refresh}
           onBuyMonthly={credits.buyMonthly}
+          onBuyAnnual={credits.buyAnnual}
           onBuyPack={credits.buyPack}
           onRestore={credits.restore}
+          onOpenPaywall={() => setPaywallOpen(true)}
+          shot={shot}
           sky={sky}
           dayContext={day}
           onMatch={setMatchContext}
         />
+
+        {paywallOpen ? (
+          <Paywall
+            language={language}
+            remaining={credits.remaining}
+            onBuyMonthly={credits.buyMonthly}
+            onBuyAnnual={credits.buyAnnual}
+            onBuyPack={credits.buyPack}
+            onRestore={credits.restore}
+            onClose={() => setPaywallOpen(false)}
+          />
+        ) : null}
 
         <CitySearch
           visible={searchOpen}
@@ -445,6 +484,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   city: { color: color.ivory, fontSize: 26, fontWeight: '700', marginTop: 4 },
+  payChip: {
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginRight: 8,
+    marginTop: 4,
+  },
+  payChipText: { color: color.gold, fontSize: 12, fontWeight: '800', letterSpacing: 1 },
   seg: {
     flexDirection: 'row',
     backgroundColor: 'rgba(10, 12, 22, 0.55)',

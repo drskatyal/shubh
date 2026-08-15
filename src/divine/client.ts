@@ -56,8 +56,8 @@ export function resolveTransport(opts?: {
 
 export function setupCopy(language: 'hi' | 'en'): string {
   return language === 'hi'
-    ? 'लाइव पंचांग के लिए ऐप को DIVINE_PROXY_URL से जोड़ें। कुंजी सर्वर / EAS secret में रहती है — ऐप में नहीं।'
-    : 'Live panchang needs the app pointed at DIVINE_PROXY_URL. The key stays on the server / EAS secret — never in the app.';
+    ? 'लाइव आकाश बाद में जुड़ेगा। आज की नज़र फ़ोन पर है।'
+    : 'Live sky connects later. Today’s glance is already on the phone.';
 }
 
 function fail(endpoint: string, status: number, error: string, extra?: Partial<TathaFail>): TathaFail {
@@ -297,7 +297,7 @@ export async function loadBirthChart(
 export async function matchPeople(
   personA: BirthData,
   personB: BirthData,
-  opts?: DivineRequestOptions,
+  opts?: DivineRequestOptions & { includeDashakoot?: boolean },
 ): Promise<TathaLoad<NormalizedMatch>> {
   const language = opts?.language ?? 'en';
   const cacheKey = matchCacheKey(personA, personB, language);
@@ -317,7 +317,10 @@ export async function matchPeople(
     };
   }
 
-  const dasha = await getDashakootMilan(personA, personB, opts);
+  const dasha =
+    opts?.includeDashakoot === false
+      ? ({ ok: false } as const)
+      : await getDashakootMilan(personA, personB, opts);
   const primary = normalizeMatch(ashta.data, personA.name, personB.name);
   const merged = dasha.ok ? mergeMatch(primary, normalizeMatch(dasha.data, personA.name, personB.name)) : primary;
   const next = dasha.ok ? { ...merged, total: primary.total || merged.total, max: primary.max || 36, kutas: primary.kutas } : primary;

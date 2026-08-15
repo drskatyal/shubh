@@ -103,9 +103,11 @@ const config: ExpoConfig = {
       process.env.EXPO_PUBLIC_DIVINE_PROXY_URL ?? process.env.DIVINE_PROXY_URL ?? '',
     ASK_PROXY_URL:
       process.env.EXPO_PUBLIC_ASK_PROXY_URL ??
+      process.env.ASK_PROXY_URL ??
       process.env.EXPO_PUBLIC_DIVINE_PROXY_URL ??
       process.env.DIVINE_PROXY_URL ??
       '',
+    SHUBH_DEV_UNLOCK: process.env.EXPO_PUBLIC_SHUBH_DEV_UNLOCK ?? '0',
     store: {
       primary: 'play',
       defaultPlayLocale: 'hi-IN',
