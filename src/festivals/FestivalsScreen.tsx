@@ -24,6 +24,7 @@ export function FestivalsScreen({
   canRemind,
   previewFestivals,
   onUnlock,
+  embedded,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -33,6 +34,7 @@ export function FestivalsScreen({
   canRemind?: boolean;
   previewFestivals?: Festival[];
   onUnlock?: () => Promise<void>;
+  embedded?: boolean;
 }) {
   const [rows, setRows] = useState<Festival[]>([]);
   const [setup, setSetup] = useState(false);
@@ -91,7 +93,7 @@ export function FestivalsScreen({
   const cityName = city ? cityLabel(city, language) : '';
 
   return (
-    <Sheet visible={visible} title={almanac.festivals} onClose={onClose} closeLabel={almanac.close}>
+    <Sheet visible={visible} title={almanac.festivals} onClose={onClose} closeLabel={almanac.close} embedded={embedded}>
       <Text style={styles.lead}>{almanac.upcoming}</Text>
       <StatusBlock
         copy={copy}

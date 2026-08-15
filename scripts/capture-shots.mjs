@@ -33,6 +33,7 @@ const waitFor = {
 const devices = [
   { name: 'iphone', width: 390, height: 844 },
   { name: 'pixel', width: 412, height: 915 },
+  { name: 'desktop', width: 1440, height: 900 },
 ];
 
 const profile = mkdtempSync(join(tmpdir(), 'shubh-chrome-'));

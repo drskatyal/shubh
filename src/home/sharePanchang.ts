@@ -1,6 +1,10 @@
 import { Share, type View } from 'react-native';
 
 import { noteSuccessfulShare } from '../store/reviewAfterShare';
+import { isWebRuntime } from '../web/platform';
+import { drawSharePng, panchangDrawInput } from '../share/drawCard';
+import { shareOrDownload } from '../share/webShare';
+import type { ShareCardModel } from './shareDay';
 
 export type ShareCapture = () => Promise<string | null>;
 
@@ -71,7 +75,19 @@ export async function captureViewPng(view: View | null): Promise<string | null> 
 export async function sharePanchang(
   title: string,
   capture?: ShareCapture,
+  card?: ShareCardModel,
 ): Promise<{ uri: string | null }> {
+  if (isWebRuntime() && card) {
+    const blob = await drawSharePng(panchangDrawInput(card));
+    await shareOrDownload({
+      title,
+      text: [card.tithi, card.startLabel, card.windowName, card.rahu].filter(Boolean).join('\n'),
+      file: blob,
+      filename: 'shubh-today.png',
+    });
+    await noteSuccessfulShare();
+    return { uri: 'web:download' };
+  }
   const uri = capture ? await capture() : null;
   if (uri) {
     await shareImageUri(uri, title);

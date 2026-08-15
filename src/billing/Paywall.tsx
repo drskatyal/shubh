@@ -4,6 +4,7 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 import type { Language } from '../engine';
 import { privacyLine, remainingLabel } from '../ask/copy';
 import { color } from '../theme/tokens';
+import { LevelFrame } from '../ui/LevelFrame';
 import { ANNUAL_PRICE_INR, MONTHLY_PRICE_INR, PACK_PRICE_INR } from './products';
 import { STORE_LATER } from './revenuecat';
 
@@ -15,6 +16,7 @@ type Props = {
   onBuyPack: () => Promise<void>;
   onRestore: () => Promise<void>;
   onClose?: () => void;
+  embedded?: boolean;
 };
 
 function benefitLines(hi: boolean): string[] {
@@ -45,6 +47,7 @@ export function Paywall({
   onBuyPack,
   onRestore,
   onClose,
+  embedded,
 }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +73,7 @@ export function Paywall({
   };
 
   return (
-    <View style={styles.root} pointerEvents="auto">
+    <LevelFrame visible embedded={embedded} zIndex={20}>
       <SafeAreaView style={styles.safe}>
         {onClose ? (
           <Pressable onPress={onClose} hitSlop={10} style={styles.closeHit} accessibilityRole="button">
@@ -148,16 +151,11 @@ export function Paywall({
           <Text style={styles.privacy}>{privacyLine(language)}</Text>
         </ScrollView>
       </SafeAreaView>
-    </View>
+    </LevelFrame>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 20,
-    backgroundColor: 'rgba(6, 7, 14, 0.94)',
-  },
   safe: { flex: 1, paddingHorizontal: 22 },
   closeHit: { alignSelf: 'flex-start', paddingTop: 8, paddingBottom: 4 },
   close: { color: color.gold, fontSize: 16, fontWeight: '600' },

@@ -23,6 +23,9 @@ describe('ask copy never names a model', () => {
     const marriageCopy = readFileSync(new URL('../marriage/copy.ts', import.meta.url), 'utf8');
     const cards = readFileSync(new URL('../marriage/ConfirmBirthCards.tsx', import.meta.url), 'utf8');
     const dock = readFileSync(new URL('../marriage/RecordDock.tsx', import.meta.url), 'utf8');
+    const webAudio = readFileSync(new URL('../webAudio.ts', import.meta.url), 'utf8');
+    const webShare = readFileSync(new URL('../../share/webShare.ts', import.meta.url), 'utf8');
+    const draw = readFileSync(new URL('../../share/drawCard.ts', import.meta.url), 'utf8');
     assert.doesNotMatch(page, /ChatGPT|powered by|chatbot|Ask the AI/i);
     assert.doesNotMatch(composer, /chat|assistant|Gemini/i);
     assert.doesNotMatch(matching, /chatbot|Ask the AI|powered by|BirthForm/i);
@@ -31,6 +34,11 @@ describe('ask copy never names a model', () => {
     assert.doesNotMatch(cards, BANNED);
     assert.doesNotMatch(dock, BANNED);
     assert.doesNotMatch(dock, /TextInput|या लिखें|Or write/i);
+    assert.doesNotMatch(webAudio, BANNED);
+    assert.doesNotMatch(webShare, BANNED);
+    assert.doesNotMatch(draw, BANNED);
+    assert.match(webAudio, /From a file/);
+    assert.match(dock, /fileInsteadLabel/);
     assert.match(composer, /पूछो|Ask/);
     assert.match(matching, /MarriageFlow/);
     assert.match(marriageCopy, /Yeh sab record kar dijiye/);

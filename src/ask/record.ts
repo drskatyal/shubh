@@ -27,6 +27,58 @@ async function readAudioBase64(uri: string): Promise<string> {
   }
 }
 
+function createWebRecorder(): Recorder {
+  let stream: MediaStream | null = null;
+  let recorder: MediaRecorder | null = null;
+  let chunks: Blob[] = [];
+
+  return {
+    async start() {
+      if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Microphone permission is required to ask.');
+      }
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks = [];
+      const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/webm';
+      const next = new MediaRecorder(stream, { mimeType: mime });
+      next.ondataavailable = (event) => {
+        if (event.data.size) chunks.push(event.data);
+      };
+      next.start();
+      recorder = next;
+    },
+
+    async stop() {
+      const rec = recorder;
+      if (!rec) throw new Error('Not recording');
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        rec.onstop = () => resolve(new Blob(chunks, { type: rec.mimeType || 'audio/webm' }));
+        rec.onerror = () => reject(new Error('Mic failed'));
+        rec.stop();
+      });
+      stream?.getTracks().forEach((track) => track.stop());
+      recorder = null;
+      stream = null;
+      const { audioFromBlob } = require('./webAudio') as {
+        audioFromBlob: (blob: Blob, mime?: string) => Promise<AskAudio>;
+      };
+      return audioFromBlob(blob, blob.type || 'audio/webm');
+    },
+  };
+}
+
+export function createRecorder(): Recorder {
+  try {
+    const { Platform } = require('react-native') as { Platform?: { OS?: string } };
+    if (Platform?.OS === 'web') return createWebRecorder();
+  } catch {
+    // Native / tests use expo-av.
+  }
+  return createExpoRecorder();
+}
+
 export function createExpoRecorder(): Recorder {
   let recording: RecordingHandle | null = null;
 

@@ -13,6 +13,9 @@ npm install
 npm test
 # DIVINE_API_KEY=… GEMINI_API_KEY=… node server/divine-proxy.mjs
 npx expo start
+npm run web
 ```
+
+`npm run web` is the same product in the browser — glance, muhurat, festivals, kundli, matching, Ask cards, paywall — not a marketing page. Hash routes: `#/muhurat`, `#/matching`, `#/ask`. Desktop (≥1100px) uses a wider temple layout. Share downloads a PNG and uses the Web Share API when the browser allows it. Matching accepts a mic take or an audio file.
 
 Ask PR: `import { getSkyState } from './src/engine'`. Motion: Home mounts `SkyBackdrop` from `src/motion`.

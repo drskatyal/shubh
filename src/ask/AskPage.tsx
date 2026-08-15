@@ -13,6 +13,7 @@ import type { City } from '../location/cities';
 import { useOptionalSkyLayer, useReduceMotion, useVerdictBeat } from '../motion';
 import type { ChartAskSummary, NormalizedDay, NormalizedMatch } from '../tathaastu/types';
 import { color } from '../theme/tokens';
+import { LevelFrame } from '../ui/LevelFrame';
 import { AskComposer } from './AskComposer';
 import { AskCardView } from './cards/AskCardView';
 import { composeAskCards } from './cards/composeCards';
@@ -20,7 +21,7 @@ import type { AskTurn } from './cards/types';
 import { privacyLine, remainingLabel } from './copy';
 import { MarriageFlow } from './marriage/MarriageFlow';
 import { looksLikeMarriageAsk } from './marriage/shaadiNow';
-import { createExpoRecorder, type Recorder } from './record';
+import { createRecorder, type Recorder } from './record';
 import { runAsk } from './runAsk';
 import type { VerdictKind } from './types';
 import { windowKindFromSky } from './windowKind';
@@ -46,6 +47,7 @@ type Props = {
   onMatch?: (match: NormalizedMatch) => void;
   initialMode?: 'ask' | 'marriage';
   initialTurns?: AskTurn[];
+  embedded?: boolean;
 };
 
 type Phase = 'idle' | 'recording' | 'sending';
@@ -71,6 +73,7 @@ export function AskPage({
   onMatch,
   initialMode = 'ask',
   initialTurns,
+  embedded,
 }: Props) {
   const remaining = wallet?.remaining() ?? 0;
   const hi = language === 'hi';
@@ -81,7 +84,7 @@ export function AskPage({
   const [error, setError] = useState<string | null>(null);
   const [turns, setTurns] = useState<AskTurn[]>(initialTurns ?? []);
   const [mode, setMode] = useState<'ask' | 'marriage'>(initialMode);
-  const recRef = useRef<Recorder>(recorder ?? createExpoRecorder());
+  const recRef = useRef<Recorder>(recorder ?? createRecorder());
   const strings = copy ?? STRINGS[language];
   const scrollRef = useRef<ScrollView>(null);
   const skyLayer = useOptionalSkyLayer();
@@ -197,7 +200,7 @@ export function AskPage({
   if (!visible) return null;
 
   return (
-    <View style={styles.root} pointerEvents="auto">
+    <LevelFrame visible embedded={embedded} zIndex={12}>
         <SafeAreaView style={styles.safe}>
           <View style={styles.top}>
             <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button">
@@ -271,13 +274,14 @@ export function AskPage({
               onChangeText={setText}
               onMic={() => void onMic()}
               onSendText={() => void submit(undefined, text.trim())}
+              onFile={(audio) => void submit(audio, undefined)}
               disabled={waiting}
             />
           )}
           {error ? <Text style={styles.error}>{error}</Text> : null}
           {initialTurns?.length ? null : <Text style={styles.privacy}>{privacyLine(language)}</Text>}
         </SafeAreaView>
-    </View>
+    </LevelFrame>
   );
 }
 

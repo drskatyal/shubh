@@ -45,6 +45,7 @@ export function MuhuratScreen({
   days,
   previewDates,
   onUnlock,
+  embedded,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -54,6 +55,7 @@ export function MuhuratScreen({
   days?: number;
   previewDates?: RankedDate[];
   onUnlock?: () => Promise<void>;
+  embedded?: boolean;
 }) {
   const [event, setEvent] = useState<FinderEvent>('marriage');
   const [rows, setRows] = useState<RankedDate[]>([]);
@@ -108,7 +110,7 @@ export function MuhuratScreen({
       : '';
 
   return (
-    <Sheet visible={visible} title={almanac.muhurat} onClose={onClose} closeLabel={almanac.close}>
+    <Sheet visible={visible} title={almanac.muhurat} onClose={onClose} closeLabel={almanac.close} embedded={embedded}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

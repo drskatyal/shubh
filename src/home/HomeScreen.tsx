@@ -30,6 +30,14 @@ import { color } from '../theme/tokens';
 import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
 import { syncGlance } from '../widget/syncGlance';
+import { isWebRuntime } from '../web/platform';
+import {
+  almanacTabForLevel,
+  levelForAlmanacTab,
+  pushWebLevel,
+  readWebLevel,
+} from '../web/route';
+import { useTempleLayout } from '../web/temple';
 import { CitySearch } from './CitySearch';
 import { toMotionVerdict, toMotionWindow } from './motionWindow';
 import { ShareCard } from './ShareCard';
@@ -89,6 +97,7 @@ export function HomeScreen() {
   const reduceMotion = useReduceMotion();
   const { activeVerdict, playVerdict } = useVerdictBeat(reduceMotion);
   const skyLayer = useSkyLayer();
+  const { temple } = useTempleLayout();
   const [now, setNow] = useState(() => new Date());
   const [searchOpen, setSearchOpen] = useState(false);
   const shot = readShotId();
@@ -211,6 +220,50 @@ export function HomeScreen() {
   }, [place.city, sky, language, day]);
 
   const overlayOpen = Boolean(almanac || askOpen || paywallOpen);
+  const hidePhoneChrome = overlayOpen && !temple;
+
+  useEffect(() => {
+    if (shot || !isWebRuntime()) return;
+    const apply = () => {
+      const level = readWebLevel();
+      setAlmanac(almanacTabForLevel(level));
+      setAskOpen(level === 'ask');
+      setPaywallOpen(level === 'paywall');
+    };
+    apply();
+    window.addEventListener('hashchange', apply);
+    window.addEventListener('popstate', apply);
+    return () => {
+      window.removeEventListener('hashchange', apply);
+      window.removeEventListener('popstate', apply);
+    };
+  }, [shot]);
+
+  const goHome = () => {
+    setAlmanac(null);
+    setAskOpen(false);
+    setPaywallOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel('home');
+  };
+
+  const openAlmanac = (tab: AlmanacTab) => {
+    setAlmanac(tab);
+    setAskOpen(false);
+    setPaywallOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel(levelForAlmanacTab(tab));
+  };
+
+  const openAsk = () => {
+    setAlmanac(null);
+    setAskOpen(true);
+    setPaywallOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel('ask');
+  };
+
+  const openPaywall = () => {
+    setPaywallOpen(true);
+    if (isWebRuntime() && !shot) pushWebLevel('paywall');
+  };
   const remaining = sky ? new Date(sky.currentWindow.end).getTime() - now.getTime() : 0;
   const cityName = place.city ? cityLabel(place.city, language) : '';
   const heroName = day?.tithi?.name ?? (sky ? windowLabel(language, sky.currentWindow.name) : '');
@@ -231,7 +284,7 @@ export function HomeScreen() {
     tapHaptic();
     setSharing(true);
     try {
-      await sharePanchang(copy.appName, () => captureViewPng(cardRef.current));
+      await sharePanchang(copy.appName, () => captureViewPng(cardRef.current), card ?? undefined);
     } catch {
       // Capture can fail in Expo Go; the 1:1 card stays on screen.
     } finally {
@@ -241,9 +294,10 @@ export function HomeScreen() {
 
   return (
     <View style={styles.root}>
-      <SafeAreaView style={styles.safe}>
-        {!overlayOpen ? (
-          <View style={styles.top}>
+      <SafeAreaView style={[styles.safe, temple && styles.templeSafe]}>
+        <View style={temple ? styles.templeRow : styles.phoneStack}>
+        {!hidePhoneChrome ? (
+          <View style={temple ? styles.leftRail : styles.top}>
             <Pressable onPress={() => setSearchOpen(true)} hitSlop={8} style={styles.cityHit}>
               <Text style={styles.brand}>{copy.appName}</Text>
               <Text style={styles.city}>
@@ -251,7 +305,7 @@ export function HomeScreen() {
               </Text>
             </Pressable>
             <Pressable
-              onPress={() => setPaywallOpen(true)}
+              onPress={openPaywall}
               style={styles.payChip}
               accessibilityRole="button"
               accessibilityLabel={language === 'hi' ? 'शुभ खोलो' : 'Open Shubh'}
@@ -275,6 +329,7 @@ export function HomeScreen() {
           </View>
         ) : null}
 
+        <View style={temple ? styles.sanctum : styles.phoneMain}>
         {sky ? (
           <>
             {!overlayOpen ? (
@@ -391,19 +446,9 @@ export function HomeScreen() {
               ) : null}
             </ScrollView>
             ) : null}
-            {!overlayOpen ? (
-            <View style={styles.dock}>
-              <AlmanacDock copy={copy} onOpen={setAlmanac} />
-              <AskFAB
-                remaining={credits.remaining}
-                language={language}
-                onPress={() => setAskOpen(true)}
-              />
-            </View>
-            ) : null}
             <AskPage
               visible={askOpen}
-              onClose={() => setAskOpen(false)}
+              onClose={goHome}
               sky={sky}
               language={language}
               wallet={credits.wallet}
@@ -420,6 +465,7 @@ export function HomeScreen() {
               copy={copy}
               defaultCity={place.city}
               onMatch={setMatchContext}
+              embedded={temple}
             />
           </>
         ) : overlayOpen ? null : (
@@ -432,7 +478,7 @@ export function HomeScreen() {
 
         <AlmanacHost
           tab={almanac}
-          onClose={() => setAlmanac(null)}
+          onClose={goHome}
           city={place.city}
           language={language}
           copy={copy}
@@ -442,11 +488,12 @@ export function HomeScreen() {
           onBuyAnnual={credits.buyAnnual}
           onBuyPack={credits.buyPack}
           onRestore={credits.restore}
-          onOpenPaywall={() => setPaywallOpen(true)}
+          onOpenPaywall={openPaywall}
           shot={shot}
           sky={sky}
           dayContext={day}
           onMatch={setMatchContext}
+          embedded={temple}
         />
 
         {paywallOpen ? (
@@ -457,9 +504,19 @@ export function HomeScreen() {
             onBuyAnnual={credits.buyAnnual}
             onBuyPack={credits.buyPack}
             onRestore={credits.restore}
-            onClose={() => setPaywallOpen(false)}
+            onClose={goHome}
+            embedded={temple}
           />
         ) : null}
+        </View>
+
+        {!hidePhoneChrome ? (
+          <View style={temple ? styles.rightRail : styles.dock}>
+            <AlmanacDock copy={copy} onOpen={openAlmanac} vertical={temple} />
+            <AskFAB remaining={credits.remaining} language={language} onPress={openAsk} />
+          </View>
+        ) : null}
+        </View>
 
         <CitySearch
           visible={searchOpen}
@@ -484,6 +541,33 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: 'transparent' },
   safe: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 20 },
+  templeSafe: { paddingHorizontal: 32, paddingVertical: 12 },
+  templeRow: { flex: 1, flexDirection: 'row', gap: 28 },
+  phoneStack: { flex: 1 },
+  phoneMain: { flex: 1 },
+  sanctum: {
+    flex: 1,
+    minWidth: 0,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: 'rgba(232, 197, 120, 0.18)',
+    backgroundColor: 'rgba(6, 7, 14, 0.28)',
+    paddingHorizontal: 28,
+    paddingTop: 8,
+    overflow: 'hidden',
+  },
+  leftRail: {
+    width: 250,
+    paddingTop: 10,
+    gap: 16,
+    alignItems: 'flex-start',
+  },
+  rightRail: {
+    width: 196,
+    paddingTop: 28,
+    gap: 16,
+    alignItems: 'stretch',
+  },
   top: {
     flexDirection: 'row',
     justifyContent: 'space-between',

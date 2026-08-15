@@ -42,6 +42,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
+    maxWidth: 720,
+    width: '100%',
+    alignSelf: 'center',
   },
   kicker: {
     color: color.gold,

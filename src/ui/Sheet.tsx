@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { color } from '../theme/tokens';
+import { LevelFrame } from './LevelFrame';
 
 /** Overlay on the shared sky — never a Modal that remounts SkyStage. */
 export function Sheet({
@@ -10,16 +11,18 @@ export function Sheet({
   onClose,
   closeLabel,
   children,
+  embedded,
 }: {
   visible: boolean;
   title: string;
   onClose: () => void;
   closeLabel: string;
   children: ReactNode;
+  embedded?: boolean;
 }) {
   if (!visible) return null;
   return (
-    <View style={styles.root} pointerEvents="auto">
+    <LevelFrame visible embedded={embedded} zIndex={8}>
       <SafeAreaView style={styles.safe}>
         <View style={styles.handle} />
         <View style={styles.top}>
@@ -31,16 +34,11 @@ export function Sheet({
         <View style={styles.rule} />
         {children}
       </SafeAreaView>
-    </View>
+    </LevelFrame>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 8,
-    backgroundColor: 'rgba(6, 7, 14, 0.92)',
-  },
   safe: { flex: 1, paddingHorizontal: 22 },
   handle: {
     alignSelf: 'center',

@@ -2,6 +2,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { Language } from '../../engine';
 import { color } from '../../theme/tokens';
+import { isWebRuntime } from '../../web/platform';
+import { audioFromBlob, fileInsteadLabel, pickAudioFile } from '../webAudio';
 import { listeningLabel, recordLabel, skyWaitLabel } from './copy';
 
 type Phase = 'idle' | 'recording' | 'sending' | 'matching';
@@ -12,12 +14,14 @@ export function RecordDock({
   phase,
   hint,
   onMic,
+  onFile,
   disabled,
 }: {
   language: Language;
   phase: Phase;
   hint?: string;
   onMic: () => void;
+  onFile?: (audio: { base64: string; mimeType: string }) => void;
   disabled?: boolean;
 }) {
   const recording = phase === 'recording';
@@ -40,6 +44,21 @@ export function RecordDock({
       >
         <Text style={styles.micText}>{label}</Text>
       </Pressable>
+      {isWebRuntime() && onFile ? (
+        <Pressable
+          onPress={() => {
+            void pickAudioFile().then(async (file) => {
+              if (!file) return;
+              onFile(await audioFromBlob(file, file.type));
+            });
+          }}
+          disabled={disabled || sending}
+          style={styles.file}
+          accessibilityRole="button"
+        >
+          <Text style={styles.fileText}>{fileInsteadLabel(language)}</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -62,4 +81,6 @@ const styles = StyleSheet.create({
   micLive: { backgroundColor: '#C44B3A' },
   micBusy: { backgroundColor: '#5A4A32' },
   micText: { color: color.ink, fontSize: 20, fontWeight: '800', letterSpacing: 1.2 },
+  file: { alignSelf: 'center', paddingVertical: 4 },
+  fileText: { color: color.ivoryDim, fontSize: 13, textDecorationLine: 'underline' },
 });

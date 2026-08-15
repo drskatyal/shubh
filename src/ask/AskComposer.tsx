@@ -2,6 +2,8 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { Language } from '../engine';
 import { color } from '../theme/tokens';
+import { isWebRuntime } from '../web/platform';
+import { audioFromBlob, fileInsteadLabel, pickAudioFile } from './webAudio';
 
 type Phase = 'idle' | 'recording' | 'sending';
 
@@ -12,6 +14,7 @@ export function AskComposer({
   onChangeText,
   onMic,
   onSendText,
+  onFile,
   disabled,
   hint,
   micLabel,
@@ -22,6 +25,7 @@ export function AskComposer({
   onChangeText: (value: string) => void;
   onMic: () => void;
   onSendText: () => void;
+  onFile?: (audio: { base64: string; mimeType: string }) => void;
   disabled?: boolean;
   hint?: string;
   micLabel?: string;
@@ -56,6 +60,21 @@ export function AskComposer({
             {recording ? (hi ? 'सुन रहे हैं…' : 'Listening…') : sending ? (hi ? 'आकाश…' : 'Sky…') : ask}
           </Text>
         </Pressable>
+        {isWebRuntime() && onFile ? (
+          <Pressable
+            onPress={() => {
+              void pickAudioFile().then(async (file) => {
+                if (!file) return;
+                onFile(await audioFromBlob(file, file.type));
+              });
+            }}
+            disabled={disabled || sending}
+            style={styles.file}
+            accessibilityRole="button"
+          >
+            <Text style={styles.fileText}>{fileInsteadLabel(language)}</Text>
+          </Pressable>
+        ) : null}
         {text.trim() && !recording ? (
           <Pressable
             onPress={onSendText}
@@ -112,4 +131,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   sendText: { color: color.gold, fontSize: 16, fontWeight: '800' },
+  file: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    paddingHorizontal: 14,
+    paddingVertical: 16,
+  },
+  fileText: { color: color.goldSoft, fontSize: 14, fontWeight: '700' },
 });

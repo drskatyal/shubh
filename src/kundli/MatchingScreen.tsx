@@ -8,6 +8,7 @@ import type { Copy, Language } from '../i18n/strings';
 import type { City } from '../location/cities';
 import type { NormalizedDay, NormalizedMatch } from '../tathaastu/types';
 import { color } from '../theme/tokens';
+import { LevelFrame } from '../ui/LevelFrame';
 import { birthPrivacy } from './copy';
 
 export function MatchingScreen({
@@ -28,6 +29,7 @@ export function MatchingScreen({
   initialExtract,
   initialMatch,
   focusResult,
+  embedded,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -46,13 +48,14 @@ export function MatchingScreen({
   initialExtract?: import('../ask/marriage/types').MarriageExtract | null;
   initialMatch?: NormalizedMatch | null;
   focusResult?: boolean;
+  embedded?: boolean;
 }) {
   if (!visible) return null;
   const hi = language === 'hi';
   const remaining = wallet?.remaining() ?? 0;
 
   return (
-    <View style={styles.root} pointerEvents="auto">
+    <LevelFrame visible embedded={embedded} zIndex={12}>
       <SafeAreaView style={styles.safe}>
         <View style={styles.top}>
           <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button">
@@ -85,16 +88,11 @@ export function MatchingScreen({
           />
         </ScrollView>
       </SafeAreaView>
-    </View>
+    </LevelFrame>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 12,
-    backgroundColor: 'rgba(6, 7, 14, 0.92)',
-  },
   safe: { flex: 1, paddingHorizontal: 20, paddingBottom: 12 },
   top: {
     flexDirection: 'row',

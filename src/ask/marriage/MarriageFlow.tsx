@@ -18,7 +18,7 @@ import { formatScoreCardText } from '../../kundli/formatScoreCard';
 import { ScoreCard } from '../../kundli/ScoreCard';
 import { loadLastMatch, saveLastMatch, saveMatchForms } from '../../kundli/storage';
 import type { Copy } from '../../i18n/strings';
-import { createExpoRecorder, type Recorder } from '../record';
+import { createRecorder, type Recorder } from '../record';
 import {
   milanCta,
   muhuratFollowLabel,
@@ -86,7 +86,7 @@ export function MarriageFlow({
   const [match, setMatch] = useState<NormalizedMatch | null>(initialMatch ?? null);
   const [muhurat, setMuhurat] = useState<RankedDate[] | null>(null);
   const [muhuratBusy, setMuhuratBusy] = useState(false);
-  const recRef = useRef<Recorder>(recorder ?? createExpoRecorder());
+  const recRef = useRef<Recorder>(recorder ?? createRecorder());
   const cardRef = useRef<CaptureHandle>(null);
   const skyLayer = useOptionalSkyLayer();
   const waiting = phase === 'sending' || phase === 'matching';
@@ -306,6 +306,7 @@ export function MarriageFlow({
             phase={phase}
             hint={extract ? hint : undefined}
             onMic={() => void onMic()}
+            onFile={(audio) => void submitExtract(audio, undefined)}
             disabled={waiting || !connected || !wallet}
           />
         </>

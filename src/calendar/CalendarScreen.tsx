@@ -26,12 +26,14 @@ export function CalendarScreen({
   city,
   language,
   copy,
+  embedded,
 }: {
   visible: boolean;
   onClose: () => void;
   city: City | null;
   language: Language;
   copy: Copy;
+  embedded?: boolean;
 }) {
   const now = city ? todayIso(city.lat, city.lon) : todayIso(28.6, 77.2);
   const [year, setYear] = useState(() => Number(now.slice(0, 4)));
@@ -91,7 +93,7 @@ export function CalendarScreen({
   };
 
   return (
-    <Sheet visible={visible} title={copy.almanac.calendar} onClose={onClose} closeLabel={copy.almanac.close}>
+    <Sheet visible={visible} title={copy.almanac.calendar} onClose={onClose} closeLabel={copy.almanac.close} embedded={embedded}>
       <View style={styles.nav}>
         <Pressable onPress={() => shift(-1)} hitSlop={8}>
           <Text style={styles.navBtn}>‹</Text>

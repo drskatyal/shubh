@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { resolvePalette } from './palette';
@@ -8,16 +9,32 @@ type Props = SkyStageProps & {
   beatVerdict?: Verdict | null;
 };
 
-const STARS = Array.from({ length: 56 }, (_, i) => ({
+const STARS = Array.from({ length: 72 }, (_, i) => ({
   top: `${(7 + i * 17) % 96}%`,
   left: `${(3 + i * 23) % 97}%`,
   size: 1 + (i % 3),
-  opacity: 0.22 + (i % 6) * 0.1,
+  opacity: 0.2 + (i % 6) * 0.1,
 }));
 
 /** Web stand-in for the Skia galaxy. Native still uses SkyStage.tsx. */
 export function SkyStage({ windowKind, verdict = null, style }: Props) {
   const palette = resolvePalette(windowKind, verdict);
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    let raf = 0;
+    const loop = () => {
+      frame += 1;
+      if (frame % 3 === 0) setTick((n) => (n + 1) % 360);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const drift = Math.sin((tick * Math.PI) / 180);
+
   return (
     <View
       style={[
@@ -28,8 +45,24 @@ export function SkyStage({ windowKind, verdict = null, style }: Props) {
         style,
       ]}
     >
-      <View style={[styles.haze, { backgroundColor: palette.skyMid }]} />
-      <View style={[styles.glow, { backgroundColor: palette.glow }]} />
+      <View
+        style={[
+          styles.haze,
+          {
+            backgroundColor: palette.skyMid,
+            transform: [{ translateX: drift * 18 }, { translateY: drift * -10 }],
+          },
+        ]}
+      />
+      <View
+        style={[
+          styles.glow,
+          {
+            backgroundColor: palette.glow,
+            transform: [{ translateX: drift * -22 }, { translateY: drift * 14 }],
+          },
+        ]}
+      />
       {STARS.map((star, index) => (
         <View
           key={index}
@@ -41,7 +74,7 @@ export function SkyStage({ windowKind, verdict = null, style }: Props) {
             height: star.size,
             borderRadius: star.size,
             backgroundColor: palette.star,
-            opacity: star.opacity,
+            opacity: star.opacity + (index % 8 === tick % 8 ? 0.25 : 0),
           }}
         />
       ))}
@@ -68,12 +101,12 @@ const styles = StyleSheet.create({
   },
   glow: {
     position: 'absolute',
-    width: 320,
-    height: 320,
-    borderRadius: 160,
-    top: '24%',
-    left: '12%',
-    opacity: 0.28,
+    width: 360,
+    height: 360,
+    borderRadius: 180,
+    top: '22%',
+    left: '10%',
+    opacity: 0.3,
   },
   sun: {
     position: 'absolute',

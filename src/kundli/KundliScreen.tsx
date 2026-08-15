@@ -32,6 +32,7 @@ export function KundliScreen({
   onBuyPack,
   onRestore,
   previewChart,
+  embedded,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -45,6 +46,7 @@ export function KundliScreen({
   onBuyPack?: () => Promise<void>;
   onRestore?: () => Promise<void>;
   previewChart?: import('../tathaastu/types').NormalizedChart;
+  embedded?: boolean;
 }) {
   const [form, setForm] = useState<BirthData>(() => emptyBirth({ city: defaultCity }));
   const [busy, setBusy] = useState(false);
@@ -78,7 +80,7 @@ export function KundliScreen({
   const summary = result?.ok ? toChartAskSummary(result.data) : null;
 
   return (
-    <Sheet visible={visible} title={copy.kundliTitle} onClose={onClose} closeLabel={copy.close}>
+    <Sheet visible={visible} title={copy.kundliTitle} onClose={onClose} closeLabel={copy.close} embedded={embedded}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         {previewChart ? null : (
           <>

@@ -34,6 +34,7 @@ export function AlmanacHost({
   dayContext,
   onMatch,
   shot,
+  embedded,
 }: {
   tab: AlmanacTab | null;
   onClose: () => void;
@@ -51,6 +52,7 @@ export function AlmanacHost({
   dayContext?: NormalizedDay | null;
   onMatch?: (match: NormalizedMatch) => void;
   shot?: ShotId | null;
+  embedded?: boolean;
 }) {
   return (
     <>
@@ -63,6 +65,7 @@ export function AlmanacHost({
         days={shot === 'muhurat' ? 60 : wallet?.muhuratDays()}
         previewDates={shot === 'muhurat' ? PREVIEW_MUHURAT : undefined}
         onUnlock={async () => onOpenPaywall?.()}
+        embedded={embedded}
       />
       <FestivalsScreen
         visible={tab === 'festivals'}
@@ -73,6 +76,7 @@ export function AlmanacHost({
         canRemind={shot === 'festivals' ? true : (wallet?.isPro() ?? false)}
         previewFestivals={shot === 'festivals' ? PREVIEW_FESTIVALS : undefined}
         onUnlock={async () => onOpenPaywall?.()}
+        embedded={embedded}
       />
       <CalendarScreen
         visible={tab === 'calendar'}
@@ -80,6 +84,7 @@ export function AlmanacHost({
         city={city}
         language={language}
         copy={copy}
+        embedded={embedded}
       />
       <KundliScreen
         visible={tab === 'kundli'}
@@ -94,6 +99,7 @@ export function AlmanacHost({
         onBuyPack={onBuyPack}
         onRestore={onRestore}
         previewChart={shot === 'kundli' ? PREVIEW_CHART : undefined}
+        embedded={embedded}
       />
       <MatchingScreen
         visible={tab === 'match'}
@@ -113,6 +119,7 @@ export function AlmanacHost({
         initialExtract={shot === 'confirm' || shot === 'milan' ? PREVIEW_EXTRACT : null}
         initialMatch={shot === 'milan' ? PREVIEW_MATCH : null}
         focusResult={shot === 'milan'}
+        embedded={embedded}
       />
     </>
   );
