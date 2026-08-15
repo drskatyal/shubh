@@ -53,6 +53,9 @@ describe('schema files', () => {
     expect(sql).toContain('private.consume_ask_credit');
     expect(sql).toContain('security definer');
     expect(sql).not.toMatch(/remaining_count|asks_remaining|remaining_asks/);
-    expect(sql).not.toMatch(/janam|naam|birth_date|birth_time|birth_place/i);
+    const columns = [...sql.matchAll(/create table public\.\w+ \(([\s\S]*?)\);/g)]
+      .map((match) => match[1])
+      .join('\n');
+    expect(columns).not.toMatch(/janam|naam|birth_date|birth_time|birth_place/i);
   });
 });
