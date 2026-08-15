@@ -20,7 +20,11 @@ export type ShotId = (typeof SHOT_IDS)[number];
 function fromSearch(): string | null {
   try {
     if (typeof window === 'undefined') return null;
-    return new URLSearchParams(window.location.search).get('shot');
+    const query = new URLSearchParams(window.location.search).get('shot');
+    if (query) return query;
+    const hash = window.location.hash.replace(/^#/, '');
+    const hashParams = new URLSearchParams(hash.includes('=') ? hash : `shot=${hash}`);
+    return hashParams.get('shot');
   } catch {
     return null;
   }

@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 8,
-    backgroundColor: 'rgba(6, 7, 14, 0.22)',
+    backgroundColor: 'rgba(6, 7, 14, 0.92)',
   },
   safe: { flex: 1, paddingHorizontal: 22 },
   handle: {

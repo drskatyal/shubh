@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 20,
-    backgroundColor: 'rgba(6, 7, 14, 0.28)',
+    backgroundColor: 'rgba(6, 7, 14, 0.94)',
   },
   safe: { flex: 1, paddingHorizontal: 22 },
   closeHit: { alignSelf: 'flex-start', paddingTop: 8, paddingBottom: 4 },

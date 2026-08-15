@@ -14,8 +14,7 @@ type Props = SkyStageProps & {
 export function SkyBackdrop({ style, ...stage }: Props) {
   return (
     <View
-      style={[StyleSheet.absoluteFill, styles.host, style]}
-      pointerEvents="none"
+      style={[StyleSheet.absoluteFillObject, styles.host, { pointerEvents: 'none' }, style]}
       accessible={false}
       importantForAccessibility="no-hide-descendants"
     >

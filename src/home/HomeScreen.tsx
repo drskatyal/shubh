@@ -91,10 +91,16 @@ export function HomeScreen() {
   const skyLayer = useSkyLayer();
   const [now, setNow] = useState(() => new Date());
   const [searchOpen, setSearchOpen] = useState(false);
-  const [askOpen, setAskOpen] = useState(false);
-  const [almanac, setAlmanac] = useState<AlmanacTab | null>(null);
-  const [paywallOpen, setPaywallOpen] = useState(false);
   const shot = readShotId();
+  const [askOpen, setAskOpen] = useState(() => shot === 'ask');
+  const [almanac, setAlmanac] = useState<AlmanacTab | null>(() => {
+    if (shot === 'match' || shot === 'confirm' || shot === 'milan') return 'match';
+    if (shot === 'muhurat') return 'muhurat';
+    if (shot === 'festivals') return 'festivals';
+    if (shot === 'kundli') return 'kundli';
+    return null;
+  });
+  const [paywallOpen, setPaywallOpen] = useState(() => shot === 'paywall');
   const [day, setDay] = useState<NormalizedDay | null>(null);
   const [dayLoading, setDayLoading] = useState(false);
   const [daySetup, setDaySetup] = useState(false);
@@ -204,6 +210,7 @@ export function HomeScreen() {
     });
   }, [place.city, sky, language, day]);
 
+  const overlayOpen = Boolean(almanac || askOpen || paywallOpen);
   const remaining = sky ? new Date(sky.currentWindow.end).getTime() - now.getTime() : 0;
   const cityName = place.city ? cityLabel(place.city, language) : '';
   const heroName = day?.tithi?.name ?? (sky ? windowLabel(language, sky.currentWindow.name) : '');
@@ -235,39 +242,42 @@ export function HomeScreen() {
   return (
     <View style={styles.root}>
       <SafeAreaView style={styles.safe}>
-        <View style={styles.top}>
-          <Pressable onPress={() => setSearchOpen(true)} hitSlop={8} style={styles.cityHit}>
-            <Text style={styles.brand}>{copy.appName}</Text>
-            <Text style={styles.city}>
-              {place.city ? cityName : copy.citySearch} ▾
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => setPaywallOpen(true)}
-            style={styles.payChip}
-            accessibilityRole="button"
-            accessibilityLabel={language === 'hi' ? 'शुभ खोलो' : 'Open Shubh'}
-          >
-            <Text style={styles.payChipText}>{language === 'hi' ? 'शुभ' : 'Shubh'}</Text>
-          </Pressable>
-          <View style={styles.seg}>
-            <Pressable
-              onPress={() => setLanguage('hi')}
-              style={[styles.segBtn, language === 'hi' && styles.segOn]}
-            >
-              <Text style={[styles.segText, language === 'hi' && styles.segTextOn]}>{copy.hindi}</Text>
+        {!overlayOpen ? (
+          <View style={styles.top}>
+            <Pressable onPress={() => setSearchOpen(true)} hitSlop={8} style={styles.cityHit}>
+              <Text style={styles.brand}>{copy.appName}</Text>
+              <Text style={styles.city}>
+                {place.city ? cityName : copy.citySearch} ▾
+              </Text>
             </Pressable>
             <Pressable
-              onPress={() => setLanguage('en')}
-              style={[styles.segBtn, language === 'en' && styles.segOn]}
+              onPress={() => setPaywallOpen(true)}
+              style={styles.payChip}
+              accessibilityRole="button"
+              accessibilityLabel={language === 'hi' ? 'शुभ खोलो' : 'Open Shubh'}
             >
-              <Text style={[styles.segText, language === 'en' && styles.segTextOn]}>{copy.english}</Text>
+              <Text style={styles.payChipText}>{language === 'hi' ? 'शुभ' : 'Shubh'}</Text>
             </Pressable>
+            <View style={styles.seg}>
+              <Pressable
+                onPress={() => setLanguage('hi')}
+                style={[styles.segBtn, language === 'hi' && styles.segOn]}
+              >
+                <Text style={[styles.segText, language === 'hi' && styles.segTextOn]}>{copy.hindi}</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setLanguage('en')}
+                style={[styles.segBtn, language === 'en' && styles.segOn]}
+              >
+                <Text style={[styles.segText, language === 'en' && styles.segTextOn]}>{copy.english}</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
+        ) : null}
 
         {sky ? (
           <>
+            {!overlayOpen ? (
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
               <View style={styles.hero}>
                 <Text style={styles.heroName}>{heroName}</Text>
@@ -352,13 +362,15 @@ export function HomeScreen() {
                 ) : null}
               </View>
 
-              <StatusBlock
-                copy={copy}
-                setup={daySetup && !day}
-                failed={dayFailed && !day}
-                onRetry={() => setReload((n) => n + 1)}
-                locale={language}
-              />
+              {!shot ? (
+                <StatusBlock
+                  copy={copy}
+                  setup={daySetup && !day}
+                  failed={dayFailed && !day}
+                  onRetry={() => setReload((n) => n + 1)}
+                  locale={language}
+                />
+              ) : null}
 
               {card ? (
                 <>
@@ -378,6 +390,8 @@ export function HomeScreen() {
                 </>
               ) : null}
             </ScrollView>
+            ) : null}
+            {!overlayOpen ? (
             <View style={styles.dock}>
               <AlmanacDock copy={copy} onOpen={setAlmanac} />
               <AskFAB
@@ -386,6 +400,7 @@ export function HomeScreen() {
                 onPress={() => setAskOpen(true)}
               />
             </View>
+            ) : null}
             <AskPage
               visible={askOpen}
               onClose={() => setAskOpen(false)}
@@ -407,13 +422,13 @@ export function HomeScreen() {
               onMatch={setMatchContext}
             />
           </>
-        ) : (
+        ) : overlayOpen ? null : (
           <View style={styles.empty}>
             <Text style={styles.emptyText}>{place.locating ? copy.locating : copy.citySearch}</Text>
           </View>
         )}
 
-        <Text style={styles.privacy}>{copy.privacyLocation}</Text>
+        {overlayOpen ? <View style={styles.overlayHold} /> : <Text style={styles.privacy}>{copy.privacyLocation}</Text>}
 
         <AlmanacHost
           tab={almanac}
@@ -582,6 +597,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   cardWrap: { alignItems: 'center' },
+  overlayHold: { flex: 1 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   emptyText: { color: color.ivoryMuted, fontSize: 16 },
   dock: { alignItems: 'center', paddingBottom: 16, gap: 14 },

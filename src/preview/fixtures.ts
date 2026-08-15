@@ -27,14 +27,17 @@ export const PREVIEW_EXTRACT: MarriageExtract = {
   question: '',
 };
 
-export const PREVIEW_MATCH: NormalizedMatch = FRAME_MATCH;
+export const PREVIEW_MATCH: NormalizedMatch = {
+  ...FRAME_MATCH,
+  verdict: 'अच्छा मेल',
+};
 
 export const PREVIEW_MUHURAT: RankedDate[] = FRAME_MUHURAT;
 
 export const PREVIEW_FESTIVALS: Festival[] = [
-  { key: 'janmashtami', name: 'Janmashtami', date: '2026-08-14', type: 'festival', tags: [] },
-  { key: 'ganesh', name: 'Ganesh Chaturthi', date: '2026-08-27', type: 'festival', tags: [] },
-  { key: 'navratri', name: 'Sharad Navratri', date: '2026-10-11', type: 'festival', tags: [] },
+  { key: 'janmashtami', name: 'जन्माष्टमी', date: '2026-08-14', type: 'festival', tags: [] },
+  { key: 'ganesh', name: 'गणेश चतुर्थी', date: '2026-08-27', type: 'festival', tags: [] },
+  { key: 'navratri', name: 'शरद नवरात्रि', date: '2026-10-11', type: 'festival', tags: [] },
 ];
 
 export const PREVIEW_CHART: NormalizedChart = {

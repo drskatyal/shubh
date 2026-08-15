@@ -33,6 +33,7 @@ import { RecordDock } from './RecordDock';
 import { runExtract } from './runExtract';
 import { askedShaadiNow } from './shaadiNow';
 import type { MarriageExtract } from './types';
+import { isShotMode } from '../../preview/shot';
 
 type Phase = 'idle' | 'recording' | 'sending' | 'matching';
 
@@ -53,6 +54,7 @@ export function MarriageFlow({
   seedText,
   initialExtract,
   initialMatch,
+  focusResult,
 }: {
   language: Language;
   copy: Copy;
@@ -70,6 +72,7 @@ export function MarriageFlow({
   seedText?: string;
   initialExtract?: MarriageExtract | null;
   initialMatch?: NormalizedMatch | null;
+  focusResult?: boolean;
 }) {
   const hi = language === 'hi';
   const remaining = wallet?.remaining() ?? 0;
@@ -95,6 +98,7 @@ export function MarriageFlow({
   }, [recorder]);
 
   useEffect(() => {
+    if (isShotMode() || initialMatch || initialExtract) return;
     void loadLastMatch().then((stored) => {
       if (stored && !match) setMatch(stored);
     });
@@ -218,14 +222,14 @@ export function MarriageFlow({
 
   return (
     <View style={styles.root}>
-      {!extract && !typedFallback ? (
+      {!focusResult && !extract && !typedFallback ? (
         <View style={styles.promptBlock}>
           <Text style={styles.prompt}>{RECORD_PROMPT}</Text>
           {language === 'en' ? <Text style={styles.promptEn}>{recordPromptLine('en')}</Text> : null}
         </View>
       ) : null}
 
-      {extract || typedFallback ? (
+      {!focusResult && (extract || typedFallback) ? (
         <ConfirmBirthCards
           language={language}
           extract={extract ?? emptyExtract()}
@@ -256,6 +260,7 @@ export function MarriageFlow({
           >
             <Text style={styles.shareText}>{copy.shareScore}</Text>
           </Pressable>
+          {focusResult ? null : (
           <Pressable
             onPress={() => void loadMuhurat()}
             style={styles.follow}
@@ -265,6 +270,7 @@ export function MarriageFlow({
               {muhuratBusy ? (hi ? 'आकाश…' : 'Sky…') : muhuratFollowLabel(language)}
             </Text>
           </Pressable>
+          )}
           {muhurat?.length ? (
             <View style={styles.dates}>
               {muhurat.map((row) => (
@@ -283,7 +289,7 @@ export function MarriageFlow({
 
       {waiting ? <DivineWait locale={language} label={hi ? 'आकाश पढ़ रहे हैं' : 'Reading the sky'} /> : null}
 
-      {showPaywall && !typedFallback && !extract ? (
+      {focusResult ? null : showPaywall && !typedFallback && !extract ? (
         <Paywall
           language={language}
           remaining={remaining}
@@ -292,7 +298,7 @@ export function MarriageFlow({
           onBuyPack={onBuyPack ?? (async () => undefined)}
           onRestore={onRestore ?? (async () => undefined)}
         />
-      ) : (
+      ) : focusResult ? null : (
         <>
           {!connected && !extract && !match ? <ConnectLater language={language} surface="ask" /> : null}
           <RecordDock
@@ -305,7 +311,7 @@ export function MarriageFlow({
         </>
       )}
 
-      {!typedFallback ? (
+      {focusResult || typedFallback ? null : (
         <Pressable
           onPress={() => {
             setTypedFallback(true);
@@ -315,9 +321,9 @@ export function MarriageFlow({
         >
           <Text style={styles.quietText}>{typeInsteadLabel(language)}</Text>
         </Pressable>
-      ) : null}
+      )}
 
-      {extract && !match && missing.length === 0 ? (
+      {!focusResult && extract && !match && missing.length === 0 ? (
         <Pressable
           onPress={() => void runMilan(extract)}
           disabled={waiting}

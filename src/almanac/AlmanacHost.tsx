@@ -112,6 +112,7 @@ export function AlmanacHost({
         onMatch={onMatch}
         initialExtract={shot === 'confirm' || shot === 'milan' ? PREVIEW_EXTRACT : null}
         initialMatch={shot === 'milan' ? PREVIEW_MATCH : null}
+        focusResult={shot === 'milan'}
       />
     </>
   );

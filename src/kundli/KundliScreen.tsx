@@ -80,15 +80,19 @@ export function KundliScreen({
   return (
     <Sheet visible={visible} title={copy.kundliTitle} onClose={onClose} closeLabel={copy.close}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <Text style={styles.privacy}>{birthPrivacy(language)}</Text>
-        <BirthForm value={form} onChange={setForm} copy={copy} language={language} city={defaultCity} />
-        <Pressable
-          onPress={() => void onGenerate()}
-          disabled={busy || !birthFormValid(form)}
-          style={[styles.cta, (busy || !birthFormValid(form)) && styles.ctaOff]}
-        >
-          <Text style={styles.ctaText}>{busy ? copy.generating : copy.generateKundli}</Text>
-        </Pressable>
+        {previewChart ? null : (
+          <>
+            <Text style={styles.privacy}>{birthPrivacy(language)}</Text>
+            <BirthForm value={form} onChange={setForm} copy={copy} language={language} city={defaultCity} />
+            <Pressable
+              onPress={() => void onGenerate()}
+              disabled={busy || !birthFormValid(form)}
+              style={[styles.cta, (busy || !birthFormValid(form)) && styles.ctaOff]}
+            >
+              <Text style={styles.ctaText}>{busy ? copy.generating : copy.generateKundli}</Text>
+            </Pressable>
+          </>
+        )}
 
         {busy ? <StatusBlock copy={copy} loading /> : null}
         {result && !result.ok ? (

@@ -1,6 +1,15 @@
 import type { ExpoConfig } from 'expo/config';
 
-import { STORE_SCREENSHOTS, appleEn, playHi } from './src/store/aso';
+/** Keep in sync with src/store/aso.ts. Avoid importing TS from this CJS config. */
+const playHiTitle = 'शुभ: पंचांग और कुंडली';
+const playHiShort = 'आज का पंचांग, rahukaal, guna milan, muhurat';
+const appleEnTitle = 'Shubh: Panchang & Kundli';
+const storeScreenshots = [
+  'feature-graphic.png',
+  '01-milan-score-ring.png',
+  '02-today-panchang.png',
+  '03-marriage-muhurat.png',
+];
 
 const micPermission =
   'Shubh listens so it can record both births or your ask. Audio is used once, then discarded.';
@@ -13,7 +22,7 @@ const config: ExpoConfig = {
   icon: './assets/icon.png',
   userInterfaceStyle: 'dark',
   scheme: 'shubh',
-  description: playHi.shortDescription,
+  description: playHiShort,
   locales: {
     en: './store/locales/en.json',
     hi: './store/locales/hi.json',
@@ -111,10 +120,10 @@ const config: ExpoConfig = {
     store: {
       primary: 'play',
       defaultPlayLocale: 'hi-IN',
-      playTitle: playHi.title,
-      appleTitle: appleEn.title,
+      playTitle: playHiTitle,
+      appleTitle: appleEnTitle,
       featureGraphic: 'feature-graphic.png',
-      screenshots: STORE_SCREENSHOTS.map((shot) => shot.file),
+      screenshots: storeScreenshots,
     },
   },
 };

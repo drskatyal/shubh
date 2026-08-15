@@ -251,7 +251,7 @@ export function AskPage({
             )}
           </ScrollView>
 
-          {!connected && turns.length === 0 && mode !== 'marriage' ? (
+          {initialTurns?.length ? null : !connected && turns.length === 0 && mode !== 'marriage' ? (
             <ConnectLater language={language} surface="ask" />
           ) : showPaywall && turns.length === 0 ? (
             <Paywall
@@ -263,7 +263,7 @@ export function AskPage({
               onRestore={onRestore ?? (async () => undefined)}
               onClose={onClose}
             />
-          ) : mode === 'marriage' ? null : (
+          ) : mode === 'marriage' || initialTurns?.length ? null : (
             <AskComposer
               language={language}
               phase={phase}
@@ -275,7 +275,7 @@ export function AskPage({
             />
           )}
           {error ? <Text style={styles.error}>{error}</Text> : null}
-          <Text style={styles.privacy}>{privacyLine(language)}</Text>
+          {initialTurns?.length ? null : <Text style={styles.privacy}>{privacyLine(language)}</Text>}
         </SafeAreaView>
     </View>
   );
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 12,
-    backgroundColor: 'rgba(6, 7, 14, 0.18)',
+    backgroundColor: 'rgba(6, 7, 14, 0.92)',
   },
   safe: { flex: 1, paddingHorizontal: 20, paddingBottom: 12 },
   top: {

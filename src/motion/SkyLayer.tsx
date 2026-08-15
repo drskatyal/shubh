@@ -71,7 +71,7 @@ export function SkyLayerProvider({ children }: { children: ReactNode }) {
           locale={locale}
         />
         {waiting ? (
-          <View style={styles.wait} pointerEvents="none" accessibilityRole="progressbar" accessibilityLabel={line}>
+          <View style={[styles.wait, { pointerEvents: 'none' }]} accessibilityRole="progressbar" accessibilityLabel={line}>
             <Text style={styles.waitLine}>{line}</Text>
           </View>
         ) : null}

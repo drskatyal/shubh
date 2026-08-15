@@ -27,6 +27,7 @@ export function MatchingScreen({
   onMatch,
   initialExtract,
   initialMatch,
+  focusResult,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -44,6 +45,7 @@ export function MatchingScreen({
   onMatch?: (match: NormalizedMatch) => void;
   initialExtract?: import('../ask/marriage/types').MarriageExtract | null;
   initialMatch?: NormalizedMatch | null;
+  focusResult?: boolean;
 }) {
   if (!visible) return null;
   const hi = language === 'hi';
@@ -63,7 +65,7 @@ export function MatchingScreen({
           <Text style={styles.remaining}>{remainingLabel(language, remaining)}</Text>
         </View>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-          <Text style={styles.privacy}>{birthPrivacy(language)}</Text>
+          {focusResult ? null : <Text style={styles.privacy}>{birthPrivacy(language)}</Text>}
           <MarriageFlow
             language={language}
             copy={copy}
@@ -79,6 +81,7 @@ export function MatchingScreen({
             onMatch={onMatch}
             initialExtract={initialExtract}
             initialMatch={initialMatch}
+            focusResult={focusResult}
           />
         </ScrollView>
       </SafeAreaView>
@@ -88,9 +91,9 @@ export function MatchingScreen({
 
 const styles = StyleSheet.create({
   root: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
     zIndex: 12,
-    backgroundColor: 'rgba(6, 7, 14, 0.18)',
+    backgroundColor: 'rgba(6, 7, 14, 0.92)',
   },
   safe: { flex: 1, paddingHorizontal: 20, paddingBottom: 12 },
   top: {
