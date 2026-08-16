@@ -126,7 +126,7 @@ export async function askAboutChart(opts: {
     return {
       ok: false,
       error: 'gemini',
-      message: 'Refusing to send birth date, time, or place to Gemini.',
+      message: 'Refusing to send birth date, time, or place.',
     };
   }
   if (!opts.apiKey) {
@@ -134,7 +134,7 @@ export async function askAboutChart(opts: {
       ok: false,
       error: 'missing_key',
       message:
-        'Gemini is not configured. Set GEMINI_API_KEY in your env or as an EAS secret, then rebuild. The key is never committed.',
+        'Ask is not connected. Point the app at the proxy, then rebuild.',
     };
   }
   if (!opts.wallet.canAsk()) {

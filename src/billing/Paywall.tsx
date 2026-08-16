@@ -1,23 +1,56 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+
 import type { Language } from '../engine';
 import { privacyLine, remainingLabel } from '../ask/copy';
-import { PRODUCTS } from './products';
+import type { LegalPage } from '../legal';
+import { color } from '../theme/tokens';
+import { LevelFrame } from '../ui/LevelFrame';
+import { ANNUAL_PRICE_INR, MONTHLY_PRICE_INR, PACK_PRICE_INR } from './products';
+import { STORE_LATER } from './revenuecat';
 
 type Props = {
   language: Language;
   remaining: number;
   onBuyMonthly: () => Promise<void>;
+  onBuyAnnual?: () => Promise<void>;
   onBuyPack: () => Promise<void>;
   onRestore: () => Promise<void>;
+  onClose?: () => void;
+  onOpenLegal?: (page: LegalPage) => void;
+  embedded?: boolean;
 };
+
+function benefitLines(hi: boolean): string[] {
+  return hi
+    ? [
+        'घर की झलक हमेशा मुफ़्त',
+        'अधिक मुहूर्त — साठ दिन',
+        'गहरा गुण मिलान',
+        'त्योहार की सुबह याद',
+        'बिना नाम का शेयर कार्ड',
+        'पूछ की मात्रा',
+      ]
+    : [
+        'Daily glance stays free',
+        'Extra muhurats — sixty days',
+        'Deeper guna milan',
+        'Festival morning reminders',
+        'Unbranded share cards',
+        'Ask quota',
+      ];
+}
 
 export function Paywall({
   language,
   remaining,
   onBuyMonthly,
+  onBuyAnnual,
   onBuyPack,
   onRestore,
+  onClose,
+  onOpenLegal,
+  embedded,
 }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,86 +62,178 @@ export function Paywall({
     try {
       await fn();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Purchase failed');
+      const raw = err instanceof Error ? err.message : STORE_LATER;
+      setError(
+        raw === STORE_LATER
+          ? hi
+            ? 'स्टोर बाद में जुड़ेगा। झलक मुफ़्त रहती है।'
+            : 'Store connects later. The glance stays free.'
+          : raw,
+      );
     } finally {
       setBusy(null);
     }
   };
 
   return (
-    <View style={styles.box}>
-      <Text style={styles.title}>{hi ? 'पूछ खत्म' : 'No asks left'}</Text>
-      <Text style={styles.remaining}>{remainingLabel(language, remaining)}</Text>
-      <Text style={styles.lead}>
-        {hi
-          ? 'एक महीना या एक पैक लो। घर की झलक मुफ़्त रहती है।'
-          : 'Take a month or a pack. The home glance stays free.'}
-      </Text>
+    <LevelFrame visible embedded={embedded} zIndex={20}>
+      <SafeAreaView style={styles.safe}>
+        {onClose ? (
+          <Pressable onPress={onClose} hitSlop={10} style={styles.closeHit} accessibilityRole="button">
+            <Text style={styles.close}>{hi ? 'बंद' : 'Close'}</Text>
+          </Pressable>
+        ) : null}
+        <ScrollView contentContainerStyle={styles.box} showsVerticalScrollIndicator={false}>
+          <Text style={styles.kicker}>{hi ? 'शुभ' : 'SHUBH'}</Text>
+          <Text style={styles.title}>{hi ? 'शुभ खोलो' : 'Open Shubh'}</Text>
+          <Text style={styles.remaining}>{remainingLabel(language, remaining)}</Text>
+          <Text style={styles.lead}>
+            {hi
+              ? 'आज का पंचांग मुफ़्त रहता है। बाकी — मुहूर्त, मिलान, याद, शेयर, पूछ — यहीं खुलते हैं।'
+              : 'The daily glance stays free. Extra muhurats, matching depth, reminders, unbranded share, and asks open here.'}
+          </Text>
 
-      <Pressable
-        style={styles.primary}
-        disabled={Boolean(busy)}
-        onPress={() => run('monthly', onBuyMonthly)}
-        accessibilityRole="button"
-      >
-        <Text style={styles.primaryText}>
-          {hi ? 'महीना · 100 पूछ' : 'Monthly · 100 asks'}
-        </Text>
-        <Text style={styles.sku}>{PRODUCTS.monthly}</Text>
-      </Pressable>
+          <View style={styles.benefits}>
+            {benefitLines(hi).map((line) => (
+              <View key={line} style={styles.benefit}>
+                <Text style={styles.dot}>✦</Text>
+                <Text style={styles.benefitText}>{line}</Text>
+              </View>
+            ))}
+          </View>
 
-      <Pressable
-        style={styles.secondary}
-        disabled={Boolean(busy)}
-        onPress={() => run('pack', onBuyPack)}
-        accessibilityRole="button"
-      >
-        <Text style={styles.secondaryText}>
-          {hi ? 'पैक · 100 पूछ' : 'Pack · 100 asks'}
-        </Text>
-        <Text style={styles.sku}>{PRODUCTS.pack}</Text>
-      </Pressable>
+          <Pressable
+            style={styles.primary}
+            disabled={Boolean(busy)}
+            onPress={() => run('monthly', onBuyMonthly)}
+            accessibilityRole="button"
+          >
+            <Text style={styles.primaryText}>
+              {hi
+                ? `महीना · ₹${MONTHLY_PRICE_INR.min}–${MONTHLY_PRICE_INR.max}`
+                : `Monthly · ₹${MONTHLY_PRICE_INR.min}–${MONTHLY_PRICE_INR.max}`}
+            </Text>
+            <Text style={styles.sku}>{hi ? '100 पूछ / महीना' : '100 asks a month'}</Text>
+          </Pressable>
 
-      <Pressable
-        style={styles.link}
-        disabled={Boolean(busy)}
-        onPress={() => run('restore', onRestore)}
-        accessibilityRole="button"
-      >
-        <Text style={styles.linkText}>
-          {hi ? 'खरीद वापस लाओ' : 'Restore purchases'}
-        </Text>
-      </Pressable>
+          <Pressable
+            style={styles.secondary}
+            disabled={Boolean(busy)}
+            onPress={() => run('annual', onBuyAnnual ?? onBuyMonthly)}
+            accessibilityRole="button"
+          >
+            <Text style={styles.secondaryText}>
+              {hi
+                ? `साल · ₹${ANNUAL_PRICE_INR.min}–${ANNUAL_PRICE_INR.max}`
+                : `Year · ₹${ANNUAL_PRICE_INR.min}–${ANNUAL_PRICE_INR.max}`}
+            </Text>
+            <Text style={styles.sku}>{hi ? 'वही द्वार, एक बार' : 'Same door, once a year'}</Text>
+          </Pressable>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Text style={styles.privacy}>{privacyLine(language)}</Text>
-    </View>
+          <Pressable
+            style={styles.ghost}
+            disabled={Boolean(busy)}
+            onPress={() => run('pack', onBuyPack)}
+            accessibilityRole="button"
+          >
+            <Text style={styles.ghostText}>
+              {hi ? `पैक · ₹${PACK_PRICE_INR} · 100 पूछ` : `Pack · ₹${PACK_PRICE_INR} · 100 asks`}
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.link}
+            disabled={Boolean(busy)}
+            onPress={() => run('restore', onRestore)}
+            accessibilityRole="button"
+          >
+            <Text style={styles.linkText}>{hi ? 'खरीद वापस लाओ' : 'Restore purchases'}</Text>
+          </Pressable>
+
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Text style={styles.privacy}>{privacyLine(language)}</Text>
+          {onOpenLegal ? (
+            <View style={styles.legalRow}>
+              <Pressable onPress={() => onOpenLegal('privacy')} accessibilityRole="button">
+                <Text style={styles.legalLink}>{hi ? 'गोपनीयता' : 'Privacy'}</Text>
+              </Pressable>
+              <Text style={styles.legalDot}>·</Text>
+              <Pressable onPress={() => onOpenLegal('terms')} accessibilityRole="button">
+                <Text style={styles.legalLink}>{hi ? 'नियम' : 'Terms'}</Text>
+              </Pressable>
+              <Text style={styles.legalDot}>·</Text>
+              <Pressable onPress={() => onOpenLegal('support')} accessibilityRole="button">
+                <Text style={styles.legalLink}>{hi ? 'सहायता' : 'Support'}</Text>
+              </Pressable>
+            </View>
+          ) : null}
+        </ScrollView>
+      </SafeAreaView>
+    </LevelFrame>
   );
 }
 
 const styles = StyleSheet.create({
-  box: { gap: 12 },
-  title: { color: '#F6EDE0', fontSize: 22, fontWeight: '700' },
-  remaining: { color: '#E8A838', fontSize: 15 },
-  lead: { color: '#C9BBA8', fontSize: 15, lineHeight: 22 },
+  safe: { flex: 1, paddingHorizontal: 22 },
+  closeHit: { alignSelf: 'flex-start', paddingTop: 8, paddingBottom: 4 },
+  close: { color: color.gold, fontSize: 16, fontWeight: '600' },
+  box: { gap: 14, paddingBottom: 36, paddingTop: 8 },
+  kicker: {
+    color: color.gold,
+    fontSize: 13,
+    letterSpacing: 6,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  title: {
+    color: color.ivory,
+    fontSize: 40,
+    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: 0.4,
+  },
+  remaining: { color: color.goldSoft, fontSize: 15, textAlign: 'center' },
+  lead: { color: color.ivoryMuted, fontSize: 16, lineHeight: 24, textAlign: 'center' },
+  benefits: { gap: 10, marginTop: 8 },
+  benefit: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  dot: { color: color.gold, fontSize: 14 },
+  benefitText: { color: color.ivory, fontSize: 16, fontWeight: '500' },
   primary: {
-    backgroundColor: '#E8A838',
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    backgroundColor: color.gold,
+    borderRadius: 18,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    marginTop: 8,
   },
-  primaryText: { color: '#1A1208', fontSize: 16, fontWeight: '700' },
+  primaryText: { color: color.ink, fontSize: 18, fontWeight: '800' },
   secondary: {
-    borderColor: '#E8A838',
-    borderWidth: 1,
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    borderColor: color.gold,
+    borderWidth: 1.5,
+    borderRadius: 18,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
   },
-  secondaryText: { color: '#F6EDE0', fontSize: 16, fontWeight: '700' },
-  sku: { color: '#8A7B68', fontSize: 12, marginTop: 4 },
-  link: { paddingVertical: 8 },
-  linkText: { color: '#E8A838', fontSize: 15 },
-  error: { color: '#E07070', fontSize: 14 },
-  privacy: { color: '#8A7B68', fontSize: 12, lineHeight: 18 },
+  secondaryText: { color: color.ivory, fontSize: 17, fontWeight: '700' },
+  sku: { color: color.ivoryDim, fontSize: 13, marginTop: 4 },
+  ghost: {
+    borderColor: color.goldLine,
+    borderWidth: 1,
+    borderRadius: 18,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+  },
+  ghostText: { color: color.goldSoft, fontSize: 16, fontWeight: '600' },
+  link: { paddingVertical: 8, alignItems: 'center' },
+  linkText: { color: color.gold, fontSize: 15 },
+  error: { color: color.danger, fontSize: 14, textAlign: 'center' },
+  privacy: { color: color.ivoryDim, fontSize: 12, lineHeight: 18, textAlign: 'center' },
+  legalRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  legalLink: { color: color.gold, fontSize: 13, fontWeight: '600' },
+  legalDot: { color: color.ivoryDim, fontSize: 13 },
 });

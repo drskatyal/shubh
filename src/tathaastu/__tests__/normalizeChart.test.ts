@@ -36,6 +36,26 @@ describe('normalizeChart', () => {
 });
 
 describe('normalizeMatch', () => {
+  it('reads Divine ashtakoot_milan points_obtained', () => {
+    const match = normalizeMatch(
+      {
+        ashtakoot_milan: {
+          varna: { points_obtained: 1, max_ponits: 1 },
+          nadi: { points_obtained: 0, max_ponits: 8 },
+        },
+        ashtakoot_milan_result: { points_obtained: 28, max_ponits: 36, content: 'Favorable' },
+        manglik_dosha: { p1: 'false', p2: 'true' },
+      },
+      'Priya',
+      'Arjun',
+    );
+    expect(match.total).toBe(28);
+    expect(match.max).toBe(36);
+    expect(match.verdict).toBe('Favorable');
+    expect(match.kutas.find((kuta) => kuta.key === 'nadi')?.score).toBe(0);
+    expect(match.manglik).toEqual({ a: false, b: true });
+  });
+
   it('reads a 36-guna total and eight kutas', () => {
     const match = normalizeMatch(
       {

@@ -1,14 +1,15 @@
-# PLAN: Store-ready TathaAstu Phase 1
+# PLAN: Store-ready Divine Phase 1
 
-Unifies the kundli (#4) and muhurat/festivals (#5) lanes on one live client. No fixture-first product.
+TathaAstuAPI is dead. Live vendor is Divine Vedic Prakash. See [PRODUCT.md](../PRODUCT.md).
 
 ## Client
 
-`src/tathaastu/client.ts` is the only HTTP surface. Paths from OpenAPI only.
+`src/divine/client.ts` is the only HTTP surface. Paths from official Divine docs only.
 
-- App → `TATHAASTU_PROXY_URL` (`server/tathaastu-proxy.mjs`).
-- `TATHAASTU_API_KEY` is server / EAS / Node-test only. Never `EXPO_PUBLIC_`.
-- Missing proxy/key or 401/402/429 → calm retry / setup. Never Arjun/Priya charts or mock festivals.
+- App → `DIVINE_PROXY_URL` (`server/divine-proxy.mjs`).
+- `DIVINE_API_KEY` is server / EAS / Node-test only. Never `EXPO_PUBLIC_`.
+- Optional `DIVINE_API_TOKEN` if Bearer is separate; otherwise the key is both.
+- Missing proxy/key or 401/402/429/5xx → on-device glance. Never Arjun/Priya charts or mock festivals.
 
 ## Screens
 

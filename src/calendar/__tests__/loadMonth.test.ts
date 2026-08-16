@@ -2,11 +2,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { loadCalendarMonth } from '../loadMonth';
 
-const originalKey = process.env.TATHAASTU_API_KEY;
+const originalKey = process.env.DIVINE_API_KEY;
 
 afterEach(() => {
-  if (originalKey === undefined) delete process.env.TATHAASTU_API_KEY;
-  else process.env.TATHAASTU_API_KEY = originalKey;
+  if (originalKey === undefined) delete process.env.DIVINE_API_KEY;
+  else process.env.DIVINE_API_KEY = originalKey;
 });
 
 function json(status: number, body: unknown) {
@@ -15,7 +15,7 @@ function json(status: number, body: unknown) {
 
 describe('loadCalendarMonth', () => {
   it('does not fill a fake month when the key is missing', async () => {
-    delete process.env.TATHAASTU_API_KEY;
+    delete process.env.DIVINE_API_KEY;
     const result = await loadCalendarMonth({
       year: 2026,
       month: 8,
@@ -31,8 +31,8 @@ describe('loadCalendarMonth', () => {
     expect(result.month).toBeUndefined();
   });
 
-  it('normalizes a live month grid', async () => {
-    process.env.TATHAASTU_API_KEY = 'test-key';
+  it('normalizes a live month grid from English calendar festivals', async () => {
+    process.env.DIVINE_API_KEY = 'test-key';
     const result = await loadCalendarMonth({
       year: 2026,
       month: 8,
@@ -40,14 +40,15 @@ describe('loadCalendarMonth', () => {
       lon: 77.2,
       lang: 'en',
       fetch: async (input) => {
-        expect(String(input)).toContain('/v1/calendar/month');
+        expect(String(input)).toContain('/indian-api/v1/english-calendar-festivals');
         return json(200, {
-          days: [{ date: '2026-08-14', tithi: { name: 'Ashtami' }, festivals: ['Ekadashi'] }],
+          success: 1,
+          data: { ekadashi: { date: '2026-08-14' } },
         });
       },
     });
     expect(result.ok).toBe(true);
     expect(result.month?.days).toHaveLength(31);
-    expect(result.month?.days[13]).toMatchObject({ date: '2026-08-14', tithi: 'Ashtami' });
+    expect(result.month?.days[13]).toMatchObject({ date: '2026-08-14', festivals: ['Ekadashi'] });
   });
 });

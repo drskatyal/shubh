@@ -1,5 +1,7 @@
 # PLAN: Kundli + Ashtakoota matching + share cards
 
+> Superseded. TathaAstuAPI is dead. Live vendor is Divine Vedic Prakash — see [PRODUCT.md](../PRODUCT.md) and `src/divine/`.
+
 Lane: TathaAstu birth chart and guna milan. Home glance, muhurat, festivals, ads, TTS, and accounts stay in other PRs.
 
 Read [PRODUCT.md](../PRODUCT.md) first. OpenAPI is the request contract: https://api.tathaastuapi.com/openapi.json. Human docs: https://www.tathaastuapi.com/docs.html. Do not invent paths.

@@ -1,0 +1,106 @@
+:root {
+  --night: #0b1020;
+  --ink: #06070e;
+  --gold: #e8c578;
+  --ivory: #f4eee0;
+  --muted: rgba(244, 238, 224, 0.72);
+  --dim: rgba(244, 238, 224, 0.48);
+  --line: rgba(232, 197, 120, 0.32);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(232, 197, 120, 0.08), transparent 42%),
+    radial-gradient(ellipse at 80% 0%, rgba(90, 110, 180, 0.12), transparent 38%),
+    var(--night);
+  color: var(--ivory);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(244, 238, 224, 0.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 62%, rgba(244, 238, 224, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 61% 22%, rgba(244, 238, 224, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 74% 71%, rgba(244, 238, 224, 0.3) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 40%, rgba(244, 238, 224, 0.4) 50%, transparent 51%);
+}
+
+main {
+  position: relative;
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 3.5rem 1.4rem 5rem;
+}
+
+.brand {
+  color: var(--gold);
+  letter-spacing: 0.42em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+h1 {
+  margin: 0.6rem 0 1.6rem;
+  font-size: 2.4rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+h2 {
+  margin: 2.2rem 0 0.8rem;
+  color: var(--gold);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.1rem;
+  margin: 1.6rem 0 2.4rem;
+}
+
+nav a, .card a {
+  color: var(--gold);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.1rem;
+}
+
+.card {
+  display: block;
+  margin: 0 0 0.9rem;
+  padding: 1.1rem 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: 1.1rem;
+  background: rgba(8, 10, 20, 0.62);
+  color: var(--ivory);
+  text-decoration: none;
+}
+
+.card strong { display: block; color: var(--gold); margin-bottom: 0.25rem; }
+.card span { color: var(--dim); font-size: 0.95rem; }
+
+footer {
+  margin-top: 2.8rem;
+  color: var(--dim);
+  font-size: 0.88rem;
+}

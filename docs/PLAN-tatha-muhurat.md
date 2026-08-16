@@ -1,5 +1,7 @@
 # Muhurat finder + festival calendar
 
+> Superseded. TathaAstuAPI is dead. Live vendor is Divine Vedic Prakash — see [PRODUCT.md](../PRODUCT.md) and `src/divine/`.
+
 This PR owns Phase 1 **muhurat**, **festivals**, and the **month grid**. Home panchang motion, Gemini ask, credits, and kundli stay in other PRs.
 
 Read [PRODUCT.md](../PRODUCT.md) first. Docs: https://www.tathaastuapi.com/docs.html · OpenAPI: https://api.tathaastuapi.com/openapi.json · Base: `https://api.tathaastuapi.com/v1`.

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { AskPage } from '../ask';
 import type { CreditWallet } from '../billing/credits';
+import { getSkyState } from '../engine';
 import type { Copy, Language } from '../i18n/strings';
-import type { City } from '../location/cities';
+import { cityLabel, type City } from '../location/cities';
 import { loadBirthChart } from '../tathaastu/client';
 import { toChartAskSummary } from '../tathaastu/normalize';
 import type { BirthData, NormalizedChart, TathaLoad } from '../tathaastu/types';
@@ -12,10 +14,9 @@ import { Sheet } from '../ui/Sheet';
 import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
 import { BirthForm, birthFormValid, emptyBirth } from './BirthForm';
-import { ChartAskSheet } from './ChartAskSheet';
 import { ChartView } from './ChartView';
 import { birthPrivacy } from './copy';
-import { loadKundliForm, saveKundliForm } from './storage';
+import { loadKundliForm, saveKundliForm, saveLastChart } from './storage';
 import { useAskAboutChart } from './useAskAboutChart';
 
 export function KundliScreen({
@@ -27,8 +28,11 @@ export function KundliScreen({
   wallet,
   onRemainingChange,
   onBuyMonthly,
+  onBuyAnnual,
   onBuyPack,
   onRestore,
+  previewChart,
+  embedded,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -38,12 +42,17 @@ export function KundliScreen({
   wallet: CreditWallet | null;
   onRemainingChange?: (remaining: number) => void;
   onBuyMonthly?: () => Promise<void>;
+  onBuyAnnual?: () => Promise<void>;
   onBuyPack?: () => Promise<void>;
   onRestore?: () => Promise<void>;
+  previewChart?: import('../tathaastu/types').NormalizedChart;
+  embedded?: boolean;
 }) {
   const [form, setForm] = useState<BirthData>(() => emptyBirth({ city: defaultCity }));
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<TathaLoad<NormalizedChart> | null>(null);
+  const [result, setResult] = useState<TathaLoad<NormalizedChart> | null>(
+    previewChart ? { ok: true, data: previewChart, source: 'fallback', status: 200 } : null,
+  );
   const chartAsk = useAskAboutChart();
 
   useEffect(() => {
@@ -60,7 +69,9 @@ export function KundliScreen({
     setBusy(true);
     try {
       await saveKundliForm(form);
-      setResult(await loadBirthChart(form, { language }));
+      const next = await loadBirthChart(form, { language });
+      setResult(next);
+      if (next.ok) await saveLastChart(toChartAskSummary(next.data));
     } finally {
       setBusy(false);
     }
@@ -69,17 +80,21 @@ export function KundliScreen({
   const summary = result?.ok ? toChartAskSummary(result.data) : null;
 
   return (
-    <Sheet visible={visible} title={copy.kundliTitle} onClose={onClose} closeLabel={copy.close}>
+    <Sheet visible={visible} title={copy.kundliTitle} onClose={onClose} closeLabel={copy.close} embedded={embedded}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <Text style={styles.privacy}>{birthPrivacy(language)}</Text>
-        <BirthForm value={form} onChange={setForm} copy={copy} language={language} city={defaultCity} />
-        <Pressable
-          onPress={() => void onGenerate()}
-          disabled={busy || !birthFormValid(form)}
-          style={[styles.cta, (busy || !birthFormValid(form)) && styles.ctaOff]}
-        >
-          <Text style={styles.ctaText}>{busy ? copy.generating : copy.generateKundli}</Text>
-        </Pressable>
+        {previewChart ? null : (
+          <>
+            <Text style={styles.privacy}>{birthPrivacy(language)}</Text>
+            <BirthForm value={form} onChange={setForm} copy={copy} language={language} city={defaultCity} />
+            <Pressable
+              onPress={() => void onGenerate()}
+              disabled={busy || !birthFormValid(form)}
+              style={[styles.cta, (busy || !birthFormValid(form)) && styles.ctaOff]}
+            >
+              <Text style={styles.ctaText}>{busy ? copy.generating : copy.generateKundli}</Text>
+            </Pressable>
+          </>
+        )}
 
         {busy ? <StatusBlock copy={copy} loading /> : null}
         {result && !result.ok ? (
@@ -105,18 +120,27 @@ export function KundliScreen({
         ) : null}
       </ScrollView>
 
-      <ChartAskSheet
-        visible={chartAsk.visible}
-        armed={chartAsk.armed}
-        onClose={chartAsk.close}
-        summary={chartAsk.summary}
-        language={language}
-        wallet={wallet}
-        onRemainingChange={onRemainingChange}
-        onBuyMonthly={onBuyMonthly}
-        onBuyPack={onBuyPack}
-        onRestore={onRestore}
-      />
+      {defaultCity ? (
+        <AskPage
+          visible={chartAsk.visible}
+          onClose={chartAsk.close}
+          sky={getSkyState(defaultCity.lat, defaultCity.lon, new Date(), {
+            city: cityLabel(defaultCity, language),
+            language,
+          })}
+          language={language}
+          wallet={wallet}
+          onRemainingChange={onRemainingChange}
+          onBuyMonthly={onBuyMonthly}
+          onBuyAnnual={onBuyAnnual}
+          onBuyPack={onBuyPack}
+          onRestore={onRestore}
+          dayContext={null}
+          chartContext={summary}
+          copy={copy}
+          defaultCity={defaultCity}
+        />
+      ) : null}
     </Sheet>
   );
 }

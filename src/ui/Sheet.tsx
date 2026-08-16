@@ -1,42 +1,44 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { color } from '../theme/tokens';
+import { LevelFrame } from './LevelFrame';
 
+/** Overlay on the shared sky — never a Modal that remounts SkyStage. */
 export function Sheet({
   visible,
   title,
   onClose,
   closeLabel,
   children,
+  embedded,
 }: {
   visible: boolean;
   title: string;
   onClose: () => void;
   closeLabel: string;
   children: ReactNode;
+  embedded?: boolean;
 }) {
+  if (!visible) return null;
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={styles.root}>
-        <SafeAreaView style={styles.safe}>
-          <View style={styles.handle} />
-          <View style={styles.top}>
-            <Text style={styles.title}>{title}</Text>
-            <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button">
-              <Text style={styles.close}>{closeLabel}</Text>
-            </Pressable>
-          </View>
-          <View style={styles.rule} />
-          {children}
-        </SafeAreaView>
-      </View>
-    </Modal>
+    <LevelFrame visible embedded={embedded} zIndex={8}>
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.handle} />
+        <View style={styles.top}>
+          <Text style={styles.title}>{title}</Text>
+          <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button">
+            <Text style={styles.close}>{closeLabel}</Text>
+          </Pressable>
+        </View>
+        <View style={styles.rule} />
+        {children}
+      </SafeAreaView>
+    </LevelFrame>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.night },
   safe: { flex: 1, paddingHorizontal: 22 },
   handle: {
     alignSelf: 'center',

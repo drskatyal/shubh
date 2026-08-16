@@ -1,6 +1,7 @@
 import * as Location from 'expo-location';
 import { useCallback, useEffect, useState } from 'react';
 
+import { isShotMode, readShotId } from '../preview/shot';
 import { loadCity, saveCity } from '../storage/preferences';
 import { CITIES, nearestCity, type City } from './cities';
 
@@ -80,6 +81,13 @@ export function usePlace(): PlaceState {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      if (isShotMode()) {
+        if (!cancelled) {
+          setCityState(readShotId() === 'firstopen' ? null : (CITIES[0] ?? null));
+          setReady(true);
+        }
+        return;
+      }
       const stored = await loadCity();
       if (cancelled) {
         return;

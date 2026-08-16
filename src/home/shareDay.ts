@@ -28,6 +28,17 @@ export function formatDateLabel(date: string, language: Language): string {
   }).format(utc);
 }
 
+export function formatBirthLabel(date: string, language: Language): string {
+  const [year, month, day] = date.split('-').map(Number);
+  if (!year || !month || !day) return date;
+  const utc = new Date(Date.UTC(year, month - 1, day));
+  return new Intl.DateTimeFormat(language === 'hi' ? 'hi-IN' : 'en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(utc);
+}
+
 export function buildShareCard(input: {
   day: NormalizedDay;
   sky: SkyState;

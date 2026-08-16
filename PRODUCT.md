@@ -1,65 +1,50 @@
-# Shubh — TathaAstu plan (approved)
+# Shubh — product lock
 
-Build this. TathaAstuAPI is the backbone. On-device `getSkyState` is the offline fallback only. Keep the existing sky motion, Hindi/English, voice ask, and credits.
+Shubh is a daily Hindu panchang app. DivineAPI Vedic Prakash is the live sky. On-device Drik (`getSkyState`) is the glance fallback only. TathaAstu is dead — do not call it. VedAstro is out of scope.
 
-Docs: https://www.tathaastuapi.com/docs.html
-OpenAPI: https://api.tathaastuapi.com/openapi.json
-Base: `https://api.tathaastuapi.com/v1`
-Auth: `X-API-Key` header. Never put the key in the app binary. Client talks to a thin proxy (`TATHAASTU_API_KEY` on the server / EAS secret). Missing key or a failed call → calm retry / setup state. Never ship a fake panchang, sample Arjun/Priya chart, or mock festival as the happy path.
+The app is layered, not a tab dump: home glance → almanac (muhurat / festivals / calendar) → kundli / matching → Ask. One `SkyStage` stays mounted behind every level. It does not remount when you move. Waiting for Divine or Ask intensifies that same sky (`DivineWait`). Never a spinner.
 
-`lang` on TathaAstu is phonetic transliteration (hi, en, ta, te, mr, kn, bn, gu, ml…). Launch hi + en. Leave i18n keys for the rest.
+## What ships
 
-## Phase 1 — ship this (viral loop)
+- Home glance: city, tithi, nakshatra, yoga, karana, good/avoid, Rahu, current window. Motion stays.
+- Muhurat finder, festival calendar, kundli.
+- **Matching is a first-class market**, not a side screen. Full-screen voice capture (one take, Record — no text box) → confirm cards → Divine Ashtakoot + Manglik → WhatsApp-family milan card. Optional 60-day marriage muhurat. Quiet type-on-cards fallback. Birth stays on device; audio is not stored.
+- Share cards: today’s panchang, match score, festival why-this-date. Image + text. WhatsApp-ready.
+- Hindi + English via Divine `lan`. Other Indian codes pluggable.
+- Ask: full-screen temple of cards (not a chat box). Mic + optional text, labeled **पूछो / Record**. Credits decrement per ask (and per first marriage extract).
+- Play is the volume store and the primary ASO surface (India, Hindi default). Closed testing in India before production so the listing indexes. iOS same binary second. Listing copy: [docs/STORE-ASO.md](docs/STORE-ASO.md). No model names in store text. Review prompt only after a successful share.
 
-### Daily panchang home
-- Prefer `GET /v1/day-context` (or `/v1/panchang/today` + `/v1/timings` if day-context is 402).
-- Also: `/v1/panchang` with `include=timings,hora,choghadiya,festivals`, `/v1/panchang/lite` for the widget.
-- Show: city, tithi, nakshatra, yoga, karana, Good/Avoid for “start something new”, Rahu / Yamaganda / Gulika / Abhijit / Brahma, current Choghadiya.
-- SkyBackdrop behind the glance. Reduce Motion respected.
-- One-tap share card (WhatsApp / Instagram square): today’s panchang, city, Good/Avoid. No ads on the card.
-- Widget: today’s tithi + now/wait + city. Cache last payload for offline.
+## Money
 
-### Muhurat finder (the share engine)
-- `GET /v1/muhurat/find` — event, start_date, end_date, lat, lon, min_score.
-- Fallback: `GET /v1/events/find-dates` or `GET /v1/events/suitability` if find is 402.
-- Events: marriage, griha_pravesh, vehicle_purchase, business_start, naming (map naming → mundan or education_start if naming is missing).
-- Ranked dates with score + reason. Share card: “Best date for housewarming”.
+- RevenueCat stays.
+- Subscription test price **₹199–299 / month**. Never default to ₹599.
+- Credit pack: ~100 asks, about $10 / ₹799.
+- Free glance never locked.
+- Paywall sells extra asks, deeper kundli / guna milan, extra muhurat ranges, festival reminders, unbranded share cards — not “AI credits”.
 
-### Festivals
-- `GET /v1/festivals`, `/v1/festivals/month`, `/v1/festivals/explain?festival=&date=`.
-- Upcoming list + “Why this date?” sheet from explain.
-- Shareable festival card. Local notifications for the next festival (no account).
+## Ask backend (never shown)
 
-### Calendar
-- `GET /v1/calendar/month` for the month grid. Tap a day → that day’s panchang.
+- One HTTP call. Model id `gemini-3.1-flash-lite` lives on the server / `src/ask/prompt.ts`.
+- Today’s Divine panchang (and last chart / last match if present) is stuffed into the prompt.
+- `GEMINI_API_KEY` is server/env only. App posts to `{DIVINE_PROXY_URL}/ask`. Do not put the key or the provider name in Expo `extra`.
+- User-facing copy never says Gemini, GPT, OpenAI, Grok, LLM, ChatGPT, AI, A.I., artificial intelligence, powered by, chatbot, or “ask the AI”.
 
-### Kundli + matching
-- `POST /v1/birth-chart` — name, date, time, lat, lon.
-- `GET /v1/compatibility/score` (lite) and `POST /v1/compatibility` (full Ashtakoota).
-- One-tap share of the guna score card.
-- Birth data stays on device. Do not invent a user account.
+## Do not build
 
-### Voice ask (already in repo)
-- Keep Gemini 3.7 Flash mic. Stuff TathaAstu day-context (plus on-device fallback sky) into the prompt. Credits unchanged. TTS still later.
+Live pundit marketplace. Tarot. Numerology. Western. Sun-sign horoscope feed. Ads. Fixture-first home. Fake Arjun/Priya charts as the happy path.
 
-## Phase 2 (structure, don’t block Phase 1)
-Personalized daily insight, family profiles, more share cards, streaks, Amanta/Purnimanta toggle.
+## Divine
 
-## Phase 3 (later)
-More regional languages, community, PDF reports, premium muhurat unlock if TathaAstu plan requires it.
+See [docs/PLAN-divine-map.md](docs/PLAN-divine-map.md). Official paths only. Key off device. Cache panchang per city+date (6h). Kundli / matching keyed on birth tuples, no TTL.
 
-## Client rules
-- `src/tathaastu/client.ts` — typed wrappers. Read OpenAPI. Do not invent paths.
-- Cache day-context for 6h on device (their server already caches 6h).
-- On 401/402/429: fall back to on-device `getSkyState` for timings; show a calm “live panchang needs a key / plan” for kundli/muhurat.
-- Never scrape Drik. Never commit keys.
-- No ads. No prayer lock. No sun-sign horoscope.
+## Ask page
 
-## Done when (Phase 1)
-- Home shows a real TathaAstu day for the city, with motion + image share card.
-- Muhurat finder returns ranked dates and a share card.
-- Festival list + explain sheet.
-- Kundli generate + matching score + share card.
-- Widget + offline last-day cache.
-- hi/en throughout.
-- Mic still works, stuffed with the same day payload.
+See [docs/PLAN-ask-page.md](docs/PLAN-ask-page.md). Cards, not bubbles. Empty state is the sky. Marriage asks use the same page: record both births, confirm (“Humne yeh samjha”), then milan — never a 12-box form.
+
+## Done when
+
+- Home shows a real Divine day (or on-device glance if Divine is down), on the shared sky.
+- Muhurat, festivals, kundli, matching, Ask all sit on that sky.
+- Ask answers arrive as mixed cards with share. Credits decrement. No provider name in the UI.
+- Matching records both births in one take, confirms on cards, then Divine milan + optional 60-day marriage muhurat.
+- Tests do not need a live key.

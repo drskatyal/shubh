@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import type { Copy, Language } from '../i18n/strings';
 import { cityLabel, type City } from '../location/cities';
@@ -21,12 +21,20 @@ export function FestivalsScreen({
   city,
   language,
   copy,
+  canRemind,
+  previewFestivals,
+  onUnlock,
+  embedded,
 }: {
   visible: boolean;
   onClose: () => void;
   city: City | null;
   language: Language;
   copy: Copy;
+  canRemind?: boolean;
+  previewFestivals?: Festival[];
+  onUnlock?: () => Promise<void>;
+  embedded?: boolean;
 }) {
   const [rows, setRows] = useState<Festival[]>([]);
   const [setup, setSetup] = useState(false);
@@ -38,6 +46,13 @@ export function FestivalsScreen({
 
   useEffect(() => {
     if (!visible || !city) return;
+    if (previewFestivals?.length) {
+      setRows(previewFestivals);
+      setSetup(false);
+      setFailed(false);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     setLoading(true);
     void loadUpcomingFestivals({ lat: city.lat, lon: city.lon, lang: language }).then((result) => {
@@ -46,7 +61,7 @@ export function FestivalsScreen({
       setSetup(Boolean(result.setup));
       setFailed(!result.ok && !result.setup);
       setLoading(false);
-      if (result.ok) {
+      if (result.ok && canRemind) {
         void scheduleNextFestival(result.festivals, {
           lat: city.lat,
           lon: city.lon,
@@ -58,7 +73,7 @@ export function FestivalsScreen({
     return () => {
       cancelled = true;
     };
-  }, [visible, city, language, tick]);
+  }, [visible, city, language, tick, canRemind, previewFestivals]);
 
   useEffect(() => {
     if (!open) {
@@ -78,7 +93,7 @@ export function FestivalsScreen({
   const cityName = city ? cityLabel(city, language) : '';
 
   return (
-    <Sheet visible={visible} title={almanac.festivals} onClose={onClose} closeLabel={almanac.close}>
+    <Sheet visible={visible} title={almanac.festivals} onClose={onClose} closeLabel={almanac.close} embedded={embedded}>
       <Text style={styles.lead}>{almanac.upcoming}</Text>
       <StatusBlock
         copy={copy}
@@ -101,12 +116,28 @@ export function FestivalsScreen({
           >
             <Text style={styles.date}>{formatDateLabel(fest.date, language)}</Text>
             <Text style={styles.name}>{fest.name}</Text>
-            {fest.type ? <Text style={styles.tag}>{fest.type}</Text> : null}
+            {fest.type ? (
+              <Text style={styles.tag}>
+                {language === 'hi' ? 'त्योहार' : 'Festival'}
+              </Text>
+            ) : null}
           </Pressable>
         ))}
-        {rows.length ? <Text style={styles.hint}>{almanac.reminderSet}</Text> : null}
+        {rows.length && canRemind ? <Text style={styles.hint}>{almanac.reminderSet}</Text> : null}
+        {rows.length && !canRemind ? (
+          <Pressable
+            onPress={() => {
+              tapHaptic();
+              void onUnlock?.();
+            }}
+          >
+            <Text style={styles.hint}>
+              {language === 'hi' ? 'त्योहार की सुबह याद — शुभ खोलो' : 'Festival morning reminder — open Shubh'}
+            </Text>
+          </Pressable>
+        ) : null}
       </ScrollView>
-      <Modal visible={Boolean(open)} animationType="fade" transparent onRequestClose={() => setOpen(null)}>
+      {open ? (
         <Pressable style={styles.overlay} onPress={() => setOpen(null)}>
           <Pressable style={styles.why} onPress={() => undefined}>
             <Text style={styles.whyTitle}>{almanac.whyThisDate}</Text>
@@ -117,6 +148,7 @@ export function FestivalsScreen({
                 lines={[explain?.humanReadable ?? '', cityName]}
                 shareLabel={almanac.shareImage}
                 language={language}
+                branded={!canRemind}
                 payload={festivalShareText({
                   language,
                   name: open.name,
@@ -136,7 +168,7 @@ export function FestivalsScreen({
             </Pressable>
           </Pressable>
         </Pressable>
-      </Modal>
+      ) : null}
     </Sheet>
   );
 }
@@ -155,7 +187,7 @@ const styles = StyleSheet.create({
   },
   date: { color: color.gold, fontSize: 13, letterSpacing: 0.6, textTransform: 'capitalize' },
   name: { color: color.ivory, fontSize: 24, fontWeight: '600', lineHeight: 30 },
-  tag: { color: color.ivoryDim, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 },
+  tag: { color: color.ivoryDim, fontSize: 13, letterSpacing: 0.4 },
   hint: { color: color.ivoryDim, fontSize: 13, lineHeight: 18, marginTop: 8 },
   overlay: {
     flex: 1,

@@ -30,7 +30,14 @@ export type AlmanacCopy = {
 export type Copy = {
   appName: string;
   subtitle: string;
+  asoLine: string;
   pickLanguage: string;
+  firstOpenLead: string;
+  useThisPlace: string;
+  more: string;
+  privacy: string;
+  terms: string;
+  support: string;
   continue: string;
   hindi: string;
   english: string;
@@ -94,7 +101,14 @@ export const STRINGS: Record<Language, Copy> = {
   en: {
     appName: 'Shubh',
     subtitle: 'Is now good for this?',
+    asoLine: 'Panchang · kundli · guna milan · rahukaal · muhurat',
     pickLanguage: 'Hindi or English',
+    firstOpenLead: 'City for today’s sky. Then the glance. No account.',
+    useThisPlace: 'Use this place',
+    more: 'More',
+    privacy: 'Privacy',
+    terms: 'Terms',
+    support: 'Support',
     continue: 'Continue',
     hindi: 'हिन्दी',
     english: 'English',
@@ -147,7 +161,7 @@ export const STRINGS: Record<Language, Copy> = {
     personB: 'Person 2',
     matchScore: 'Get matching score',
     matchingInProgress: 'Matching…',
-    shareScore: 'Share score card',
+    shareScore: 'WhatsApp family',
     scoreCardTitle: 'Shubh · Guna milan',
     close: 'Close',
     windows: {
@@ -177,7 +191,7 @@ export const STRINGS: Record<Language, Copy> = {
       reason: 'Why',
       upcoming: 'Upcoming',
       whyThisDate: 'Why this date?',
-      liveNeedsKey: 'Live panchang needs TATHAASTU_PROXY_URL. The key stays on the server.',
+      liveNeedsKey: 'Live sky connects later. Today’s glance is already on the phone.',
       liveFailed: 'Couldn’t reach live panchang.',
       noDates: 'No ranked dates in this range.',
       noFestivals: 'No upcoming festivals yet.',
@@ -189,6 +203,7 @@ export const STRINGS: Record<Language, Copy> = {
         vehicle_purchase: 'Vehicle',
         business_start: 'Business',
         naming: 'Naming',
+        property_purchase: 'Property',
       },
       weekdays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
     },
@@ -196,7 +211,14 @@ export const STRINGS: Record<Language, Copy> = {
   hi: {
     appName: 'शुभ',
     subtitle: 'क्या अभी ठीक है?',
+    asoLine: 'पंचांग · कुंडली · गुण मिलान · राहु काल · मुहूर्त',
     pickLanguage: 'हिन्दी या अंग्रेज़ी',
+    firstOpenLead: 'आज के आकाश के लिए शहर। फिर झलक। खाता नहीं।',
+    useThisPlace: 'इसी जगह से',
+    more: 'और',
+    privacy: 'गोपनीयता',
+    terms: 'नियम',
+    support: 'सहायता',
     continue: 'आगे बढ़ें',
     hindi: 'हिन्दी',
     english: 'English',
@@ -225,7 +247,7 @@ export const STRINGS: Record<Language, Copy> = {
     loadingPanchang: 'आज का पंचांग आ रहा है…',
     shareToday: 'आज का पंचांग शेयर करें',
     motionSlot: 'आकाश की गति यहाँ आएगी',
-    micSlot: 'पूछें',
+    micSlot: 'पूछो',
     privacyLocation: 'लोकेशन केवल स्थानीय सूर्योदय के लिए है।',
     kundli: 'कुंडली',
     matching: 'मिलान',
@@ -249,7 +271,7 @@ export const STRINGS: Record<Language, Copy> = {
     personB: 'व्यक्ति 2',
     matchScore: 'मिलान अंक देखें',
     matchingInProgress: 'मिलान हो रहा है…',
-    shareScore: 'अंक कार्ड साझा करें',
+    shareScore: 'परिवार को WhatsApp करें',
     scoreCardTitle: 'शुभ · गुण मिलान',
     close: 'बंद',
     windows: {
@@ -279,7 +301,7 @@ export const STRINGS: Record<Language, Copy> = {
       reason: 'कारण',
       upcoming: 'आने वाले',
       whyThisDate: 'यह तारीख क्यों?',
-      liveNeedsKey: 'लाइव पंचांग के लिए TATHAASTU_PROXY_URL चाहिए। कुंजी सर्वर पर रहती है।',
+      liveNeedsKey: 'लाइव आकाश बाद में जुड़ेगा। आज की नज़र फ़ोन पर है।',
       liveFailed: 'लाइव पंचांग नहीं मिला।',
       noDates: 'इस अवधि में कोई अच्छी तारीख नहीं मिली।',
       noFestivals: 'अभी कोई आने वाला त्योहार नहीं।',
@@ -291,6 +313,7 @@ export const STRINGS: Record<Language, Copy> = {
         vehicle_purchase: 'वाहन',
         business_start: 'व्यवसाय',
         naming: 'नामकरण',
+        property_purchase: 'संपत्ति',
       },
       weekdays: ['र', 'सो', 'मं', 'बु', 'गु', 'शु', 'श'],
     },

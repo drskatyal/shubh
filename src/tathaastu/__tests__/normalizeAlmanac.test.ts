@@ -38,6 +38,30 @@ describe('normalize', () => {
     });
   });
 
+  it('reads Divine is_muhurat dates', () => {
+    const rows = normalizeRankedDates({
+      dates: [
+        { date: '2026-08-20', is_muhurat: 'true', weekday: 'Thursday' },
+        { date: '2026-08-19', is_muhurat: 'false' },
+      ],
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ date: '2026-08-20', rating: 'EXCELLENT' });
+  });
+
+  it('reads Divine english-calendar festival maps', () => {
+    const fests = normalizeFestivals({
+      janmashtami: { date: '2026-08-28' },
+      utpanna_ekadashi: { smartas: { date: '2026-08-22' } },
+    });
+    expect(fests).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ date: '2026-08-28', key: 'janmashtami', name: 'Janmashtami' }),
+        expect.objectContaining({ date: '2026-08-22', key: 'utpanna_ekadashi' }),
+      ]),
+    );
+  });
+
   it('reads festivals from a month days payload', () => {
     const fests = normalizeFestivals({
       days: [

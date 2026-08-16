@@ -121,8 +121,7 @@ export function SkyStage({
 
   return (
     <Canvas
-      style={[styles.fill, style]}
-      pointerEvents="none"
+      style={[styles.fill, { pointerEvents: 'none' }, style]}
       accessible={false}
       importantForAccessibility="no-hide-descendants"
     >

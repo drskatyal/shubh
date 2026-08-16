@@ -1,12 +1,14 @@
 type Extra = {
-  GEMINI_API_KEY?: string;
   REVENUECAT_API_KEY?: string;
-  TATHAASTU_PROXY_URL?: string;
+  DIVINE_PROXY_URL?: string;
+  ASK_PROXY_URL?: string;
+  SHUBH_DEV_UNLOCK?: string;
+  SUPABASE_URL?: string;
+  SUPABASE_ANON_KEY?: string;
 };
 
 function readExtra(): Extra {
   try {
-    // Lazy require so node tests do not load Expo.
     const Constants = require('expo-constants').default as {
       expoConfig?: { extra?: Extra };
     };
@@ -21,12 +23,19 @@ function trim(value: string | undefined): string | null {
   return next ? next : null;
 }
 
-/** GEMINI_API_KEY from env or EAS extra. Never read a committed file. */
+/**
+ * Server / Node-test key only. Never written into Expo extra.
+ * The app binary should call the proxy instead.
+ */
 export function getGeminiApiKey(): string | null {
+  return trim(process.env.GEMINI_API_KEY);
+}
+
+export function getAskProxyUrl(): string | null {
   return (
-    trim(process.env.GEMINI_API_KEY) ??
-    trim(process.env.EXPO_PUBLIC_GEMINI_API_KEY) ??
-    trim(readExtra().GEMINI_API_KEY)
+    trim(process.env.EXPO_PUBLIC_ASK_PROXY_URL) ??
+    trim(readExtra().ASK_PROXY_URL) ??
+    getDivineProxyUrl()
   );
 }
 
@@ -39,15 +48,18 @@ export function getRevenueCatApiKey(): string | null {
 }
 
 export function isDevUnlock(): boolean {
-  return process.env.EXPO_PUBLIC_SHUBH_DEV_UNLOCK === '1';
+  return (
+    process.env.EXPO_PUBLIC_SHUBH_DEV_UNLOCK === '1' ||
+    readExtra().SHUBH_DEV_UNLOCK === '1'
+  );
 }
 
 /** Public proxy URL only. Never an API key. */
-export function getTathaastuProxyUrl(): string | null {
+export function getDivineProxyUrl(): string | null {
   return (
-    trim(process.env.EXPO_PUBLIC_TATHAASTU_PROXY_URL) ??
-    trim(process.env.TATHAASTU_PROXY_URL) ??
-    trim(readExtra().TATHAASTU_PROXY_URL)
+    trim(process.env.EXPO_PUBLIC_DIVINE_PROXY_URL) ??
+    trim(process.env.DIVINE_PROXY_URL) ??
+    trim(readExtra().DIVINE_PROXY_URL)
   );
 }
 
@@ -55,6 +67,27 @@ export function getTathaastuProxyUrl(): string | null {
  * Server / Node-test key only. Not EXPO_PUBLIC_, not written into extra.
  * The app binary must use the proxy instead.
  */
-export function getTathaastuApiKey(): string | null {
-  return trim(process.env.TATHAASTU_API_KEY);
+export function getDivineApiKey(): string | null {
+  return trim(process.env.DIVINE_API_KEY);
+}
+
+/** Optional Bearer token. Defaults to DIVINE_API_KEY when unset. */
+export function getDivineApiToken(): string | null {
+  return trim(process.env.DIVINE_API_TOKEN);
+}
+
+/** Public project URL only. Empty in this branch. Never a live placeholder. */
+export function getSupabaseUrl(): string | null {
+  return trim(process.env.EXPO_PUBLIC_SUPABASE_URL) ?? trim(readExtra().SUPABASE_URL);
+}
+
+/** Publishable / anon key only. Never the service role. */
+export function getSupabaseAnonKey(): string | null {
+  return (
+    trim(process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY) ?? trim(readExtra().SUPABASE_ANON_KEY)
+  );
+}
+
+export function isSupabaseConfigured(): boolean {
+  return Boolean(getSupabaseUrl() && getSupabaseAnonKey());
 }

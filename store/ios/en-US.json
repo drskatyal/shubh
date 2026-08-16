@@ -1,0 +1,43 @@
+{
+  "locale": "en-US",
+  "defaultListing": true,
+  "name": "Shubh: Panchang & Kundli",
+  "subtitle": "Rahu, muhurat, festivals",
+  "keywords": "guna milan,kundali,vivah,rahukaal,choghadiya,shaadi,janampatri,ashtakoot,manglik,tithi,nakshatra",
+  "promotionalText": "Today’s panchang, guna milan, and marriage muhurat — share the card with family on WhatsApp.",
+  "description": "Shubh is a daily Hindu panchang. Open it and see today’s tithi, nakshatra, Rahu Kaal, and whether now is good to start.\n\nGuna milan (Ashtakoot) and Manglik for two births — speak both names, janam tithi, samay, and shehar in one take, then share the score card with family.\n\nFind a marriage muhurat for the next 60 days. Festival calendar with why-this-date. Janam kundli on device. Hindi and English.\n\nThe home glance stays free. Extra asks, deeper reports, and further muhurat ranges are optional.",
+  "whatsNew": "Voice guna milan, shareable score card, and marriage muhurat for the next 60 days. Daily panchang still on the home glance.",
+  "primaryCategory": "Lifestyle",
+  "secondaryCategory": "Reference",
+  "ageRating": "4+",
+  "copyright": "2026 Sanyam Katyal",
+  "supportUrl": "https://drskatyal.github.io/shubh/support.html",
+  "privacyUrl": "https://drskatyal.github.io/shubh/privacy.html",
+  "marketingUrl": "https://drskatyal.github.io/shubh/",
+  "demoAccount": "No login.",
+  "exportCompliance": {
+    "usesNonExemptEncryption": false,
+    "ascAnswer": "No"
+  },
+  "ageRatingQuestionnaire": {
+    "unrestrictedWebAccess": "No",
+    "userGeneratedContent": "No",
+    "violenceCartoon": "None",
+    "violenceRealistic": "None",
+    "sexualContent": "None",
+    "profanity": "None",
+    "alcoholTobaccoDrugs": "None",
+    "horror": "None",
+    "medicalTreatmentInfo": "None",
+    "gambling": "None",
+    "contests": "None",
+    "madeForKids": "No",
+    "notes": "Almanac, not a priest. Voice is one take then discarded. No UGC feed."
+  },
+  "iap": [
+    { "productId": "shubh_monthly_100", "role": "Monthly, 100 asks" },
+    { "productId": "shubh_annual_1200", "role": "Yearly" },
+    { "productId": "shubh_credits_100", "role": "Pack, 100 asks" }
+  ],
+  "reviewNotes": "No login. No demo account. The glance is free and works offline with on-device panchang.\n\nFirst launch: a city + language sheet (Hindi / English, or “use this place”). Then today’s glance. No account wall.\n\nDock on Home: Muhurat, Festivals, Panchang, Kundli, Matching. Paywall: tap शुभ / Shubh in the header, or a locked extra. Restore is on the paywall.\n\nEmpty keys show a calm “connect later” on live almanac / matching extract. The glance never locks.\n\nMicrophone: one take for matching or Ask, then discarded. Not stored.\n\nLocation: optional. Sunrise and local windows only. Not linked. Not used for tracking.\n\nIAP: monthly shubh_monthly_100, yearly shubh_annual_1200, pack shubh_credits_100. Restore on the paywall.\n\nMuhurat and guna milan are an almanac for a family talk — not a guarantee and not medical advice."
+}

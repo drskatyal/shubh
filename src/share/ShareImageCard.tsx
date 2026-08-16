@@ -28,6 +28,7 @@ export function ShareImageCard({
   shareLabel,
   language,
   payload,
+  branded = true,
 }: {
   kicker: string;
   title: string;
@@ -35,12 +36,13 @@ export function ShareImageCard({
   shareLabel: string;
   language: Language;
   payload: string;
+  branded?: boolean;
 }) {
   const ref = useRef<CaptureHandle>(null);
   const ViewShot = maybeViewShot();
   const card = (
     <View style={styles.card} accessibilityRole="summary">
-      <Text style={styles.brandMark}>{language === 'hi' ? 'शुभ' : 'Shubh'}</Text>
+      {branded ? <Text style={styles.brandMark}>{language === 'hi' ? 'शुभ' : 'Shubh'}</Text> : null}
       <Text style={styles.kicker}>{kicker}</Text>
       <Text style={styles.title}>{title}</Text>
       {lines.filter(Boolean).map((line) => (

@@ -1,33 +1,24 @@
+/**
+ * Divine Vedic Prakash types + normalizers.
+ * One vendor. This barrel is the alias screens already import — not a second live client.
+ */
 export {
-  TATHAASTU_HOST,
-  createBirthChart,
-  createCompatibility,
   explainFestival,
-  findEventDates,
   findMuhurat,
   getCalendarDay,
   getCalendarMonth,
-  getCompatibilityScore,
   getDayContext,
-  getEventSuitability,
   getFestivalsMonth,
-  getKundliTeaser,
   getPanchang,
   getPanchangLite,
   getPanchangToday,
   getTimings,
   loadBirthChart,
   matchPeople,
-  muhuratFindQuery,
   resolveTransport,
   setupCopy,
-  tathaGet,
-  tathaPost,
-  tathaRequest,
-  toDocsAliasBody,
-  toOpenApiBody,
-  toScoreQuery,
 } from './client';
+export type { TathaRequestOptions, TathaTransport } from './client';
 export { EVENT_CANDIDATES, minRatingForScore } from './events';
 export {
   chartSummaryHasBirthPii,
@@ -42,7 +33,6 @@ export {
   normalizeRankedDates,
   toChartAskSummary,
 } from './normalize';
-export type { TathaTransport } from './client';
 export type {
   BirthData,
   CalendarDay,

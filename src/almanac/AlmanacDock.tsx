@@ -6,7 +6,15 @@ import { tapHaptic } from '../ui/haptics';
 
 export type AlmanacTab = 'muhurat' | 'festivals' | 'calendar' | 'kundli' | 'match';
 
-export function AlmanacDock({ copy, onOpen }: { copy: Copy; onOpen: (tab: AlmanacTab) => void }) {
+export function AlmanacDock({
+  copy,
+  onOpen,
+  vertical,
+}: {
+  copy: Copy;
+  onOpen: (tab: AlmanacTab) => void;
+  vertical?: boolean;
+}) {
   const items: Array<{ tab: AlmanacTab; label: string }> = [
     { tab: 'muhurat', label: copy.almanac.muhurat },
     { tab: 'festivals', label: copy.almanac.festivals },
@@ -15,7 +23,7 @@ export function AlmanacDock({ copy, onOpen }: { copy: Copy; onOpen: (tab: Almana
     { tab: 'match', label: copy.matching },
   ];
   return (
-    <View style={styles.row}>
+    <View style={vertical ? styles.col : styles.row}>
       {items.map((item) => (
         <Pressable
           key={item.tab}
@@ -39,6 +47,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingHorizontal: 4,
+  },
+  col: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: 10,
+    width: '100%',
   },
   chip: {
     borderWidth: 1,

@@ -10,6 +10,8 @@ import { color } from '../theme/tokens';
 import { Sheet } from '../ui/Sheet';
 import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
+import { FREE_MUHURAT_DAYS } from '../billing/products';
+import { formatDateLabel } from '../home/shareDay';
 import { findMuhuratDates } from './findMuhurat';
 
 function ratingTone(rating: string): string {
@@ -19,12 +21,38 @@ function ratingTone(rating: string): string {
   return color.wait;
 }
 
-function DateRow({ row, copy, hero }: { row: RankedDate; copy: Copy; hero?: boolean }) {
+function ratingLabel(rating: string, language: Language): string {
+  const key = rating.toUpperCase();
+  if (language === 'hi') {
+    if (key === 'EXCELLENT') return 'उत्तम';
+    if (key === 'GOOD') return 'अच्छा';
+    if (key === 'AVOID') return 'टालें';
+    return 'सामान्य';
+  }
+  if (key === 'EXCELLENT') return 'Excellent';
+  if (key === 'GOOD') return 'Good';
+  if (key === 'AVOID') return 'Avoid';
+  return 'Fair';
+}
+
+function DateRow({
+  row,
+  copy,
+  language,
+  hero,
+}: {
+  row: RankedDate;
+  copy: Copy;
+  language: Language;
+  hero?: boolean;
+}) {
   return (
     <View style={[styles.row, hero && styles.heroRow]}>
       <View style={styles.rowTop}>
-        <Text style={[styles.date, hero && styles.heroDate]}>{row.date}</Text>
-        <Text style={[styles.rating, { color: ratingTone(String(row.rating)) }]}>{row.rating}</Text>
+        <Text style={[styles.date, hero && styles.heroDate]}>{formatDateLabel(row.date, language)}</Text>
+        <Text style={[styles.rating, { color: ratingTone(String(row.rating)) }]}>
+          {ratingLabel(String(row.rating), language)}
+        </Text>
       </View>
       <Text style={[styles.score, hero && styles.heroScore]}>
         {row.score}
@@ -41,12 +69,20 @@ export function MuhuratScreen({
   city,
   language,
   copy,
+  days,
+  previewDates,
+  onUnlock,
+  embedded,
 }: {
   visible: boolean;
   onClose: () => void;
   city: City | null;
   language: Language;
   copy: Copy;
+  days?: number;
+  previewDates?: RankedDate[];
+  onUnlock?: () => Promise<void>;
+  embedded?: boolean;
 }) {
   const [event, setEvent] = useState<FinderEvent>('marriage');
   const [rows, setRows] = useState<RankedDate[]>([]);
@@ -54,12 +90,26 @@ export function MuhuratScreen({
   const [setup, setSetup] = useState(false);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
+  const range = days ?? FREE_MUHURAT_DAYS;
+  const lockedExtra = range < 60;
 
   useEffect(() => {
     if (!visible || !city) return;
+    if (previewDates?.length) {
+      setRows(previewDates);
+      setSetup(false);
+      setFailed(false);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     setLoading(true);
-    void findMuhuratDates({ event, lat: city.lat, lon: city.lon }).then((result) => {
+    void findMuhuratDates({
+      event,
+      lat: city.lat,
+      lon: city.lon,
+      days: range,
+    }).then((result) => {
       if (cancelled) return;
       setRows(result.dates);
       setSetup(Boolean(result.setup));
@@ -69,7 +119,7 @@ export function MuhuratScreen({
     return () => {
       cancelled = true;
     };
-  }, [visible, event, city, tick]);
+  }, [visible, event, city, tick, previewDates, range]);
 
   const almanac = copy.almanac;
   const eventLabel = almanac.events[event];
@@ -87,7 +137,7 @@ export function MuhuratScreen({
       : '';
 
   return (
-    <Sheet visible={visible} title={almanac.muhurat} onClose={onClose} closeLabel={almanac.close}>
+    <Sheet visible={visible} title={almanac.muhurat} onClose={onClose} closeLabel={almanac.close} embedded={embedded}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -108,6 +158,19 @@ export function MuhuratScreen({
           </Pressable>
         ))}
       </ScrollView>
+      {lockedExtra ? (
+        <Pressable
+          onPress={() => {
+            tapHaptic();
+            void onUnlock?.();
+          }}
+          style={styles.unlock}
+        >
+          <Text style={styles.unlockText}>
+            {language === 'hi' ? 'साठ दिन का मुहूर्त खोलो' : 'Open the sixty-day window'}
+          </Text>
+        </Pressable>
+      ) : null}
       <ScrollView contentContainerStyle={styles.body}>
         <StatusBlock
           copy={copy}
@@ -120,12 +183,12 @@ export function MuhuratScreen({
         />
         {best ? (
           <>
-            <DateRow row={best} copy={copy} hero />
+            <DateRow row={best} copy={copy} language={language} hero />
             <ShareImageCard
               kicker={
                 language === 'hi' ? `${eventLabel} के लिए सबसे अच्छी तारीख` : `Best date for ${eventLabel}`
               }
-              title={best.date}
+              title={formatDateLabel(best.date, language)}
               lines={[`${almanac.score} ${best.score}`, best.reason, city ? cityLabel(city, language) : '']}
               shareLabel={almanac.shareImage}
               language={language}
@@ -134,7 +197,7 @@ export function MuhuratScreen({
           </>
         ) : null}
         {rows.slice(1).map((row) => (
-          <DateRow key={row.date} row={row} copy={copy} />
+          <DateRow key={row.date} row={row} copy={copy} language={language} />
         ))}
       </ScrollView>
     </Sheet>
@@ -142,6 +205,16 @@ export function MuhuratScreen({
 }
 
 const styles = StyleSheet.create({
+  unlock: {
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  unlockText: { color: color.gold, fontSize: 13, fontWeight: '700' },
   chips: { gap: 8, paddingVertical: 16, flexDirection: 'row' },
   chip: {
     borderRadius: 999,
@@ -169,7 +242,7 @@ const styles = StyleSheet.create({
   rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
   date: { color: color.ivory, fontSize: 18, fontWeight: '600' },
   heroDate: { fontSize: 22 },
-  rating: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase' },
+  rating: { fontSize: 12, fontWeight: '800', letterSpacing: 0.4 },
   score: { color: color.gold, fontSize: 22, fontWeight: '700' },
   heroScore: { color: color.ivory, fontSize: 56, fontWeight: '300', lineHeight: 62 },
   scoreMeta: { color: color.ivoryDim, fontSize: 14, fontWeight: '600' },

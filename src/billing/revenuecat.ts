@@ -1,6 +1,8 @@
 import { getRevenueCatApiKey } from '../config/env';
 import type { CreditWallet } from './credits';
-import { PRODUCTS } from './products';
+import { ENTITLEMENTS, PRODUCTS } from './products';
+
+export const STORE_LATER = 'store_later';
 
 type CustomerInfo = {
   entitlements: {
@@ -61,17 +63,23 @@ export async function syncEntitlements(
   }
 }
 
+function activePro(info: CustomerInfo) {
+  const active = info.entitlements.active;
+  return (
+    active[ENTITLEMENTS.pro] ??
+    active[ENTITLEMENTS.monthly] ??
+    active[ENTITLEMENTS.annual] ??
+    active[PRODUCTS.monthly] ??
+    active[PRODUCTS.annual]
+  );
+}
+
 export async function applyCustomerInfo(
   wallet: CreditWallet,
   info: CustomerInfo,
 ): Promise<void> {
-  const monthly =
-    info.entitlements.active.monthly_asks ??
-    info.entitlements.active[PRODUCTS.monthly];
-  await wallet.setMonthly(
-    Boolean(monthly),
-    monthly?.latestPurchaseDate ?? null,
-  );
+  const pro = activePro(info);
+  await wallet.setMonthly(Boolean(pro), pro?.latestPurchaseDate ?? null);
 
   for (const tx of info.nonSubscriptionTransactions ?? []) {
     if (tx.productIdentifier === PRODUCTS.pack) {
@@ -84,6 +92,10 @@ export async function purchaseMonthly(): Promise<CustomerInfo | null> {
   return purchaseByProduct(PRODUCTS.monthly);
 }
 
+export async function purchaseAnnual(): Promise<CustomerInfo | null> {
+  return purchaseByProduct(PRODUCTS.annual);
+}
+
 export async function purchasePack(): Promise<CustomerInfo | null> {
   return purchaseByProduct(PRODUCTS.pack);
 }
@@ -91,9 +103,7 @@ export async function purchasePack(): Promise<CustomerInfo | null> {
 export async function restorePurchases(): Promise<CustomerInfo | null> {
   const client = await initPurchases();
   if (!client) {
-    throw new Error(
-      'Purchases are not configured. Set EXPO_PUBLIC_REVENUECAT_API_KEY on a store build.',
-    );
+    throw new Error(STORE_LATER);
   }
   return client.restorePurchases();
 }
@@ -101,16 +111,14 @@ export async function restorePurchases(): Promise<CustomerInfo | null> {
 async function purchaseByProduct(productId: string): Promise<CustomerInfo | null> {
   const client = await initPurchases();
   if (!client) {
-    throw new Error(
-      'Purchases are not configured. Set EXPO_PUBLIC_REVENUECAT_API_KEY on a store build.',
-    );
+    throw new Error(STORE_LATER);
   }
   const offerings = await client.getOfferings();
   const pkg = offerings.current?.availablePackages?.find(
     (item) => item.product.identifier === productId,
   );
   if (!pkg) {
-    throw new Error(`Store product ${productId} is not in the current offering.`);
+    throw new Error(STORE_LATER);
   }
   const result = await client.purchasePackage(pkg);
   return result.customerInfo;

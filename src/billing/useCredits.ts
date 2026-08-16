@@ -3,12 +3,13 @@ import { isDevUnlock } from '../config/env';
 import { CreditWallet } from './credits';
 import {
   applyCustomerInfo,
+  purchaseAnnual,
   purchaseMonthly,
   purchasePack,
   restorePurchases,
   syncEntitlements,
 } from './revenuecat';
-import { createAsyncStorageStore } from './store';
+import { createAppCreditStore } from './supabaseStore';
 
 export function useCredits() {
   const [wallet, setWallet] = useState<CreditWallet | null>(null);
@@ -18,7 +19,7 @@ export function useCredits() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const next = await CreditWallet.open(createAsyncStorageStore(), {
+      const next = await CreditWallet.open(await createAppCreditStore(), {
         devUnlock: isDevUnlock(),
       });
       await syncEntitlements(next);
@@ -43,6 +44,13 @@ export function useCredits() {
     refresh();
   }, [wallet, refresh]);
 
+  const buyAnnual = useCallback(async () => {
+    if (!wallet) return;
+    const info = await purchaseAnnual();
+    if (info) await applyCustomerInfo(wallet, info);
+    refresh();
+  }, [wallet, refresh]);
+
   const buyPack = useCallback(async () => {
     if (!wallet) return;
     const info = await purchasePack();
@@ -63,6 +71,7 @@ export function useCredits() {
     ready,
     refresh,
     buyMonthly,
+    buyAnnual,
     buyPack,
     restore,
   };

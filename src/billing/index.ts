@@ -1,7 +1,9 @@
 export { CreditWallet, MemoryCreditStore, remainingAsks } from './credits';
+export { createAppCreditStore, SupabaseCreditStore } from './supabaseStore';
 export { Paywall } from './Paywall';
 export { PRODUCTS } from './products';
 export {
+  purchaseAnnual,
   purchaseMonthly,
   purchasePack,
   restorePurchases,

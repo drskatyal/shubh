@@ -1,7 +1,18 @@
 import type { ExpoConfig } from 'expo/config';
 
+/** Keep in sync with src/store/aso.ts. Avoid importing TS from this CJS config. */
+const playHiTitle = 'शुभ: पंचांग और कुंडली';
+const playHiShort = 'आज का पंचांग, rahukaal, guna milan, muhurat';
+const appleEnTitle = 'Shubh: Panchang & Kundli';
+const storeScreenshots = [
+  'feature-graphic.png',
+  '01-milan-score-ring.png',
+  '02-today-panchang.png',
+  '03-marriage-muhurat.png',
+];
+
 const micPermission =
-  'Shubh listens to your question so it can map the task onto today’s sky. Audio is sent to Gemini for that ask, then discarded.';
+  'Shubh listens so it can record both births or your ask. Audio is used once, then discarded.';
 
 const config: ExpoConfig = {
   name: 'Shubh',
@@ -11,6 +22,11 @@ const config: ExpoConfig = {
   icon: './assets/icon.png',
   userInterfaceStyle: 'dark',
   scheme: 'shubh',
+  description: playHiShort,
+  locales: {
+    en: './store/locales/en.json',
+    hi: './store/locales/hi.json',
+  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'ai.flowrad.shubh',
@@ -18,6 +34,7 @@ const config: ExpoConfig = {
       'com.apple.security.application-groups': ['group.ai.flowrad.shubh'],
     },
     infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
       NSLocationWhenInUseUsageDescription:
         'Shubh uses your location only to compute local sunrise and today’s sky windows.',
       NSLocationAlwaysAndWhenInUseUsageDescription:
@@ -90,11 +107,27 @@ const config: ExpoConfig = {
     eas: {
       projectId: '00000000-0000-0000-0000-000000000000',
     },
-    GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? '',
     REVENUECAT_API_KEY:
       process.env.REVENUECAT_API_KEY ?? process.env.EXPO_PUBLIC_REVENUECAT_API_KEY ?? '',
-    TATHAASTU_PROXY_URL:
-      process.env.EXPO_PUBLIC_TATHAASTU_PROXY_URL ?? process.env.TATHAASTU_PROXY_URL ?? '',
+    DIVINE_PROXY_URL:
+      process.env.EXPO_PUBLIC_DIVINE_PROXY_URL ?? process.env.DIVINE_PROXY_URL ?? '',
+    ASK_PROXY_URL:
+      process.env.EXPO_PUBLIC_ASK_PROXY_URL ??
+      process.env.ASK_PROXY_URL ??
+      process.env.EXPO_PUBLIC_DIVINE_PROXY_URL ??
+      process.env.DIVINE_PROXY_URL ??
+      '',
+    SHUBH_DEV_UNLOCK: process.env.EXPO_PUBLIC_SHUBH_DEV_UNLOCK ?? '0',
+    SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
+    SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
+    store: {
+      primary: 'play',
+      defaultPlayLocale: 'hi-IN',
+      playTitle: playHiTitle,
+      appleTitle: appleEnTitle,
+      featureGraphic: 'feature-graphic.png',
+      screenshots: storeScreenshots,
+    },
   },
 };
 

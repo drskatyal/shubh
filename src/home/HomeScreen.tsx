@@ -11,23 +11,37 @@ import {
 
 import { AlmanacDock, type AlmanacTab } from '../almanac/AlmanacDock';
 import { AlmanacHost } from '../almanac/AlmanacHost';
-import { AskFAB, AskSheet } from '../ask';
-import { useCredits } from '../billing';
+import { AskFAB, AskPage } from '../ask';
+import { Paywall, useCredits } from '../billing';
+import { LegalScreen, type LegalPage } from '../legal';
+import { PREVIEW_ASK_TURN } from '../preview/fixtures';
+import { readShotId } from '../preview/shot';
 import { getSkyState, type SkyState } from '../engine';
 import { useLanguage } from '../i18n/language';
 import { choghadiyaLabel, pakshaLabel, windowLabel } from '../i18n/strings';
+import { loadLastChart, loadLastMatch } from '../kundli/storage';
 import { cityLabel } from '../location/cities';
 import { usePlace } from '../location/usePlace';
-import { SkyBackdrop, useReduceMotion, useVerdictBeat } from '../motion';
+import { useReduceMotion, useSkyLayer, useVerdictBeat } from '../motion';
 import { readCachedDay, writeCachedDay } from '../panchang/cacheDay';
 import { loadLiveDay } from '../panchang/loadDay';
 import { todayIso } from '../tathaastu/dates';
-import type { NormalizedDay } from '../tathaastu/types';
+import type { ChartAskSummary, NormalizedDay, NormalizedMatch } from '../tathaastu/types';
 import { color } from '../theme/tokens';
 import { StatusBlock } from '../ui/StatusBlock';
 import { tapHaptic } from '../ui/haptics';
 import { syncGlance } from '../widget/syncGlance';
+import { isWebRuntime } from '../web/platform';
+import {
+  almanacTabForLevel,
+  isLegalLevel,
+  levelForAlmanacTab,
+  pushWebLevel,
+  readWebLevel,
+} from '../web/route';
+import { useTempleLayout } from '../web/temple';
 import { CitySearch } from './CitySearch';
+import { FirstOpenSheet } from './FirstOpenSheet';
 import { toMotionVerdict, toMotionWindow } from './motionWindow';
 import { ShareCard } from './ShareCard';
 import { buildShareCard } from './shareDay';
@@ -80,21 +94,37 @@ function TimingChip({
 }
 
 export function HomeScreen() {
-  const { language, copy, setLanguage } = useLanguage();
+  const { language, copy, setLanguage, chosen } = useLanguage();
   const place = usePlace();
   const credits = useCredits();
   const reduceMotion = useReduceMotion();
-  const { intensity, activeVerdict, playVerdict } = useVerdictBeat(reduceMotion);
+  const { activeVerdict, playVerdict } = useVerdictBeat(reduceMotion);
+  const skyLayer = useSkyLayer();
+  const { temple } = useTempleLayout();
   const [now, setNow] = useState(() => new Date());
   const [searchOpen, setSearchOpen] = useState(false);
-  const [askOpen, setAskOpen] = useState(false);
-  const [almanac, setAlmanac] = useState<AlmanacTab | null>(null);
+  const shot = readShotId();
+  const [askOpen, setAskOpen] = useState(() => shot === 'ask');
+  const [almanac, setAlmanac] = useState<AlmanacTab | null>(() => {
+    if (shot === 'match' || shot === 'confirm' || shot === 'milan') return 'match';
+    if (shot === 'muhurat') return 'muhurat';
+    if (shot === 'festivals') return 'festivals';
+    if (shot === 'kundli') return 'kundli';
+    return null;
+  });
+  const [paywallOpen, setPaywallOpen] = useState(() => shot === 'paywall');
+  const [legal, setLegal] = useState<LegalPage | null>(() =>
+    shot === 'privacy' || shot === 'terms' || shot === 'support' ? shot : null,
+  );
+  const [menuOpen, setMenuOpen] = useState(false);
   const [day, setDay] = useState<NormalizedDay | null>(null);
   const [dayLoading, setDayLoading] = useState(false);
   const [daySetup, setDaySetup] = useState(false);
   const [dayFailed, setDayFailed] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [reload, setReload] = useState(0);
+  const [chartContext, setChartContext] = useState<ChartAskSummary | null>(null);
+  const [matchContext, setMatchContext] = useState<NormalizedMatch | null>(null);
   const cardRef = useRef<ViewType>(null);
 
   useEffect(() => {
@@ -103,10 +133,20 @@ export function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    if (!place.city && place.ready && !place.locating) {
-      setSearchOpen(true);
-    }
-  }, [place.city, place.ready, place.locating]);
+    if (!shot) return;
+    if (shot === 'match' || shot === 'confirm' || shot === 'milan') setAlmanac('match');
+    if (shot === 'muhurat') setAlmanac('muhurat');
+    if (shot === 'festivals') setAlmanac('festivals');
+    if (shot === 'kundli') setAlmanac('kundli');
+    if (shot === 'ask') setAskOpen(true);
+    if (shot === 'paywall') setPaywallOpen(true);
+    if (shot === 'privacy' || shot === 'terms' || shot === 'support') setLegal(shot);
+  }, [shot]);
+
+  useEffect(() => {
+    void loadLastChart().then(setChartContext);
+    void loadLastMatch().then(setMatchContext);
+  }, [askOpen]);
 
   const sky: SkyState | null = useMemo(() => {
     if (!place.city) return null;
@@ -158,6 +198,19 @@ export function HomeScreen() {
   }, [place.city, language, reload]);
 
   useEffect(() => {
+    if (!sky) {
+      skyLayer.setSky({ locale: language, waiting: dayLoading && !day });
+      return;
+    }
+    skyLayer.setSky({
+      windowKind: toMotionWindow(sky.currentWindow.name),
+      verdict: activeVerdict ?? toMotionVerdict(sky.startingSomethingNew),
+      locale: language,
+      waiting: dayLoading && !day,
+    });
+  }, [sky, language, dayLoading, day, askOpen, activeVerdict, skyLayer]);
+
+  useEffect(() => {
     if (!place.city || !sky || !day?.tithi?.name) return;
     void syncGlance({
       city: cityLabel(place.city, language),
@@ -168,6 +221,66 @@ export function HomeScreen() {
     });
   }, [place.city, sky, language, day]);
 
+  const firstOpen = (!chosen || !place.city) && (!shot || shot === 'firstopen');
+  const overlayOpen = Boolean(almanac || askOpen || paywallOpen || legal);
+  const hidePhoneChrome = overlayOpen && !temple || firstOpen;
+
+  useEffect(() => {
+    if (shot || !isWebRuntime()) return;
+    const apply = () => {
+      const level = readWebLevel();
+      setAlmanac(almanacTabForLevel(level));
+      setAskOpen(level === 'ask');
+      setPaywallOpen(level === 'paywall');
+      setLegal(isLegalLevel(level) ? level : null);
+    };
+    apply();
+    window.addEventListener('hashchange', apply);
+    window.addEventListener('popstate', apply);
+    return () => {
+      window.removeEventListener('hashchange', apply);
+      window.removeEventListener('popstate', apply);
+    };
+  }, [shot]);
+
+  const goHome = () => {
+    setAlmanac(null);
+    setAskOpen(false);
+    setPaywallOpen(false);
+    setLegal(null);
+    setMenuOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel('home');
+  };
+
+  const openAlmanac = (tab: AlmanacTab) => {
+    setAlmanac(tab);
+    setAskOpen(false);
+    setPaywallOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel(levelForAlmanacTab(tab));
+  };
+
+  const openAsk = () => {
+    setAlmanac(null);
+    setAskOpen(true);
+    setPaywallOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel('ask');
+  };
+
+  const openPaywall = () => {
+    setPaywallOpen(true);
+    setLegal(null);
+    setMenuOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel('paywall');
+  };
+
+  const openLegal = (page: LegalPage) => {
+    setLegal(page);
+    setPaywallOpen(false);
+    setAskOpen(false);
+    setAlmanac(null);
+    setMenuOpen(false);
+    if (isWebRuntime() && !shot) pushWebLevel(page);
+  };
   const remaining = sky ? new Date(sky.currentWindow.end).getTime() - now.getTime() : 0;
   const cityName = place.city ? cityLabel(place.city, language) : '';
   const heroName = day?.tithi?.name ?? (sky ? windowLabel(language, sky.currentWindow.name) : '');
@@ -188,7 +301,7 @@ export function HomeScreen() {
     tapHaptic();
     setSharing(true);
     try {
-      await sharePanchang(copy.appName, () => captureViewPng(cardRef.current));
+      await sharePanchang(copy.appName, () => captureViewPng(cardRef.current), card ?? undefined);
     } catch {
       // Capture can fail in Expo Go; the 1:1 card stays on screen.
     } finally {
@@ -198,41 +311,83 @@ export function HomeScreen() {
 
   return (
     <View style={styles.root}>
-      {sky ? (
-        <SkyBackdrop
-          windowKind={toMotionWindow(sky.currentWindow.name)}
-          verdict={activeVerdict ?? toMotionVerdict(sky.startingSomethingNew)}
-          locale={language}
-          beatIntensity={intensity}
-          beatVerdict={activeVerdict}
-        />
-      ) : null}
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.top}>
-          <Pressable onPress={() => setSearchOpen(true)} hitSlop={8} style={styles.cityHit}>
-            <Text style={styles.brand}>{copy.appName}</Text>
-            <Text style={styles.city}>
-              {place.city ? cityName : copy.citySearch} ▾
-            </Text>
-          </Pressable>
-          <View style={styles.seg}>
-            <Pressable
-              onPress={() => setLanguage('hi')}
-              style={[styles.segBtn, language === 'hi' && styles.segOn]}
-            >
-              <Text style={[styles.segText, language === 'hi' && styles.segTextOn]}>{copy.hindi}</Text>
+      <SafeAreaView style={[styles.safe, temple && styles.templeSafe]}>
+        <View style={temple ? styles.templeRow : styles.phoneStack}>
+        {!hidePhoneChrome ? (
+          <View style={temple ? styles.leftRail : styles.top}>
+            <Pressable onPress={() => setSearchOpen(true)} hitSlop={8} style={styles.cityHit}>
+              <Text style={styles.brand}>{copy.appName}</Text>
+              <Text style={styles.city}>
+                {place.city ? cityName : copy.citySearch} ▾
+              </Text>
             </Pressable>
             <Pressable
-              onPress={() => setLanguage('en')}
-              style={[styles.segBtn, language === 'en' && styles.segOn]}
+              onPress={openPaywall}
+              style={styles.payChip}
+              accessibilityRole="button"
+              accessibilityLabel={language === 'hi' ? 'शुभ खोलो' : 'Open Shubh'}
             >
-              <Text style={[styles.segText, language === 'en' && styles.segTextOn]}>{copy.english}</Text>
+              <Text style={styles.payChipText}>{language === 'hi' ? 'शुभ' : 'Shubh'}</Text>
+            </Pressable>
+            <View style={styles.seg}>
+              <Pressable
+                onPress={() => setLanguage('hi')}
+                style={[styles.segBtn, language === 'hi' && styles.segOn]}
+              >
+                <Text style={[styles.segText, language === 'hi' && styles.segTextOn]}>{copy.hindi}</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setLanguage('en')}
+                style={[styles.segBtn, language === 'en' && styles.segOn]}
+              >
+                <Text style={[styles.segText, language === 'en' && styles.segTextOn]}>{copy.english}</Text>
+              </Pressable>
+            </View>
+            <Pressable
+              onPress={() => setMenuOpen((open) => !open)}
+              style={styles.moreHit}
+              accessibilityRole="button"
+              accessibilityLabel={copy.more}
+            >
+              <Text style={styles.moreMark}>⋯</Text>
             </Pressable>
           </View>
-        </View>
+        ) : null}
+        {menuOpen && !hidePhoneChrome ? (
+          <View style={styles.menu}>
+            {(
+              [
+                ['privacy', copy.privacy],
+                ['terms', copy.terms],
+                ['support', copy.support],
+              ] as const
+            ).map(([page, label]) => (
+              <Pressable key={page} onPress={() => openLegal(page)} style={styles.menuRow}>
+                <Text style={styles.menuText}>{label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
 
-        {sky ? (
+        <View style={temple ? styles.sanctum : styles.phoneMain}>
+        {firstOpen ? (
+          <FirstOpenSheet
+            copy={copy}
+            language={language}
+            locating={place.locating}
+            denied={place.denied}
+            onLanguage={setLanguage}
+            onUsePlace={() => {
+              void place.requestLocation();
+            }}
+            onSelectCity={(city) => {
+              if (!chosen) setLanguage(language);
+              place.setCity(city);
+            }}
+          />
+        ) : sky ? (
           <>
+            {!overlayOpen ? (
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
               <View style={styles.hero}>
                 <Text style={styles.heroName}>{heroName}</Text>
@@ -317,13 +472,15 @@ export function HomeScreen() {
                 ) : null}
               </View>
 
-              <StatusBlock
-                copy={copy}
-                loading={dayLoading && !day}
-                setup={daySetup && !day}
-                failed={dayFailed && !day}
-                onRetry={() => setReload((n) => n + 1)}
-              />
+              {!shot ? (
+                <StatusBlock
+                  copy={copy}
+                  setup={daySetup && !day}
+                  failed={dayFailed && !day}
+                  onRetry={() => setReload((n) => n + 1)}
+                  locale={language}
+                />
+              ) : null}
 
               {card ? (
                 <>
@@ -338,53 +495,91 @@ export function HomeScreen() {
                     <Text style={styles.shareCtaText}>{sharing ? '…' : copy.shareToday}</Text>
                   </Pressable>
                   <View style={styles.cardWrap} ref={cardRef} collapsable={false}>
-                    <ShareCard card={card} />
+                    <ShareCard card={card} branded={!credits.wallet?.isPro()} />
                   </View>
                 </>
               ) : null}
             </ScrollView>
-            <View style={styles.dock}>
-              <AlmanacDock copy={copy} onOpen={setAlmanac} />
-              <AskFAB
-                remaining={credits.remaining}
-                language={language}
-                onPress={() => setAskOpen(true)}
-              />
-            </View>
-            <AskSheet
+            ) : null}
+            <AskPage
               visible={askOpen}
-              onClose={() => setAskOpen(false)}
+              onClose={goHome}
               sky={sky}
               language={language}
               wallet={credits.wallet}
               onRemainingChange={credits.refresh}
               onBuyMonthly={credits.buyMonthly}
+              onBuyAnnual={credits.buyAnnual}
               onBuyPack={credits.buyPack}
               onRestore={credits.restore}
               onVerdict={(verdict) => playVerdict(verdict)}
+              initialTurns={shot === 'ask' ? [PREVIEW_ASK_TURN] : undefined}
               dayContext={day}
+              chartContext={chartContext}
+              matchContext={matchContext}
+              copy={copy}
+              defaultCity={place.city}
+              onMatch={setMatchContext}
+              embedded={temple}
             />
           </>
-        ) : (
+        ) : overlayOpen ? null : (
           <View style={styles.empty}>
             <Text style={styles.emptyText}>{place.locating ? copy.locating : copy.citySearch}</Text>
           </View>
         )}
 
-        <Text style={styles.privacy}>{copy.privacyLocation}</Text>
+        {overlayOpen || firstOpen ? (
+          <View style={styles.overlayHold} />
+        ) : (
+          <Text style={styles.privacy}>{copy.privacyLocation}</Text>
+        )}
 
         <AlmanacHost
           tab={almanac}
-          onClose={() => setAlmanac(null)}
+          onClose={goHome}
           city={place.city}
           language={language}
           copy={copy}
           wallet={credits.wallet}
           onRemainingChange={credits.refresh}
           onBuyMonthly={credits.buyMonthly}
+          onBuyAnnual={credits.buyAnnual}
           onBuyPack={credits.buyPack}
           onRestore={credits.restore}
+          onOpenPaywall={openPaywall}
+          shot={shot}
+          sky={sky}
+          dayContext={day}
+          onMatch={setMatchContext}
+          embedded={temple}
         />
+
+        {paywallOpen ? (
+          <Paywall
+            language={language}
+            remaining={credits.remaining}
+            onBuyMonthly={credits.buyMonthly}
+            onBuyAnnual={credits.buyAnnual}
+            onBuyPack={credits.buyPack}
+            onRestore={credits.restore}
+            onClose={goHome}
+            onOpenLegal={openLegal}
+            embedded={temple}
+          />
+        ) : null}
+        {legal ? (
+          <LegalScreen page={legal} language={language} onClose={goHome} embedded={temple} />
+        ) : null}
+        </View>
+
+        {!hidePhoneChrome ? (
+          <View style={temple ? styles.rightRail : styles.dock}>
+            <AlmanacDock copy={copy} onOpen={openAlmanac} vertical={temple} />
+            <AskFAB remaining={credits.remaining} language={language} onPress={openAsk} />
+          </View>
+        ) : null}
+        </View>
 
         <CitySearch
           visible={searchOpen}
@@ -407,14 +602,56 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.night },
+  root: { flex: 1, backgroundColor: 'transparent' },
   safe: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 20 },
+  templeSafe: { paddingHorizontal: 32, paddingVertical: 12 },
+  templeRow: { flex: 1, flexDirection: 'row', gap: 28 },
+  phoneStack: { flex: 1 },
+  phoneMain: { flex: 1 },
+  sanctum: {
+    flex: 1,
+    minWidth: 0,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: 'rgba(232, 197, 120, 0.18)',
+    backgroundColor: 'rgba(6, 7, 14, 0.28)',
+    paddingHorizontal: 28,
+    paddingTop: 8,
+    overflow: 'hidden',
+  },
+  leftRail: {
+    width: 250,
+    paddingTop: 10,
+    gap: 16,
+    alignItems: 'flex-start',
+  },
+  rightRail: {
+    width: 196,
+    paddingTop: 28,
+    gap: 16,
+    alignItems: 'stretch',
+  },
   top: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingTop: 8,
+    gap: 6,
   },
+  moreHit: { paddingHorizontal: 6, paddingVertical: 4, marginTop: 2 },
+  moreMark: { color: color.gold, fontSize: 22, fontWeight: '700', lineHeight: 22 },
+  menu: {
+    alignSelf: 'flex-end',
+    backgroundColor: color.cardSolid,
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    borderRadius: 16,
+    paddingVertical: 6,
+    minWidth: 160,
+    zIndex: 18,
+  },
+  menuRow: { paddingHorizontal: 16, paddingVertical: 10 },
+  menuText: { color: color.ivory, fontSize: 15, fontWeight: '600' },
   cityHit: { flex: 1, paddingRight: 12 },
   brand: {
     color: color.gold,
@@ -424,6 +661,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   city: { color: color.ivory, fontSize: 26, fontWeight: '700', marginTop: 4 },
+  payChip: {
+    borderWidth: 1,
+    borderColor: color.goldLine,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginRight: 8,
+    marginTop: 4,
+  },
+  payChipText: { color: color.gold, fontSize: 12, fontWeight: '800', letterSpacing: 1 },
   seg: {
     flexDirection: 'row',
     backgroundColor: 'rgba(10, 12, 22, 0.55)',
@@ -512,6 +759,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   cardWrap: { alignItems: 'center' },
+  overlayHold: { flex: 1 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   emptyText: { color: color.ivoryMuted, fontSize: 16 },
   dock: { alignItems: 'center', paddingBottom: 16, gap: 14 },
