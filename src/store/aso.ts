@@ -163,7 +163,29 @@ export const STORE_SCREENSHOTS = [
   },
 ] as const;
 
+export const LEGAL_ORIGIN = 'https://drskatyal.github.io/shubh';
+export const LEGAL_PRIVACY_URL = `${LEGAL_ORIGIN}/privacy.html`;
+export const LEGAL_TERMS_URL = `${LEGAL_ORIGIN}/terms.html`;
+export const LEGAL_SUPPORT_URL = `${LEGAL_ORIGIN}/support.html`;
+
 export const STORE_PHONE_SHOTS = STORE_SCREENSHOTS.filter((shot) => shot.kind !== 'feature');
+
+/** App Store Connect phone / iPad shots. Lead three first. Never Ask. */
+export const APPLE_IOS_SHOTS = [
+  { file: '01-milan-score-ring.png', shot: 'milan' },
+  { file: '02-today-panchang.png', shot: 'home' },
+  { file: '03-marriage-muhurat.png', shot: 'muhurat' },
+  { file: '04-first-open.png', shot: 'firstopen' },
+  { file: '05-festivals.png', shot: 'festivals' },
+  { file: '06-kundli.png', shot: 'kundli' },
+  { file: '07-paywall.png', shot: 'paywall' },
+] as const;
+
+export const APPLE_IOS_SIZES = {
+  '6.7': { width: 1320, height: 2868 },
+  '6.5': { width: 1290, height: 2796 },
+  ipad13: { width: 2064, height: 2752 },
+} as const;
 
 /** After the locked first three. Never in the Play lead slots. */
 export const STORE_OPTIONAL_SHOTS = [

@@ -56,14 +56,30 @@ describe('ask copy never names a model', () => {
     const privacy = readFileSync(new URL('../../../docs/PRIVACY.md', import.meta.url), 'utf8');
     const legal = readFileSync(new URL('../../legal/copy.ts', import.meta.url), 'utf8');
     const firstOpen = readFileSync(new URL('../../home/FirstOpenSheet.tsx', import.meta.url), 'utf8');
+    const asc = readFileSync(new URL('../../../store/ios/ASC.md', import.meta.url), 'utf8');
+    const appleEnJson = readFileSync(new URL('../../../store/ios/en-US.json', import.meta.url), 'utf8');
+    const appleHiJson = readFileSync(new URL('../../../store/ios/hi.json', import.meta.url), 'utf8');
+    const legalHtml = [
+      readFileSync(new URL('../../../legal/privacy.html', import.meta.url), 'utf8'),
+      readFileSync(new URL('../../../legal/terms.html', import.meta.url), 'utf8'),
+      readFileSync(new URL('../../../legal/support.html', import.meta.url), 'utf8'),
+      readFileSync(new URL('../../../legal/index.html', import.meta.url), 'utf8'),
+    ].join('\n');
     assert.doesNotMatch(aso, BANNED);
     assert.doesNotMatch(backend, BANNED);
     assert.doesNotMatch(submit, BANNED);
     assert.doesNotMatch(privacy, BANNED);
     assert.doesNotMatch(legal, BANNED);
     assert.doesNotMatch(firstOpen, BANNED);
+    assert.doesNotMatch(asc, BANNED);
+    assert.doesNotMatch(appleEnJson, BANNED);
+    assert.doesNotMatch(appleHiJson, BANNED);
+    assert.doesNotMatch(legalHtml, BANNED);
     assert.match(submit, /Closed testing in India/);
     assert.match(submit, /feature-graphic/);
+    assert.match(submit, /drskatyal\.github\.io\/shubh\/privacy\.html/);
+    assert.doesNotMatch(submit, /https:\/\/<host>/);
+    assert.match(appleEnJson, /No login/);
     assert.match(privacy, /Birth details|जन्म की बात/);
     assert.match(aso, /Shubh: Panchang & Kundli/);
     assert.match(aso, /01-milan/);

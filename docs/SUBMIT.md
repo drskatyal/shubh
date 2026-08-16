@@ -2,13 +2,14 @@
 
 Play first. Then Apple. The binary is this branch. You paste keys and listing copy. Do not invent store field names that mention a model.
 
-Public legal URLs (same app, hash routes):
+Public legal URLs (GitHub Pages, already in the repo as `legal/`):
 
-- `https://<host>/#/privacy`
-- `https://<host>/#/terms`
-- `https://<host>/#/support`
+- https://drskatyal.github.io/shubh/privacy.html
+- https://drskatyal.github.io/shubh/terms.html
+- https://drskatyal.github.io/shubh/support.html
+- https://drskatyal.github.io/shubh/
 
-`<host>` is the Expo web deploy or GitHub Pages later. Routes already work on `npm run web`.
+If those 404, turn on **GitHub Pages: source = GitHub Actions**. Workflow: `.github/workflows/pages.yml` (publishes `legal/` from this branch). In-app `#/privacy` `#/terms` `#/support` stay for the app; App Store Connect uses the github.io URLs.
 
 ---
 
@@ -19,9 +20,10 @@ Public legal URLs (same app, hash routes):
 - [x] First-open: city (“इसी जगह से”) + हिन्दी / English. No account wall
 - [x] Matching, muhurat (marriage / house / vehicle / business / property), festivals, kundli, Ask cards, paywall
 - [x] Play listing copy in `store/play/hi-IN.json` then `store/play/en-IN.json`
-- [x] Apple copy in `src/store/aso.ts` (`appleHi`, `appleEn`) and `docs/STORE-ASO.md`
-- [x] Feature graphic + screenshots in `store/play/` and `store/ios/`
-- [x] Privacy / terms / support in-app and `docs/PRIVACY.md`
+- [x] Apple paste pack in `store/ios/ASC.md`, `store/ios/en-US.json`, `store/ios/hi.json`
+- [x] Feature graphic + screenshots in `store/play/` and `store/ios/` (Apple 01–07, exact sizes)
+- [x] Privacy / terms / support in-app, `docs/PRIVACY.md`, and `legal/*.html`
+- [x] `ITSAppUsesNonExemptEncryption: false`
 - [x] Production EAS profile forces `EXPO_PUBLIC_SHUBH_DEV_UNLOCK=0`
 - [x] Supabase placeholders only. No live project
 
@@ -33,6 +35,7 @@ Public legal URLs (same app, hash routes):
 - [ ] `EXPO_PUBLIC_REVENUECAT_API_KEY`
 - [ ] Real EAS `projectId` in `app.config.ts` extra.eas (today it is the zero UUID)
 - [ ] Play + Apple listing paste from the files below
+- [ ] Turn on GitHub Pages (Actions) if github.io still 404s
 - [ ] Optional later: `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY` (app boots empty)
 
 Never put a service role key in the app.
@@ -72,7 +75,7 @@ Do not put Ask in the first three. Do not put a chat shot anywhere on the listin
 
 Data sold: **No**. Ads: **No**.
 
-9. Privacy policy URL: `https://<host>/#/privacy`
+9. Privacy policy URL: https://drskatyal.github.io/shubh/privacy.html
 10. IAP (RevenueCat placeholders — create in Play + RC):
 
 | Product | Play / RC id | Role |
@@ -85,21 +88,41 @@ Entitlements: `shubh_pro`, `monthly_asks`, `annual_asks`.
 
 ---
 
-## Apple (same binary, second)
+## Apple — App Store Connect walkthrough
 
-1. Name / subtitle / keywords / promo / description from `docs/STORE-ASO.md` (English first on App Store, Hindi as second locale).
-2. Screenshots from `store/ios/`:
+Open `store/ios/ASC.md`. Paste from `store/ios/en-US.json` (primary) then `store/ios/hi.json`.
 
-| Size | Folder | Lead shots |
-| --- | --- | --- |
-| 6.7" (1320×2868) | `store/ios/6.7/` | 01 milan, 02 panchang, 03 muhurat |
-| 6.5" (1290×2796) | `store/ios/6.5/` | same three |
-| iPad 13" (2064×2752) | `store/ios/ipad13/` | same three (tablet claimed) |
+1. **App Information → Name** ← `name` (en-US: `Shubh: Panchang & Kundli`).
+2. **Subtitle** ← `subtitle`.
+3. **Privacy Policy URL** ← `privacyUrl` = https://drskatyal.github.io/shubh/privacy.html
+4. **Category** ← primary **Lifestyle**, secondary **Reference**.
+5. **Copyright** ← `2026 Sanyam Katyal`.
+6. **Version → Promotional Text** ← `promotionalText`.
+7. **Description** ← `description`.
+8. **Keywords** ← `keywords`.
+9. **What’s New** ← `whatsNew`.
+10. **Support URL** ← `supportUrl` = https://drskatyal.github.io/shubh/support.html
+11. **Marketing URL** (optional) ← https://drskatyal.github.io/shubh/
+12. Add locale **Hindi** from `hi.json`. Keep English as the primary.
+13. **Age rating** → **4+**. Questionnaire: no unrestricted web, no UGC, no violence, no medical claims. Answers are in `en-US.json` → `ageRatingQuestionnaire`. Almanac, not a priest.
+14. **App Privacy** — same table as Play. No ATT. No tracking.
+15. **Export compliance** → **No** (does not use non-exempt encryption). `app.config.ts` already sets `ITSAppUsesNonExemptEncryption: false`.
+16. **Sign-In Information** → **No login.** Demo account: none.
+17. **Notes for Review** ← paste `reviewNotes` from `store/ios/en-US.json` (also written in `store/ios/ASC.md`). Do not add a model name.
+18. **In-App Purchases** — monthly `shubh_monthly_100`, yearly `shubh_annual_1200`, pack `shubh_credits_100`. Restore on the paywall.
+19. **Screenshots** from `store/ios/`, this order, all three sizes:
 
-3. Age rating **4+**. No UGC.
-4. Privacy nutrition: same table as Play.
-5. Support URL: `https://<host>/#/support`
-6. Privacy URL: `https://<host>/#/privacy`
+| Order | File | 6.7" | 6.5" | iPad 13" |
+| --- | --- | --- | --- | --- |
+| 1 | `01-milan-score-ring.png` | 1320×2868 | 1290×2796 | 2064×2752 |
+| 2 | `02-today-panchang.png` | same | same | same |
+| 3 | `03-marriage-muhurat.png` | same | same | same |
+| 4 | `04-first-open.png` | same | same | same |
+| 5 | `05-festivals.png` | same | same | same |
+| 6 | `06-kundli.png` | same | same | same |
+| 7 | `07-paywall.png` | same | same | same |
+
+Never upload Ask / chat.
 
 ---
 

@@ -34,6 +34,7 @@ const config: ExpoConfig = {
       'com.apple.security.application-groups': ['group.ai.flowrad.shubh'],
     },
     infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
       NSLocationWhenInUseUsageDescription:
         'Shubh uses your location only to compute local sunrise and today’s sky windows.',
       NSLocationAlwaysAndWhenInUseUsageDescription:

@@ -42,9 +42,27 @@ const devices = [
   { name: 'iphone', width: 390, height: 844, scale: 3, shots },
   { name: 'pixel', width: 412, height: 915, scale: 3, shots },
   { name: 'desktop', width: 1440, height: 900, scale: 2, shots },
-  { name: 'ios67', width: 440, height: 956, scale: 3, shots: ['milan', 'home', 'muhurat'] },
-  { name: 'ios65', width: 430, height: 932, scale: 3, shots: ['milan', 'home', 'muhurat'] },
-  { name: 'ipad13', width: 1032, height: 1376, scale: 2, shots: ['milan', 'home', 'muhurat'] },
+  {
+    name: 'ios67',
+    width: 440,
+    height: 956,
+    scale: 3,
+    shots: ['milan', 'home', 'muhurat', 'firstopen', 'festivals', 'kundli', 'paywall'],
+  },
+  {
+    name: 'ios65',
+    width: 430,
+    height: 932,
+    scale: 3,
+    shots: ['milan', 'home', 'muhurat', 'firstopen', 'festivals', 'kundli', 'paywall'],
+  },
+  {
+    name: 'ipad13',
+    width: 1032,
+    height: 1376,
+    scale: 2,
+    shots: ['milan', 'home', 'muhurat', 'firstopen', 'festivals', 'kundli', 'paywall'],
+  },
 ];
 
 const profile = mkdtempSync(join(tmpdir(), 'shubh-chrome-'));

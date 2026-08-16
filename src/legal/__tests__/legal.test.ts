@@ -19,6 +19,21 @@ describe('legal pages', () => {
     expect(legalBody('support', 'hi')).toMatch(/खरीद वापस/);
   });
 
+  it('ships a static github.io site with the same words', () => {
+    const privacy = readFileSync(new URL('../../../legal/privacy.html', import.meta.url), 'utf8');
+    const terms = readFileSync(new URL('../../../legal/terms.html', import.meta.url), 'utf8');
+    const support = readFileSync(new URL('../../../legal/support.html', import.meta.url), 'utf8');
+    const index = readFileSync(new URL('../../../legal/index.html', import.meta.url), 'utf8');
+    const pages = readFileSync(new URL('../../../.github/workflows/pages.yml', import.meta.url), 'utf8');
+    expect(privacy).toMatch(/जन्म की बात/);
+    expect(privacy).toMatch(/Birth details/);
+    expect(terms).toMatch(/almanac, not a priest/);
+    expect(support).toMatch(/खरीद वापस/);
+    expect(index).toMatch(/privacy\.html/);
+    expect(pages).toMatch(/path: legal/);
+    expect(`${privacy}${terms}${support}${index}`).not.toMatch(BANNED);
+  });
+
   it('is linked from paywall and home', () => {
     const paywall = readFileSync(new URL('../../billing/Paywall.tsx', import.meta.url), 'utf8');
     const home = readFileSync(new URL('../../home/HomeScreen.tsx', import.meta.url), 'utf8');

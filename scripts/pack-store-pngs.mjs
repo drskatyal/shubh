@@ -33,16 +33,23 @@ if (existsSync(join(ART, 'feature-graphic.png'))) {
   mustCopy(join(ART, 'feature-graphic.png'), join(PLAY, 'feature-graphic.png'));
 }
 
-const lead = [
+const iosShots = [
   ['milan', '01-milan-score-ring.png'],
   ['home', '02-today-panchang.png'],
   ['muhurat', '03-marriage-muhurat.png'],
+  ['firstopen', '04-first-open.png'],
+  ['festivals', '05-festivals.png'],
+  ['kundli', '06-kundli.png'],
+  ['paywall', '07-paywall.png'],
 ];
 
-for (const [shot, file] of lead) {
+for (const [shot, file] of iosShots) {
   mustCopy(join(ART, `ios67-${shot}.png`), join(IOS, '6.7', file));
   mustCopy(join(ART, `ios65-${shot}.png`), join(IOS, '6.5', file));
   mustCopy(join(ART, `ipad13-${shot}.png`), join(IOS, 'ipad13', file));
 }
+
+const { assertIosSizes } = await import('./assert-ios-sizes.mjs');
+assertIosSizes();
 
 console.log('store pngs packed');

@@ -13,6 +13,8 @@ import {
   STORE_BANNED,
   STORE_PHONE_SHOTS,
   STORE_SCREENSHOTS,
+  LEGAL_PRIVACY_URL,
+  LEGAL_SUPPORT_URL,
   appleEn,
   appleHi,
   assertStoreLimits,
@@ -146,5 +148,41 @@ describe('store ASO', () => {
     expect(frames).toMatch(/ScoreCard/);
     expect(frames).toMatch(/ShareCard/);
     expect(frames).toMatch(/Marriage muhurat/);
+  });
+
+  it('ships App Store Connect paste files with github.io URLs', () => {
+    const en = JSON.parse(
+      readFileSync(new URL('../../../store/ios/en-US.json', import.meta.url), 'utf8'),
+    ) as typeof appleEn & {
+      privacyUrl: string;
+      supportUrl: string;
+      reviewNotes: string;
+      demoAccount: string;
+      primaryCategory: string;
+      copyright: string;
+    };
+    const hi = JSON.parse(
+      readFileSync(new URL('../../../store/ios/hi.json', import.meta.url), 'utf8'),
+    ) as typeof appleHi;
+    expect(en.name).toBe(appleEn.title);
+    expect(en.subtitle).toBe(appleEn.subtitle);
+    expect(en.keywords).toBe(appleEn.keywords);
+    expect(en.promotionalText).toBe(appleEn.promotionalText);
+    expect(en.description).toBe(appleEn.description);
+    expect(hi.name).toBe(appleHi.title);
+    expect(hi.subtitle).toBe(appleHi.subtitle);
+    expect(en.privacyUrl).toBe(LEGAL_PRIVACY_URL);
+    expect(en.supportUrl).toBe(LEGAL_SUPPORT_URL);
+    expect(en.demoAccount).toBe('No login.');
+    expect(en.primaryCategory).toBe('Lifestyle');
+    expect(en.copyright).toBe('2026 Sanyam Katyal');
+    expect(en.reviewNotes).toMatch(/No login/);
+    expect(en.reviewNotes).toMatch(/connect later/);
+    expect(en.reviewNotes).not.toMatch(STORE_BANNED);
+    const config = readFileSync(new URL('../../../app.config.ts', import.meta.url), 'utf8');
+    expect(config).toMatch(/ITSAppUsesNonExemptEncryption:\s*false/);
+    const submit = readFileSync(new URL('../../../docs/SUBMIT.md', import.meta.url), 'utf8');
+    expect(submit).toMatch(/drskatyal\.github\.io\/shubh\/privacy\.html/);
+    expect(submit).not.toMatch(/https:\/\/<host>/);
   });
 });
